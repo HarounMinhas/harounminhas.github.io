@@ -1,41 +1,22 @@
 function App() {
   return (
     <>
-      <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-dark">
-        <div className="container">
-          <a className="navbar-brand logo" href="#">Haroun Minhas</a>
-          <button
-            className="navbar-toggler"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-          >
-            <span className="visually-hidden">Toggle navigation</span>
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div id="navbarNav" className="collapse navbar-collapse">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item"><a className="nav-link active" href="/index.html">Home</a></li>
-              <li className="nav-item"><a className="nav-link" href="/projects-grid-cards.html">Projects</a></li>
-              <li className="nav-item"><a className="nav-link" href="/cv.html">CV</a></li>
-              <li className="nav-item"><a className="nav-link" href="/hire-me.html">Hire me</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+        <Navbar active="home" />
       <main className="page" style={{marginTop: '56px'}}>
         <section className="portfolio-block block-intro">
           <div className="container text-center">
-            <div
-              className="avatar mx-auto mb-3"
-              style={{
-                width: '120px',
-                height: '120px',
-                borderRadius: '50%',
-                backgroundImage: "url('https://avatars.githubusercontent.com/u/152099124?v=4')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            ></div>
+              <ImageWithFallback
+                className="avatar mx-auto mb-3"
+                src="https://avatars.githubusercontent.com/u/152099124?v=4"
+                fallback={PLACEHOLDER_120}
+                alt="Haroun Minhas"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }}
+              />
             <div className="about-me">
               <p>
                 Hello! I am <strong>Haroun Minhas</strong> from Ostend, Belgium. I have a
@@ -50,15 +31,15 @@ function App() {
         <section className="portfolio-block photography">
           <div className="container">
             <div className="row g-0">
-              <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                <a href="#"><img className="img-fluid image" src="https://picsum.photos/600/400?random=1" /></a>
-              </div>
-              <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                <a href="#"><img className="img-fluid image" src="https://picsum.photos/600/400?random=2" /></a>
-              </div>
-              <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                <a href="#"><img className="img-fluid image" src="https://picsum.photos/600/400?random=3" /></a>
-              </div>
+                <div className="col-md-6 col-lg-4 item zoom-on-hover">
+                  <a href="#"><ImageWithFallback className="img-fluid image" src="https://picsum.photos/600/400?random=1" fallback={PLACEHOLDER_600x400} alt="Sample work 1" /></a>
+                </div>
+                <div className="col-md-6 col-lg-4 item zoom-on-hover">
+                  <a href="#"><ImageWithFallback className="img-fluid image" src="https://picsum.photos/600/400?random=2" fallback={PLACEHOLDER_600x400} alt="Sample work 2" /></a>
+                </div>
+                <div className="col-md-6 col-lg-4 item zoom-on-hover">
+                  <a href="#"><ImageWithFallback className="img-fluid image" src="https://picsum.photos/600/400?random=3" fallback={PLACEHOLDER_600x400} alt="Sample work 3" /></a>
+                </div>
             </div>
           </div>
         </section>
@@ -131,33 +112,23 @@ function App() {
               </p>
             </div>
             <div className="col-md-12 col-lg-5">
-              <div className="portfolio-laptop-mockup">
-                <div className="screen">
-                  <div
-                    className="screen-content"
-                    style={{ backgroundImage: "url('https://picsum.photos/800/600?random=4')" }}
-                  ></div>
+                <div className="portfolio-laptop-mockup">
+                  <div className="screen">
+                    <ImageWithFallback
+                      className="screen-content"
+                      src="https://picsum.photos/800/600?random=4"
+                      fallback={PLACEHOLDER_800x600}
+                      alt="Tapp Project screenshot"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div className="keyboard"></div>
                 </div>
-                <div className="keyboard"></div>
-              </div>
             </div>
           </div>
         </div>
       </section>
-      <footer className="page-footer py-3 border-top">
-        <div className="container my-4">
-          <div className="links">
-            <a href="#">About me</a>
-            <a href="#">Contact me</a>
-            <a href="#">Projects</a>
-          </div>
-          <div className="social-icons">
-            <a className="me-3" href="#"><i className="icon ion-social-facebook"></i></a>
-            <a className="me-3" href="#"><i className="icon ion-social-instagram-outline"></i></a>
-            <a className="me-3" href="#"><i className="icon ion-social-twitter"></i></a>
-          </div>
-        </div>
-      </footer>
+        <Footer />
     </>
   );
 }
