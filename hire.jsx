@@ -1,31 +1,16 @@
 function App() {
   return (
     <>
-      <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-dark">
-        <div className="container">
-          <a className="navbar-brand logo" href="#">Haroun Minhas</a>
-          <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span className="visually-hidden">Toggle navigation</span>
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div id="navbarNav" className="collapse navbar-collapse">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item"><a className="nav-link" href="/index.html">Home</a></li>
-              <li className="nav-item"><a className="nav-link" href="/projects-grid-cards.html">Projects</a></li>
-              <li className="nav-item"><a className="nav-link" href="/cv.html">CV</a></li>
-              <li className="nav-item"><a className="nav-link active" href="/hire-me.html">Hire me</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+        <Navbar active="hire" />
       <main className="page" style={{marginTop: '56px'}}>
         <section className="portfolio-block hire-me">
           <div className="container">
-            <img
-              className="img-fluid rounded mb-4"
-              src="https://picsum.photos/800/200?random=5"
-              alt="workspace"
-            />
+              <ImageWithFallback
+                className="img-fluid rounded mb-4"
+                src="https://picsum.photos/800/200?random=5"
+                fallback={PLACEHOLDER_800x200}
+                alt="Workspace"
+              />
             <div className="heading">
               <h2>Hire Me</h2>
             </div>
@@ -61,20 +46,7 @@ function App() {
           </div>
         </section>
       </main>
-      <footer className="page-footer py-3 border-top">
-        <div className="container my-4">
-          <div className="links">
-            <a href="#">About me</a>
-            <a href="#">Contact me</a>
-            <a href="#">Projects</a>
-          </div>
-          <div className="social-icons">
-            <a className="me-3" href="#"><i className="icon ion-social-facebook"></i></a>
-            <a className="me-3" href="#"><i className="icon ion-social-instagram-outline"></i></a>
-            <a className="me-3" href="#"><i className="icon ion-social-twitter"></i></a>
-          </div>
-        </div>
-      </footer>
+        <Footer />
     </>
   );
 }
