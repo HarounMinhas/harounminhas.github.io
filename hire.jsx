@@ -3,7 +3,7 @@ function App() {
     <>
       <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-dark">
         <div className="container">
-          <a className="navbar-brand logo" href="#">Brand</a>
+          <a className="navbar-brand logo" href="#">Haroun Minhas</a>
           <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span className="visually-hidden">Toggle navigation</span>
             <span className="navbar-toggler-icon"></span>
@@ -21,6 +21,11 @@ function App() {
       <main className="page" style={{marginTop: '56px'}}>
         <section className="portfolio-block hire-me">
           <div className="container">
+            <img
+              className="img-fluid rounded mb-4"
+              src="https://picsum.photos/800/200?random=5"
+              alt="workspace"
+            />
             <div className="heading">
               <h2>Hire Me</h2>
             </div>
@@ -28,11 +33,9 @@ function App() {
               <div className="mb-3">
                 <label className="form-label" htmlFor="subject">Subject</label>
                 <select id="subject" className="form-select">
-                  <optgroup label="This is a group">
-                    <option value="12" selected>This is item 1</option>
-                    <option value="13">This is item 2</option>
-                    <option value="14">This is item 3</option>
-                  </optgroup>
+                  <option>Web Development</option>
+                  <option>Consulting</option>
+                  <option>Training</option>
                 </select>
               </div>
               <div className="mb-3">

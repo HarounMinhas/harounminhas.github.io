@@ -1,0 +1,13 @@
+body {
+  background-color: #343a40;
+  color: #f8f9fa;
+}
+
+.navbar.gradient {
+  background: linear-gradient(135deg, #495057, #343a40);
+}
+
+.footer, .page-footer {
+  background-color: #343a40;
+}
+

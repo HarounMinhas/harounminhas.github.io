@@ -1,9 +1,18 @@
 function App() {
+  const [repos, setRepos] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch('https://api.github.com/users/HarounMinhas/repos')
+      .then(res => res.json())
+      .then(setRepos)
+      .catch(console.error);
+  }, []);
+
   return (
     <>
       <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-dark">
         <div className="container">
-          <a className="navbar-brand logo" href="#">Brand</a>
+          <a className="navbar-brand logo" href="#">Haroun Minhas</a>
           <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span className="visually-hidden">Toggle navigation</span>
             <span className="navbar-toggler-icon"></span>
@@ -22,16 +31,18 @@ function App() {
         <section className="portfolio-block projects-cards">
           <div className="container">
             <div className="heading">
-              <h2>Recent Work</h2>
+              <h2>Projects</h2>
             </div>
             <div className="row">
-              {Array.from({length:6}).map((_, i) => (
-                <div key={i} className="col-md-6 col-lg-4">
+              {repos.map(repo => (
+                <div key={repo.id} className="col-md-6 col-lg-4">
                   <div className="card border-0">
-                    <a href="#"><img className="card-img-top scale-on-hover" src={`https://via.placeholder.com/600x400?text=Image+${i+1}`} alt="Card" /></a>
+                    <a href={repo.html_url} target="_blank">
+                      <img className="card-img-top scale-on-hover" src={`https://picsum.photos/seed/${repo.id}/600/400`} alt={repo.name} />
+                    </a>
                     <div className="card-body">
-                      <h6><a href="#">Lorem Ipsum</a></h6>
-                      <p className="text-muted card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc quam urna.</p>
+                      <h6><a href={repo.html_url} target="_blank">{repo.name}</a></h6>
+                      <p className="text-muted card-text">{repo.description || 'No description provided.'}</p>
                     </div>
                   </div>
                 </div>

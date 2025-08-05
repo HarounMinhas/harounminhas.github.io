@@ -3,7 +3,7 @@ function App() {
     <>
       <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-dark">
         <div className="container">
-          <a className="navbar-brand logo" href="#">Brand</a>
+          <a className="navbar-brand logo" href="#">Haroun Minhas</a>
           <button
             className="navbar-toggler"
             data-bs-toggle="collapse"
@@ -31,16 +31,17 @@ function App() {
                 width: '120px',
                 height: '120px',
                 borderRadius: '50%',
-                backgroundImage: "url('https://via.placeholder.com/120')",
+                backgroundImage: "url('https://avatars.githubusercontent.com/u/152099124?v=4')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
             ></div>
             <div className="about-me">
               <p>
-                Hello! I am <strong>John Smith</strong>. I work as interface and front end
-                developer. I have passion for pixel perfect, minimal and easy to use
-                interfaces.
+                Hello! I am <strong>Haroun Minhas</strong> from Ostend, Belgium. I have a
+                background in the social sector with strong project management and
+                communication skills. I am now focused on C# .NET while honing my HTML,
+                CSS, JavaScript and SQL abilities.
               </p>
               <a className="btn btn-outline-primary" role="button" href="/hire-me.html">Hire me</a>
             </div>
@@ -50,13 +51,13 @@ function App() {
           <div className="container">
             <div className="row g-0">
               <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                <a href="#"><img className="img-fluid image" src="https://via.placeholder.com/600x400" /></a>
+                <a href="#"><img className="img-fluid image" src="https://picsum.photos/600/400?random=1" /></a>
               </div>
               <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                <a href="#"><img className="img-fluid image" src="https://via.placeholder.com/600x400" /></a>
+                <a href="#"><img className="img-fluid image" src="https://picsum.photos/600/400?random=2" /></a>
               </div>
               <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                <a href="#"><img className="img-fluid image" src="https://via.placeholder.com/600x400" /></a>
+                <a href="#"><img className="img-fluid image" src="https://picsum.photos/600/400?random=3" /></a>
               </div>
             </div>
           </div>
@@ -81,11 +82,10 @@ function App() {
                     <i className="icon ion-ios-star-outline"></i>
                   </div>
                   <div className="card-body">
-                    <h3 className="card-title">Web Design</h3>
+                    <h3 className="card-title">Project Management</h3>
                     <p className="card-text">
-                      Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo
-                      odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non
-                      mi porta gravida at eget metus.
+                      Experienced in coordinating teams and initiatives within the social
+                      sector.
                     </p>
                   </div>
                 </div>
@@ -96,11 +96,9 @@ function App() {
                     <i className="icon ion-ios-lightbulb-outline"></i>
                   </div>
                   <div className="card-body">
-                    <h3 className="card-title">Interface Design</h3>
+                    <h3 className="card-title">C# .NET Development</h3>
                     <p className="card-text">
-                      Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo
-                      odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non
-                      mi porta gravida at eget metus.
+                      Building applications with C# and the .NET framework.
                     </p>
                   </div>
                 </div>
@@ -111,11 +109,9 @@ function App() {
                     <i className="icon ion-ios-gear-outline"></i>
                   </div>
                   <div className="card-body">
-                    <h3 className="card-title">Photography and Print</h3>
+                    <h3 className="card-title">Web Development</h3>
                     <p className="card-text">
-                      Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo
-                      odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non
-                      mi porta gravida at eget metus.
+                      Creating responsive interfaces using HTML, CSS, JavaScript and SQL.
                     </p>
                   </div>
                 </div>
@@ -128,11 +124,10 @@ function App() {
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-12 col-lg-5 offset-lg-1 text">
-              <h3>Website Project</h3>
+              <h3>Tapp Project</h3>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eget velit
-                ultricies, feugiat est sed, efr nunc, vivamus vel accumsan dui. Quisque ac
-                dolor cursus, volutpat nisl vel, porttitor eros.
+                Simple task manager built with C# showcasing clean architecture and
+                practical features.
               </p>
             </div>
             <div className="col-md-12 col-lg-5">
@@ -140,7 +135,7 @@ function App() {
                 <div className="screen">
                   <div
                     className="screen-content"
-                    style={{ backgroundImage: "url('https://via.placeholder.com/800x600')" }}
+                    style={{ backgroundImage: "url('https://picsum.photos/800/600?random=4')" }}
                   ></div>
                 </div>
                 <div className="keyboard"></div>
