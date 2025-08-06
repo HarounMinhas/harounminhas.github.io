@@ -11,7 +11,7 @@ function Navbar({ active }) {
     { key: 'hire', href: '/hire-me.html', label: 'Hire me' }
   ];
   return (
-    <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-dark">
+    <nav className="navbar navbar-expand-lg fixed-top portfolio-navbar gradient navbar-light">
       <div className="container">
         <a className="navbar-brand logo" href="#">Haroun Minhas</a>
         <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">

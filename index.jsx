@@ -1,39 +1,48 @@
 function App() {
   return (
-    <>
-        <Navbar active="home" />
-      <main className="page" style={{marginTop: '56px'}}>
-        <section className="portfolio-block block-intro">
-          <div className="container text-center">
-              <ImageWithFallback
-                className="avatar mx-auto mb-3"
-                src="https://avatars.githubusercontent.com/u/152099124?v=4"
-                fallback={PLACEHOLDER_120}
-                alt="Haroun Minhas"
-                style={{
-                  width: '120px',
-                  height: '120px',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            <div className="about-me">
-              <p>
-                Hello! I am <strong>Haroun Minhas</strong> from Ostend, Belgium. I have a
-                background in the social sector with strong project management and
-                communication skills. I am now focused on C# .NET while honing my HTML,
-                CSS, JavaScript and SQL abilities.
-              </p>
-              <a className="btn btn-outline-primary" role="button" href="/hire-me.html">Hire me</a>
-            </div>
+      <>
+          <Navbar active="home" />
+        <main className="page" style={{marginTop: '56px'}}>
+          <div className="bg-warning text-dark text-center py-2 mb-4">
+            This site is part of a Codex usage test.
           </div>
-        </section>
-        <section className="portfolio-block photography">
-          <div className="container">
-            <div className="row g-0">
-                <div className="col-md-6 col-lg-4 item zoom-on-hover">
-                  <a href="#"><ImageWithFallback className="img-fluid image" src="https://picsum.photos/600/400?random=1" fallback={PLACEHOLDER_600x400} alt="Sample work 1" /></a>
+          <section className="portfolio-block block-intro py-5">
+            <div className="container">
+              <div className="row align-items-center">
+                <div className="col-md-3 text-center mb-3 mb-md-0">
+                  <ImageWithFallback
+                    className="avatar"
+                    src="https://avatars.githubusercontent.com/u/152099124?v=4"
+                    fallback={PLACEHOLDER_120}
+                    alt="Haroun Minhas"
+                    style={{
+                      width: '120px',
+                      height: '120px',
+                      borderRadius: '50%',
+                      objectFit: 'cover'
+                    }}
+                  />
                 </div>
+                <div className="col-md-9">
+                  <div className="about-me">
+                    <p>
+                      Hello! I am <strong>Haroun Minhas</strong> from Ostend, Belgium. I have a
+                      background in the social sector with strong project management and
+                      communication skills. I am now focused on C# .NET while honing my HTML,
+                      CSS, JavaScript and SQL abilities.
+                    </p>
+                    <a className="btn btn-outline-primary mt-3" role="button" href="/hire-me.html">Hire me</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section className="portfolio-block photography py-5">
+            <div className="container">
+              <div className="row g-0">
+                  <div className="col-md-6 col-lg-4 item zoom-on-hover">
+                    <a href="#"><ImageWithFallback className="img-fluid image" src="https://picsum.photos/600/400?random=1" fallback={PLACEHOLDER_600x400} alt="Sample work 1" /></a>
+                  </div>
                 <div className="col-md-6 col-lg-4 item zoom-on-hover">
                   <a href="#"><ImageWithFallback className="img-fluid image" src="https://picsum.photos/600/400?random=2" fallback={PLACEHOLDER_600x400} alt="Sample work 2" /></a>
                 </div>
@@ -43,20 +52,20 @@ function App() {
             </div>
           </div>
         </section>
-        <section className="portfolio-block call-to-action border-bottom">
-          <div className="container">
-            <div className="d-flex justify-content-center align-items-center content">
-              <h3>Like what you see?</h3>
-              <button className="btn btn-outline-primary btn-lg ms-3" type="button">Hire me</button>
+          <section className="portfolio-block call-to-action border-bottom py-5">
+            <div className="container">
+              <div className="d-flex justify-content-center align-items-center content">
+                <h3>Like what you see?</h3>
+                <button className="btn btn-outline-primary btn-lg ms-3" type="button">Hire me</button>
+              </div>
             </div>
-          </div>
-        </section>
-        <section className="portfolio-block skills">
-          <div className="container">
-            <div className="heading">
-              <h2>Special Skills</h2>
-            </div>
-            <div className="row">
+          </section>
+          <section className="portfolio-block skills py-5">
+            <div className="container">
+              <div className="heading">
+                <h2>Special Skills</h2>
+              </div>
+              <div className="row">
               <div className="col-md-4">
                 <div className="card special-skill-item border-0">
                   <div className="card-header bg-transparent border-0">
@@ -100,8 +109,8 @@ function App() {
             </div>
           </div>
         </section>
-      </main>
-      <section className="portfolio-block website gradient">
+        </main>
+      <section className="portfolio-block website gradient py-5">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-12 col-lg-5 offset-lg-1 text">
