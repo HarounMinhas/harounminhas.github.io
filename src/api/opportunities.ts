@@ -59,10 +59,23 @@ export type OpportunityListResponse = {
 
 const API = "https://api.artconnect.com/v1";
 
-export async function fetchOpportunities(params: { sortBy?: string; page?: number } = {}): Promise<OpportunityListResponse> {
+export async function fetchOpportunities(
+  params: {
+    sortBy?: string;
+    page?: number;
+    type?: string;
+    country?: string;
+    city?: string;
+    pageLength?: number;
+  } = {}
+): Promise<OpportunityListResponse> {
   const url = new URL(API + "/opportunities/");
   if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
   if (params.page) url.searchParams.set("page", String(params.page));
+  if (params.type) url.searchParams.set("type", params.type);
+  if (params.country) url.searchParams.set("country", params.country);
+  if (params.city) url.searchParams.set("city", params.city);
+  if (params.pageLength) url.searchParams.set("pageLength", String(params.pageLength));
   const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`List fetch failed: ${res.status}`);
   return (await res.json()) as OpportunityListResponse;
