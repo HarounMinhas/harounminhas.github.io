@@ -6,12 +6,17 @@ import OpportunityCard from './OpportunityCard';
 import SkeletonCard from './SkeletonCard';
 import Pagination from './Pagination';
 import SortSelect from './SortSelect';
+import Filters from './Filters';
 
 export default function OpportunitiesList() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sortBy = searchParams.get('sortBy') || '-deadline';
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const type = searchParams.get('type') || '';
+  const country = searchParams.get('country') || '';
+  const city = searchParams.get('city') || '';
+  const pageLength = parseInt(searchParams.get('pageLength') || '6', 10);
 
   const [data, setData] = useState<OpportunityListResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,11 +25,11 @@ export default function OpportunitiesList() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchOpportunities({ sortBy, page })
+    fetchOpportunities({ sortBy, page, type, country, city, pageLength })
       .then((res) => setData(res))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [sortBy, page]);
+  }, [sortBy, page, type, country, city, pageLength]);
 
   const updateParams = (params: URLSearchParams) => {
     router.push(`/opportunities?${params.toString()}`);
@@ -33,6 +38,17 @@ export default function OpportunitiesList() {
   const handleSortChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sortBy', value);
+    params.set('page', '1');
+    updateParams(params);
+  };
+
+  const handleFilterChange = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(name, value);
+    } else {
+      params.delete(name);
+    }
     params.set('page', '1');
     updateParams(params);
   };
@@ -51,8 +67,17 @@ export default function OpportunitiesList() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end">
-        <SortSelect value={sortBy} onChange={handleSortChange} />
+      <div className="mb-4 flex flex-col gap-2">
+        <Filters
+          type={type}
+          country={country}
+          city={city}
+          pageLength={pageLength}
+          onChange={handleFilterChange}
+        />
+        <div className="flex items-center justify-end">
+          <SortSelect value={sortBy} onChange={handleSortChange} />
+        </div>
       </div>
       {error && (
         <div className="mb-4 rounded border border-red-200 bg-red-50 p-4">
@@ -68,7 +93,7 @@ export default function OpportunitiesList() {
       )}
       {loading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: pageLength }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
