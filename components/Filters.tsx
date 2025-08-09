@@ -1,8 +1,6 @@
 'use client';
 import React from 'react';
-import TypeFilter from './filters/TypeFilter';
-import CountryFilter from './filters/CountryFilter';
-import CityFilter from './filters/CityFilter';
+import TextFilter from './filters/TextFilter';
 import PageLengthSelect from './filters/PageLengthSelect';
 
 interface FiltersProps {
@@ -16,9 +14,24 @@ interface FiltersProps {
 export default function Filters({ type = '', city = '', country = '', pageLength, onChange }: FiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <TypeFilter value={type} onChange={(v) => onChange('type', v)} />
-      <CountryFilter value={country} onChange={(v) => onChange('country', v)} />
-      <CityFilter value={city} onChange={(v) => onChange('city', v)} />
+      <TextFilter
+        ariaLabel="Filter by type"
+        placeholder="Type"
+        value={type}
+        onChange={(v) => onChange('type', v)}
+      />
+      <TextFilter
+        ariaLabel="Filter by country"
+        placeholder="Country"
+        value={country}
+        onChange={(v) => onChange('country', v)}
+      />
+      <TextFilter
+        ariaLabel="Filter by city"
+        placeholder="City"
+        value={city}
+        onChange={(v) => onChange('city', v)}
+      />
       <PageLengthSelect value={pageLength} onChange={(v) => onChange('pageLength', v)} />
     </div>
   );
