@@ -1,6 +1,7 @@
 import "./globals.css";
 import Link from "next/link";
 import React from "react";
+import SearchBar from "../components/SearchBar";
 
 export const metadata = {
   title: "ArtConnect Opportunities",
@@ -16,13 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/opportunities" className="text-xl font-semibold">
               Opportunities
             </Link>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-48 rounded border px-3 py-1 text-sm"
-              aria-label="Search opportunities"
-              disabled
-            />
+            <SearchBar />
           </div>
         </header>
         <main className="mx-auto max-w-5xl p-4">{children}</main>

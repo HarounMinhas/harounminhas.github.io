@@ -22,6 +22,7 @@ export default function OpportunitiesList() {
   const typeParam = searchParams.get('type') || '';
   const countryParam = searchParams.get('country') || '';
   const cityParam = searchParams.get('city') || '';
+  const searchQuery = searchParams.get('search') || '';
   const type = useMemo(() => (typeParam ? typeParam.split(',').filter(Boolean) : []), [typeParam]);
   const country = useMemo(() => (countryParam ? countryParam.split(',').filter(Boolean) : []), [countryParam]);
   const city = useMemo(() => (cityParam ? cityParam.split(',').filter(Boolean) : []), [cityParam]);
@@ -68,11 +69,11 @@ export default function OpportunitiesList() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchOpportunities({ sortBy, page, type, country, city, pageLength })
+    fetchOpportunities({ sortBy, page, type, country, city, pageLength, search: searchQuery })
       .then((res) => setData(res))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [sortBy, page, type, country, city, pageLength]);
+  }, [sortBy, page, type, country, city, pageLength, searchQuery]);
 
   const updateParams = (params: URLSearchParams) => {
     router.push(`/opportunities?${params.toString()}`);

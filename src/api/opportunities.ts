@@ -67,6 +67,7 @@ export async function fetchOpportunities(
     country?: string | string[];
     city?: string | string[];
     pageLength?: number;
+    search?: string;
   } = {},
 ): Promise<OpportunityListResponse> {
   const url = new URL(API + "/opportunities/");
@@ -85,6 +86,7 @@ export async function fetchOpportunities(
     url.searchParams.set("city", value);
   }
   if (params.pageLength !== undefined) url.searchParams.set("pageLength", String(params.pageLength));
+  if (params.search) url.searchParams.set("search", params.search);
   const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`List fetch failed: ${res.status}`);
   return (await res.json()) as OpportunityListResponse;
