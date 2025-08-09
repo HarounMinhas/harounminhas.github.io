@@ -1,14 +1,12 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Opportunity, fetchOpportunity } from '../../../src/api/opportunities';
+import { Opportunity, fetchOpportunity } from '../src/api/opportunities';
 
-export default function OpportunityDetail() {
-  const params = useParams<{ id: string }>();
+export default function OpportunityDetail({ id }: { id: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { id } = params;
   const [data, setData] = useState<Opportunity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +19,9 @@ export default function OpportunityDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const backHref = `/opportunities?${searchParams.toString()}`;
+  const backParams = new URLSearchParams(searchParams.toString());
+  backParams.delete('id');
+  const backHref = `/opportunities?${backParams.toString()}`;
 
   if (loading) return <div className="py-10 text-center" role="status">Loading…</div>;
   if (error) return <div className="py-10 text-center">Failed to load. <button className="underline" onClick={() => router.refresh()}>Retry</button></div>;
@@ -121,3 +121,4 @@ function formatDate(date?: string) {
     return date;
   }
 }
+

@@ -44,7 +44,9 @@ export default function OpportunitiesList() {
   };
 
   const handleCardClick = (id: string) => {
-    router.push(`/opportunities/${id}?${searchParams.toString()}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('id', id);
+    router.push(`/opportunities?${params.toString()}`);
   };
 
   return (
