@@ -1,27 +1,69 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { OpportunityListResponse, fetchOpportunities } from '../src/api/opportunities';
+import {
+  Opportunity,
+  OpportunityListResponse,
+  fetchOpportunities,
+  fetchAllOpportunities,
+} from '../src/api/opportunities';
 import OpportunityCard from './OpportunityCard';
 import SkeletonCard from './SkeletonCard';
 import Pagination from './Pagination';
 import SortSelect from './SortSelect';
 import Filters from './Filters';
+import { Option } from './filters/MultiSelectFilter';
 
 export default function OpportunitiesList() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sortBy = searchParams.get('sortBy') || '-deadline';
   const page = parseInt(searchParams.get('page') || '1', 10);
-  const type = searchParams.get('type') || '';
-  const country = searchParams.get('country') || '';
-  const city = searchParams.get('city') || '';
+  const typeParam = searchParams.get('type') || '';
+  const countryParam = searchParams.get('country') || '';
+  const cityParam = searchParams.get('city') || '';
+  const type = useMemo(() => (typeParam ? typeParam.split(',').filter(Boolean) : []), [typeParam]);
+  const country = useMemo(() => (countryParam ? countryParam.split(',').filter(Boolean) : []), [countryParam]);
+  const city = useMemo(() => (cityParam ? cityParam.split(',').filter(Boolean) : []), [cityParam]);
   const pageLengthParam = searchParams.get('pageLength');
   const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 6;
 
   const [data, setData] = useState<OpportunityListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [typeOptions, setTypeOptions] = useState<Option[]>([]);
+  const [countryOptions, setCountryOptions] = useState<Option[]>([]);
+  const [cityOptions, setCityOptions] = useState<Option[]>([]);
+
+  useEffect(() => {
+    let canceled = false;
+    async function loadOptions() {
+      try {
+        const all: Opportunity[] = await fetchAllOpportunities();
+        if (canceled) return;
+        const types = Array.from(
+          new Set(all.map((o) => o.type).filter((v): v is string => Boolean(v))),
+        ).sort();
+        const countries = Array.from(
+          new Set(
+            all.map((o) => o.profile?.country).filter((v): v is string => Boolean(v)),
+          ),
+        ).sort();
+        const cities = Array.from(
+          new Set(all.map((o) => o.profile?.city).filter((v): v is string => Boolean(v))),
+        ).sort();
+        setTypeOptions(types.map((v) => ({ value: v, label: v })));
+        setCountryOptions(countries.map((v) => ({ value: v, label: v })));
+        setCityOptions(cities.map((v) => ({ value: v, label: v })));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    loadOptions();
+    return () => {
+      canceled = true;
+    };
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -43,9 +85,15 @@ export default function OpportunitiesList() {
     updateParams(params);
   };
 
-  const handleFilterChange = (name: string, value: string) => {
+  const handleFilterChange = (name: string, value: string | string[]) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value) {
+    if (Array.isArray(value)) {
+      if (value.length) {
+        params.set(name, value.join(','));
+      } else {
+        params.delete(name);
+      }
+    } else if (value) {
       params.set(name, value);
     } else {
       params.delete(name);
@@ -75,6 +123,9 @@ export default function OpportunitiesList() {
           city={city}
           pageLength={pageLength}
           onChange={handleFilterChange}
+          typeOptions={typeOptions}
+          countryOptions={countryOptions}
+          cityOptions={cityOptions}
         />
         <div className="flex items-center justify-end">
           <SortSelect value={sortBy} onChange={handleSortChange} />
@@ -111,3 +162,4 @@ export default function OpportunitiesList() {
     </div>
   );
 }
+
