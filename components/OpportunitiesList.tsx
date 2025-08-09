@@ -16,7 +16,8 @@ export default function OpportunitiesList() {
   const type = searchParams.get('type') || '';
   const country = searchParams.get('country') || '';
   const city = searchParams.get('city') || '';
-  const pageLength = parseInt(searchParams.get('pageLength') || '6', 10);
+  const pageLengthParam = searchParams.get('pageLength');
+  const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 6;
 
   const [data, setData] = useState<OpportunityListResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,7 +94,7 @@ export default function OpportunitiesList() {
       )}
       {loading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: pageLength }).map((_, i) => (
+          {Array.from({ length: pageLength || 6 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
@@ -104,7 +105,7 @@ export default function OpportunitiesList() {
           ))}
         </div>
       )}
-      {!loading && !error && (
+      {!loading && !error && pageLength !== 0 && (
         <Pagination page={page} totalPages={data?.pages} onPageChange={handlePageChange} />
       )}
     </div>

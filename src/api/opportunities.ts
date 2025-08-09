@@ -75,7 +75,7 @@ export async function fetchOpportunities(
   if (params.type) url.searchParams.set("type", params.type);
   if (params.country) url.searchParams.set("country", params.country);
   if (params.city) url.searchParams.set("city", params.city);
-  if (params.pageLength) url.searchParams.set("pageLength", String(params.pageLength));
+  if (params.pageLength !== undefined) url.searchParams.set("pageLength", String(params.pageLength));
   const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`List fetch failed: ${res.status}`);
   return (await res.json()) as OpportunityListResponse;
