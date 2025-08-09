@@ -1,5 +1,9 @@
 'use client';
 import React from 'react';
+import TypeFilter from './filters/TypeFilter';
+import CountryFilter from './filters/CountryFilter';
+import CityFilter from './filters/CityFilter';
+import PageLengthSelect from './filters/PageLengthSelect';
 
 interface FiltersProps {
   type?: string;
@@ -12,37 +16,10 @@ interface FiltersProps {
 export default function Filters({ type = '', city = '', country = '', pageLength, onChange }: FiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <input
-        aria-label="Filter by type"
-        placeholder="Type"
-        className="rounded border px-2 py-1 text-sm"
-        value={type}
-        onChange={(e) => onChange('type', e.target.value)}
-      />
-      <input
-        aria-label="Filter by country"
-        placeholder="Country"
-        className="rounded border px-2 py-1 text-sm"
-        value={country}
-        onChange={(e) => onChange('country', e.target.value)}
-      />
-      <input
-        aria-label="Filter by city"
-        placeholder="City"
-        className="rounded border px-2 py-1 text-sm"
-        value={city}
-        onChange={(e) => onChange('city', e.target.value)}
-      />
-      <select
-        aria-label="Items per page"
-        className="rounded border px-2 py-1 text-sm"
-        value={pageLength}
-        onChange={(e) => onChange('pageLength', e.target.value)}
-      >
-        <option value="6">6</option>
-        <option value="12">12</option>
-        <option value="24">24</option>
-      </select>
+      <TypeFilter value={type} onChange={(v) => onChange('type', v)} />
+      <CountryFilter value={country} onChange={(v) => onChange('country', v)} />
+      <CityFilter value={city} onChange={(v) => onChange('city', v)} />
+      <PageLengthSelect value={pageLength} onChange={(v) => onChange('pageLength', v)} />
     </div>
   );
 }
