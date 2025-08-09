@@ -1,38 +1,51 @@
 'use client';
 import React from 'react';
-import TextFilter from './filters/TextFilter';
 import PageLengthSelect from './filters/PageLengthSelect';
+import MultiSelectFilter, { Option } from './filters/MultiSelectFilter';
 
 interface FiltersProps {
-  type?: string;
-  city?: string;
-  country?: string;
+  type?: string[];
+  city?: string[];
+  country?: string[];
   pageLength: number;
-  onChange: (name: string, value: string) => void;
+  onChange: (name: string, value: string | string[]) => void;
+  typeOptions: Option[];
+  countryOptions: Option[];
+  cityOptions: Option[];
 }
 
-export default function Filters({ type = '', city = '', country = '', pageLength, onChange }: FiltersProps) {
+export default function Filters({
+  type = [],
+  city = [],
+  country = [],
+  pageLength,
+  onChange,
+  typeOptions = [],
+  countryOptions = [],
+  cityOptions = [],
+}: FiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <TextFilter
-        ariaLabel="Filter by type"
-        placeholder="Type"
-        value={type}
+      <MultiSelectFilter
+        label="Type"
+        options={typeOptions}
+        selected={type}
         onChange={(v) => onChange('type', v)}
       />
-      <TextFilter
-        ariaLabel="Filter by country"
-        placeholder="Country"
-        value={country}
+      <MultiSelectFilter
+        label="Country"
+        options={countryOptions}
+        selected={country}
         onChange={(v) => onChange('country', v)}
       />
-      <TextFilter
-        ariaLabel="Filter by city"
-        placeholder="City"
-        value={city}
+      <MultiSelectFilter
+        label="City"
+        options={cityOptions}
+        selected={city}
         onChange={(v) => onChange('city', v)}
       />
       <PageLengthSelect value={pageLength} onChange={(v) => onChange('pageLength', v)} />
     </div>
   );
 }
+

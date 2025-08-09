@@ -63,18 +63,27 @@ export async function fetchOpportunities(
   params: {
     sortBy?: string;
     page?: number;
-    type?: string;
-    country?: string;
-    city?: string;
+    type?: string | string[];
+    country?: string | string[];
+    city?: string | string[];
     pageLength?: number;
-  } = {}
+  } = {},
 ): Promise<OpportunityListResponse> {
   const url = new URL(API + "/opportunities/");
   if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
   if (params.page) url.searchParams.set("page", String(params.page));
-  if (params.type) url.searchParams.set("type", params.type);
-  if (params.country) url.searchParams.set("country", params.country);
-  if (params.city) url.searchParams.set("city", params.city);
+  if (params.type) {
+    const value = Array.isArray(params.type) ? params.type.join(",") : params.type;
+    url.searchParams.set("type", value);
+  }
+  if (params.country) {
+    const value = Array.isArray(params.country) ? params.country.join(",") : params.country;
+    url.searchParams.set("country", value);
+  }
+  if (params.city) {
+    const value = Array.isArray(params.city) ? params.city.join(",") : params.city;
+    url.searchParams.set("city", value);
+  }
   if (params.pageLength !== undefined) url.searchParams.set("pageLength", String(params.pageLength));
   const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`List fetch failed: ${res.status}`);
@@ -86,3 +95,17 @@ export async function fetchOpportunity(id: string): Promise<Opportunity> {
   if (!res.ok) throw new Error(`Detail fetch failed: ${res.status}`);
   return (await res.json()) as Opportunity;
 }
+
+export async function fetchAllOpportunities(): Promise<Opportunity[]> {
+  const pageLength = 100;
+  let page = 1;
+  const all: Opportunity[] = [];
+  while (true) {
+    const res = await fetchOpportunities({ page, pageLength });
+    all.push(...res.data);
+    if (!res.pages || page >= res.pages) break;
+    page++;
+  }
+  return all;
+}
+
