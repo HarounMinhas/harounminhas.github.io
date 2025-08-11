@@ -84,8 +84,9 @@ export default function OpportunitiesList() {
             setProgress((currentPage / pages) * 100);
           }
         });
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
+        setError(e.message);
       }
     }
     loadAll();
@@ -234,7 +235,7 @@ export default function OpportunitiesList() {
           </button>
         </div>
       )}
-      {loading ? (
+      {loading && !(data?.data.length) ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: pageLength || 6 }).map((_, i) => (
             <SkeletonCard key={i} />
@@ -247,8 +248,8 @@ export default function OpportunitiesList() {
           ))}
         </div>
       )}
-      {!loading && !error && pageLength !== 0 && (
-        <Pagination page={page} totalPages={data?.pages} onPageChange={handlePageChange} />
+      {!error && data && pageLength !== 0 && (
+        <Pagination page={page} totalPages={data.pages} onPageChange={handlePageChange} />
       )}
     </div>
   );

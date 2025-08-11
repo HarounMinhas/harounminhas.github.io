@@ -63,24 +63,43 @@ export async function fetchOpportunities(page = 1): Promise<OpportunityListRespo
   const url = new URL(API + "/opportunities/");
   url.searchParams.set("page", String(page));
   const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+  if (res.status === 409) throw new Error("409");
   if (!res.ok) throw new Error(`List fetch failed: ${res.status}`);
   return (await res.json()) as OpportunityListResponse;
 }
 
 export async function fetchOpportunity(id: string): Promise<Opportunity> {
-  const res = await fetch(`${API}/opportunities/${encodeURIComponent(id)}/`, { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`Detail fetch failed: ${res.status}`);
-  return (await res.json()) as Opportunity;
+  async function load(): Promise<Opportunity> {
+    const res = await fetch(`${API}/opportunities/${encodeURIComponent(id)}/`, {
+      headers: { Accept: "application/json" },
+    });
+    if (res.status === 409) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return load();
+    }
+    if (!res.ok) throw new Error(`Detail fetch failed: ${res.status}`);
+    return (await res.json()) as Opportunity;
+  }
+  return load();
 }
 
 export async function fetchAllOpportunities(
   onPage?: (partial: Opportunity[], page: number, pages?: number) => void,
-  delayMs = 100,
+  delayMs = 800,
 ): Promise<Opportunity[]> {
   let page = 1;
   const all: Opportunity[] = [];
   while (true) {
-    const res = await fetchOpportunities(page);
+    let res: OpportunityListResponse;
+    try {
+      res = await fetchOpportunities(page);
+    } catch (e: any) {
+      if (typeof e.message === "string" && e.message.includes("409")) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        continue;
+      }
+      throw e;
+    }
     all.push(...res.data);
     if (onPage) {
       onPage(all.slice(), page, res.pages);
