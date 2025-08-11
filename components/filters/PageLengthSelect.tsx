@@ -14,10 +14,9 @@ export default function PageLengthSelect({ value, onChange }: PageLengthSelectPr
       value={String(value)}
       onChange={(e) => onChange(e.target.value)}
     >
+      <option value="20">20</option>
+      <option value="40">40</option>
       <option value="0">All</option>
-      <option value="6">6</option>
-      <option value="12">12</option>
-      <option value="24">24</option>
     </select>
   );
 }
