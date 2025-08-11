@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Opportunity,
   OpportunityListResponse,
-  fetchOpportunities,
   fetchAllOpportunities,
 } from '../src/api/opportunities';
 import OpportunityCard from './OpportunityCard';
@@ -24,11 +23,15 @@ export default function OpportunitiesList() {
   const cityParam = searchParams.get('city') || '';
   const searchQuery = searchParams.get('search') || '';
   const type = useMemo(() => (typeParam ? typeParam.split(',').filter(Boolean) : []), [typeParam]);
-  const country = useMemo(() => (countryParam ? countryParam.split(',').filter(Boolean) : []), [countryParam]);
+  const country = useMemo(
+    () => (countryParam ? countryParam.split(',').filter(Boolean) : []),
+    [countryParam],
+  );
   const city = useMemo(() => (cityParam ? cityParam.split(',').filter(Boolean) : []), [cityParam]);
   const pageLengthParam = searchParams.get('pageLength');
   const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 6;
 
+  const [allData, setAllData] = useState<Opportunity[]>([]);
   const [data, setData] = useState<OpportunityListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,44 +39,118 @@ export default function OpportunitiesList() {
   const [countryOptions, setCountryOptions] = useState<Option[]>([]);
   const [cityOptions, setCityOptions] = useState<Option[]>([]);
 
+  // Restore previously used filters and pagination from session storage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!searchParams.toString()) {
+      const saved = sessionStorage.getItem('opportunity-search');
+      if (saved) {
+        router.replace(`/opportunities?${saved}`);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist current search params
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    sessionStorage.setItem('opportunity-search', searchParams.toString());
+  }, [searchParams.toString()]);
+
+  // Load all opportunities (from cache if available)
   useEffect(() => {
     let canceled = false;
-    async function loadOptions() {
+    const cached = typeof window !== 'undefined'
+      ? sessionStorage.getItem('all-opportunities')
+      : null;
+    if (cached) {
       try {
-        const all: Opportunity[] = await fetchAllOpportunities();
+        const parsed: Opportunity[] = JSON.parse(cached);
+        setAllData(parsed);
+      } catch {
+        // ignore parse errors
+      }
+    }
+
+    async function loadAll() {
+      try {
+        const latest = await fetchAllOpportunities();
         if (canceled) return;
-        const types = Array.from(
-          new Set(all.map((o) => o.type).filter((v): v is string => Boolean(v))),
-        ).sort();
-        const countries = Array.from(
-          new Set(
-            all.map((o) => o.profile?.country).filter((v): v is string => Boolean(v)),
-          ),
-        ).sort();
-        const cities = Array.from(
-          new Set(all.map((o) => o.profile?.city).filter((v): v is string => Boolean(v))),
-        ).sort();
-        setTypeOptions(types.map((v) => ({ value: v, label: v })));
-        setCountryOptions(countries.map((v) => ({ value: v, label: v })));
-        setCityOptions(cities.map((v) => ({ value: v, label: v })));
+        const latestIds = latest.map((o) => o.id).join(',');
+        const cachedIds = allData.map((o) => o.id).join(',');
+        if (latestIds !== cachedIds) {
+          setAllData(latest);
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('all-opportunities', JSON.stringify(latest));
+          }
+        }
       } catch (e) {
         console.error(e);
       }
     }
-    loadOptions();
+    loadAll();
     return () => {
       canceled = true;
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Derive filter options from the full dataset
+  useEffect(() => {
+    const types = Array.from(
+      new Set(allData.map((o) => o.type).filter((v): v is string => Boolean(v))),
+    ).sort();
+    const countries = Array.from(
+      new Set(
+        allData.map((o) => o.profile?.country).filter((v): v is string => Boolean(v)),
+      ),
+    ).sort();
+    const cities = Array.from(
+      new Set(allData.map((o) => o.profile?.city).filter((v): v is string => Boolean(v))),
+    ).sort();
+    setTypeOptions(types.map((v) => ({ value: v, label: v })));
+    setCountryOptions(countries.map((v) => ({ value: v, label: v })));
+    setCityOptions(cities.map((v) => ({ value: v, label: v })));
+  }, [allData]);
+
+  // Apply filters, sorting and pagination on the client
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchOpportunities({ sortBy, page, type, country, city, pageLength, search: searchQuery })
-      .then((res) => setData(res))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [sortBy, page, type, country, city, pageLength, searchQuery]);
+    try {
+      let items = allData;
+      if (type.length) items = items.filter((o) => o.type && type.includes(o.type));
+      if (country.length)
+        items = items.filter(
+          (o) => o.profile?.country && country.includes(o.profile.country),
+        );
+      if (city.length)
+        items = items.filter((o) => o.profile?.city && city.includes(o.profile.city));
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        items = items.filter((o) => o.title.toLowerCase().includes(q));
+      }
+      const field = sortBy.startsWith('-') ? sortBy.slice(1) : sortBy;
+      const dir = sortBy.startsWith('-') ? -1 : 1;
+      items = items.slice().sort((a: any, b: any) => {
+        const av = a[field];
+        const bv = b[field];
+        if (!av || !bv) return 0;
+        const ad = Date.parse(av);
+        const bd = Date.parse(bv);
+        if (!Number.isNaN(ad) && !Number.isNaN(bd)) {
+          return (ad - bd) * dir;
+        }
+        return String(av).localeCompare(String(bv)) * dir;
+      });
+      const totalPages = pageLength ? Math.ceil(items.length / pageLength) : 1;
+      const start = pageLength ? (page - 1) * pageLength : 0;
+      const pageItems = pageLength ? items.slice(start, start + pageLength) : items;
+      setData({ data: pageItems, pages: pageLength ? totalPages : undefined, entries: items.length });
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [allData, sortBy, page, type, country, city, pageLength, searchQuery]);
 
   const updateParams = (params: URLSearchParams) => {
     router.push(`/opportunities?${params.toString()}`);
