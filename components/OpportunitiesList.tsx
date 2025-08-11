@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Opportunity,
@@ -32,7 +32,7 @@ export default function OpportunitiesList() {
   const city = useMemo(() => (cityParam ? cityParam.split(',').filter(Boolean) : []), [cityParam]);
   const pageLengthParam = searchParams.get('pageLength');
   const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 20;
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const view = searchParams.get('view') === 'list' ? 'list' : 'grid';
 
   const [allData, setAllData] = useState<Opportunity[]>([]);
   const [data, setData] = useState<OpportunityListResponse | null>(null);
@@ -183,6 +183,12 @@ export default function OpportunitiesList() {
     router.push(`/opportunities?${params.toString()}`);
   };
 
+  const handleViewChange = (v: 'grid' | 'list') => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('view', v);
+    updateParams(params);
+  };
+
   const handleSortChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sortBy', value);
@@ -232,7 +238,7 @@ export default function OpportunitiesList() {
           countryOptions={countryOptions}
           cityOptions={cityOptions}
           view={view}
-          onViewChange={setView}
+          onViewChange={handleViewChange}
         />
         <div className="flex items-center justify-end">
           <SortSelect value={sortBy} onChange={handleSortChange} />

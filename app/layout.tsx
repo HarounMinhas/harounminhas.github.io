@@ -2,6 +2,7 @@ import "./globals.css";
 import Link from "next/link";
 import React from "react";
 import SearchBar from "../components/SearchBar";
+import ThemeSelector from "../components/ThemeSelector";
 
 const version = `Example of what can be done with Codex - ${process.env.NEXT_PUBLIC_PR_INFO || "local"}`;
 
@@ -15,8 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <link
+          id="bootstrap-theme"
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/flatly/bootstrap.min.css"
         />
         <link
           rel="stylesheet"
@@ -28,11 +30,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {version}
         </div>
         <header className="border-b bg-white">
-          <div className="mx-auto flex max-w-5xl items-center justify-between p-4">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 p-4">
             <Link href="/opportunities" className="text-xl font-semibold">
               Opportunities
             </Link>
-            <SearchBar />
+            <div className="flex items-center gap-2">
+              <ThemeSelector />
+              <SearchBar />
+            </div>
           </div>
         </header>
         <main className="mx-auto max-w-5xl p-4">{children}</main>
