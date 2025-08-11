@@ -73,11 +73,10 @@ export async function fetchOpportunity(id: string): Promise<Opportunity> {
     const res = await fetch(`${API}/opportunities/${encodeURIComponent(id)}/`, {
       headers: { Accept: "application/json" },
     });
-    if (res.status === 409) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!res.ok) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       return load();
     }
-    if (!res.ok) throw new Error(`Detail fetch failed: ${res.status}`);
     return (await res.json()) as Opportunity;
   }
   return load();
@@ -85,7 +84,7 @@ export async function fetchOpportunity(id: string): Promise<Opportunity> {
 
 export async function fetchAllOpportunities(
   onPage?: (partial: Opportunity[], page: number, pages?: number) => void,
-  delayMs = 800,
+  delayMs = 100,
 ): Promise<Opportunity[]> {
   let page = 1;
   const all: Opportunity[] = [];
@@ -94,11 +93,8 @@ export async function fetchAllOpportunities(
     try {
       res = await fetchOpportunities(page);
     } catch (e: any) {
-      if (typeof e.message === "string" && e.message.includes("409")) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        continue;
-      }
-      throw e;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      continue;
     }
     all.push(...res.data);
     if (onPage) {

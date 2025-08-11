@@ -67,6 +67,8 @@ export default function OpportunitiesList() {
       try {
         const parsed: Opportunity[] = JSON.parse(cached);
         setAllData(parsed);
+        setProgress(100);
+        return;
       } catch {
         // ignore parse errors
       }
@@ -83,7 +85,7 @@ export default function OpportunitiesList() {
           if (pages) {
             setProgress((currentPage / pages) * 100);
           }
-        });
+        }, 100);
       } catch (e: any) {
         console.error(e);
         setError(e.message);
@@ -220,7 +222,9 @@ export default function OpportunitiesList() {
             aria-valuenow={progress}
             aria-valuemin={0}
             aria-valuemax={100}
-          />
+          >
+            {Math.round(progress)}%
+          </div>
         </div>
       )}
       {error && (
