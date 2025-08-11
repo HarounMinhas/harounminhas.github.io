@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { BsSearch } from 'react-icons/bs';
 import { fetchAllOpportunities, Opportunity } from '../src/api/opportunities';
 
 export default function SearchBar() {
@@ -67,21 +68,22 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="relative">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search..."
-          className="w-48 rounded border px-3 py-1 text-sm"
-          aria-label="Search opportunities"
-        />
-      </form>
-      {suggestions.length > 0 && (
-        <ul className="absolute z-10 mt-1 w-48 rounded border bg-white text-sm">
-          {suggestions.map((s) => (
-            <li key={s.id}>
+      <div className="relative">
+        <form onSubmit={handleSubmit}>
+          <BsSearch className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search..."
+            className="w-48 rounded border py-1 pl-8 pr-3 text-sm"
+            aria-label="Search opportunities"
+          />
+        </form>
+        {suggestions.length > 0 && (
+          <ul className="absolute z-10 mt-1 w-48 rounded border bg-white text-sm">
+            {suggestions.map((s) => (
+              <li key={s.id}>
               <button
                 className="block w-full px-3 py-1 text-left hover:bg-gray-100"
                 onClick={() => handleSelect(s.id)}

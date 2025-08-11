@@ -7,6 +7,7 @@ import {
   fetchAllOpportunities,
 } from '../src/api/opportunities';
 import OpportunityCard from './OpportunityCard';
+import OpportunityListItem from './OpportunityListItem';
 import SkeletonCard from './SkeletonCard';
 import Pagination from './Pagination';
 import SortSelect from './SortSelect';
@@ -30,7 +31,9 @@ export default function OpportunitiesList() {
   );
   const city = useMemo(() => (cityParam ? cityParam.split(',').filter(Boolean) : []), [cityParam]);
   const pageLengthParam = searchParams.get('pageLength');
-  const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 6;
+  const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 20;
+  const viewParam = searchParams.get('view');
+  const view = viewParam === 'list' ? 'list' : 'grid';
 
   const [allData, setAllData] = useState<Opportunity[]>([]);
   const [data, setData] = useState<OpportunityListResponse | null>(null);
@@ -205,6 +208,16 @@ export default function OpportunitiesList() {
     updateParams(params);
   };
 
+  const handleViewChange = (v: 'grid' | 'list') => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (v === 'grid') {
+      params.delete('view');
+    } else {
+      params.set('view', v);
+    }
+    updateParams(params);
+  };
+
   const handlePageChange = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', String(p));
@@ -225,6 +238,8 @@ export default function OpportunitiesList() {
           country={country}
           city={city}
           pageLength={pageLength}
+          view={view}
+          onViewChange={handleViewChange}
           onChange={handleFilterChange}
           typeOptions={typeOptions}
           countryOptions={countryOptions}
@@ -260,19 +275,35 @@ export default function OpportunitiesList() {
           </button>
         </div>
       )}
-      {loading && !(data?.data.length) ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: pageLength || 6 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {data?.data.map((item) => (
-            <OpportunityCard key={item.id} item={item} onClick={() => handleCardClick(item.id)} />
-          ))}
-        </div>
-      )}
+        {loading && !(data?.data.length) ? (
+          view === 'list' ? (
+            <div className="flex flex-col divide-y">
+              {Array.from({ length: pageLength || 20 }).map((_, i) => (
+                <div key={i} className="py-3">
+                  <SkeletonCard />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: pageLength || 20 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          )
+        ) : view === 'list' ? (
+          <div className="flex flex-col divide-y">
+            {data?.data.map((item) => (
+              <OpportunityListItem key={item.id} item={item} onClick={() => handleCardClick(item.id)} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {data?.data.map((item) => (
+              <OpportunityCard key={item.id} item={item} onClick={() => handleCardClick(item.id)} />
+            ))}
+          </div>
+        )}
       {!error && data && pageLength !== 0 && (
         <Pagination page={page} totalPages={data.pages} onPageChange={handlePageChange} />
       )}
