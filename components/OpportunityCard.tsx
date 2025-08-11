@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Opportunity } from '../src/api/opportunities';
+import { getCountryName } from '../src/countries';
 import { FeeBadge, RewardBadge, SponsoredBadge, TypeBadge } from './Badges';
 
 function formatDate(date?: string) {
@@ -28,7 +29,12 @@ function feeLabel(item: Opportunity) {
 }
 
 export default function OpportunityCard({ item, onClick }: { item: Opportunity; onClick?: () => void }) {
-  const location = [item.profile.city, item.profile.country].filter(Boolean).join(', ');
+  const location = [
+    item.profile.city,
+    getCountryName(item.profile.country),
+  ]
+    .filter(Boolean)
+    .join(', ');
   const hasRewards = item.rewards && item.rewards.rewardTypes && item.rewards.rewardTypes.length > 0;
   return (
     <button

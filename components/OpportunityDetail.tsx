@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Opportunity, fetchOpportunity } from '../src/api/opportunities';
+import { getCountryName } from '../src/countries';
 
 export default function OpportunityDetail({ id }: { id: string }) {
   const searchParams = useSearchParams();
@@ -41,7 +42,12 @@ export default function OpportunityDetail({ id }: { id: string }) {
   if (error) return <div className="py-10 text-center">Failed to load. <button className="underline" onClick={() => router.refresh()}>Retry</button></div>;
   if (!data) return null;
 
-  const location = [data.profile.city, data.profile.country].filter(Boolean).join(', ');
+  const location = [
+    data.profile.city,
+    getCountryName(data.profile.country),
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   return (
     <article className="space-y-4">

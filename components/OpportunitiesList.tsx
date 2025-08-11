@@ -12,6 +12,7 @@ import Pagination from './Pagination';
 import SortSelect from './SortSelect';
 import Filters from './Filters';
 import { Option } from './filters/MultiSelectFilter';
+import { getCountryName } from '../src/countries';
 
 export default function OpportunitiesList() {
   const searchParams = useSearchParams();
@@ -52,10 +53,11 @@ export default function OpportunitiesList() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist current search params
+  const searchParamsString = searchParams.toString();
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    sessionStorage.setItem('opportunity-search', searchParams.toString());
-  }, [searchParams.toString()]);
+    sessionStorage.setItem('opportunity-search', searchParamsString);
+  }, [searchParamsString]);
 
   // Load all opportunities (from cache if available)
   useEffect(() => {
@@ -97,23 +99,42 @@ export default function OpportunitiesList() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Derive filter options from the full dataset
+  // Derive filter options from the current dataset and selections
   useEffect(() => {
+    const filterBy = (
+      items: Opportunity[],
+      filters: { type?: string[]; country?: string[]; city?: string[] },
+    ) => {
+      const q = searchQuery.toLowerCase();
+      return items.filter(
+        (o) =>
+          (!filters.type?.length || (o.type && filters.type.includes(o.type))) &&
+          (!filters.country?.length || (o.profile?.country && filters.country.includes(o.profile.country))) &&
+          (!filters.city?.length || (o.profile?.city && filters.city.includes(o.profile.city))) &&
+          (!searchQuery || o.title.toLowerCase().includes(q)),
+      );
+    };
+
+    const typeItems = filterBy(allData, { country, city });
+    const countryItems = filterBy(allData, { type, city });
+    const cityItems = filterBy(allData, { type, country });
+
     const types = Array.from(
-      new Set(allData.map((o) => o.type).filter((v): v is string => Boolean(v))),
+      new Set(typeItems.map((o) => o.type).filter((v): v is string => Boolean(v))),
     ).sort();
     const countries = Array.from(
       new Set(
-        allData.map((o) => o.profile?.country).filter((v): v is string => Boolean(v)),
+        countryItems.map((o) => o.profile?.country).filter((v): v is string => Boolean(v)),
       ),
     ).sort();
     const cities = Array.from(
-      new Set(allData.map((o) => o.profile?.city).filter((v): v is string => Boolean(v))),
+      new Set(cityItems.map((o) => o.profile?.city).filter((v): v is string => Boolean(v))),
     ).sort();
+
     setTypeOptions(types.map((v) => ({ value: v, label: v })));
-    setCountryOptions(countries.map((v) => ({ value: v, label: v })));
+    setCountryOptions(countries.map((v) => ({ value: v, label: getCountryName(v) || v })));
     setCityOptions(cities.map((v) => ({ value: v, label: v })));
-  }, [allData]);
+  }, [allData, type, country, city, searchQuery]);
 
   // Apply filters, sorting and pagination on the client
   useEffect(() => {
