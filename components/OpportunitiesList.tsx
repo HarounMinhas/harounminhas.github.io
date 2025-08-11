@@ -7,6 +7,7 @@ import {
   fetchAllOpportunities,
 } from '../src/api/opportunities';
 import OpportunityCard from './OpportunityCard';
+import OpportunityListItem from './OpportunityListItem';
 import SkeletonCard from './SkeletonCard';
 import Pagination from './Pagination';
 import SortSelect from './SortSelect';
@@ -30,7 +31,8 @@ export default function OpportunitiesList() {
   );
   const city = useMemo(() => (cityParam ? cityParam.split(',').filter(Boolean) : []), [cityParam]);
   const pageLengthParam = searchParams.get('pageLength');
-  const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 6;
+  const pageLength = pageLengthParam ? parseInt(pageLengthParam, 10) : 20;
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   const [allData, setAllData] = useState<Opportunity[]>([]);
   const [data, setData] = useState<OpportunityListResponse | null>(null);
@@ -229,6 +231,8 @@ export default function OpportunitiesList() {
           typeOptions={typeOptions}
           countryOptions={countryOptions}
           cityOptions={cityOptions}
+          view={view}
+          onViewChange={setView}
         />
         <div className="flex items-center justify-end">
           <SortSelect value={sortBy} onChange={handleSortChange} />
@@ -262,14 +266,20 @@ export default function OpportunitiesList() {
       )}
       {loading && !(data?.data.length) ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: pageLength || 6 }).map((_, i) => (
+          {Array.from({ length: pageLength || 20 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
-      ) : (
+      ) : view === 'grid' ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data?.data.map((item) => (
             <OpportunityCard key={item.id} item={item} onClick={() => handleCardClick(item.id)} />
+          ))}
+        </div>
+      ) : (
+        <div className="list-group">
+          {data?.data.map((item) => (
+            <OpportunityListItem key={item.id} item={item} onClick={() => handleCardClick(item.id)} />
           ))}
         </div>
       )}

@@ -68,13 +68,16 @@ export default function SearchBar() {
 
   return (
     <div className="relative">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="relative">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-500">
+          <i className="bi bi-search" />
+        </span>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search..."
-          className="w-48 rounded border px-3 py-1 text-sm"
+          className="w-48 rounded border pl-8 pr-3 py-1 text-sm"
           aria-label="Search opportunities"
         />
       </form>
