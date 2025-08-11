@@ -74,7 +74,7 @@ export async function fetchOpportunity(id: string): Promise<Opportunity> {
       headers: { Accept: "application/json" },
     });
     if (!res.ok) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return load();
     }
     return (await res.json()) as Opportunity;
@@ -93,7 +93,7 @@ export async function fetchAllOpportunities(
     try {
       res = await fetchOpportunities(page);
     } catch (e: any) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       continue;
     }
     all.push(...res.data);
