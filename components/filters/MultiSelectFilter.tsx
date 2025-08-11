@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export interface Option {
   value: string;
@@ -12,12 +12,31 @@ interface MultiSelectFilterProps {
   options: Option[];
   selected: string[];
   onChange: (values: string[]) => void;
+  open: boolean;
+  onToggle: () => void;
+  onClose: () => void;
 }
 
-export default function MultiSelectFilter({ label, options, selected, onChange }: MultiSelectFilterProps) {
-  const [open, setOpen] = useState(false);
+export default function MultiSelectFilter({
+  label,
+  options,
+  selected,
+  onChange,
+  open,
+  onToggle,
+  onClose,
+}: MultiSelectFilterProps) {
+  const ref = useRef<HTMLDivElement>(null);
 
-  const toggle = () => setOpen((o) => !o);
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (open && ref.current && !ref.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open, onClose]);
 
   const handleChange = (value: string) => {
     if (selected.includes(value)) {
@@ -28,12 +47,12 @@ export default function MultiSelectFilter({ label, options, selected, onChange }
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={toggle}
+        onClick={onToggle}
         className="rounded border px-2 py-1 text-sm"
       >
         {selected.length ? `${label} (${selected.length})` : label}
