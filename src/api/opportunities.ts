@@ -2,7 +2,7 @@
  * API helpers for ArtConnect opportunities.
  * List endpoint: GET https://api.artconnect.com/v1/opportunities/
  * Detail endpoint: GET https://api.artconnect.com/v1/opportunities/:id/
- * Supports query params: sortBy, page (1-based).
+ * Only the `page` query parameter is supported.
  */
 
 export type Contact = { email?: string; url?: string; instagram?: string };
@@ -59,34 +59,9 @@ export type OpportunityListResponse = {
 
 const API = "https://api.artconnect.com/v1";
 
-export async function fetchOpportunities(
-  params: {
-    sortBy?: string;
-    page?: number;
-    type?: string | string[];
-    country?: string | string[];
-    city?: string | string[];
-    pageLength?: number;
-    search?: string;
-  } = {},
-): Promise<OpportunityListResponse> {
+export async function fetchOpportunities(page = 1): Promise<OpportunityListResponse> {
   const url = new URL(API + "/opportunities/");
-  if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
-  if (params.page) url.searchParams.set("page", String(params.page));
-  if (params.type) {
-    const value = Array.isArray(params.type) ? params.type.join(",") : params.type;
-    url.searchParams.set("type", value);
-  }
-  if (params.country) {
-    const value = Array.isArray(params.country) ? params.country.join(",") : params.country;
-    url.searchParams.set("country", value);
-  }
-  if (params.city) {
-    const value = Array.isArray(params.city) ? params.city.join(",") : params.city;
-    url.searchParams.set("city", value);
-  }
-  if (params.pageLength !== undefined) url.searchParams.set("pageLength", String(params.pageLength));
-  if (params.search) url.searchParams.set("search", params.search);
+  url.searchParams.set("page", String(page));
   const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`List fetch failed: ${res.status}`);
   return (await res.json()) as OpportunityListResponse;
@@ -99,11 +74,10 @@ export async function fetchOpportunity(id: string): Promise<Opportunity> {
 }
 
 export async function fetchAllOpportunities(): Promise<Opportunity[]> {
-  const pageLength = 100;
   let page = 1;
   const all: Opportunity[] = [];
   while (true) {
-    const res = await fetchOpportunities({ page, pageLength });
+    const res = await fetchOpportunities(page);
     all.push(...res.data);
     if (!res.pages || page >= res.pages) break;
     page++;
