@@ -23,7 +23,21 @@ export default function OpportunityDetail({ id }: { id: string }) {
   backParams.delete('id');
   const backHref = `/opportunities?${backParams.toString()}`;
 
-  if (loading) return <div className="py-10 text-center" role="status">Loading…</div>;
+  if (loading)
+    return (
+      <div className="py-10 text-center" role="status">
+        <div className="progress mx-auto w-1/2">
+          <div
+            className="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style={{ width: '100%' }}
+            aria-valuenow={100}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          />
+        </div>
+      </div>
+    );
   if (error) return <div className="py-10 text-center">Failed to load. <button className="underline" onClick={() => router.refresh()}>Retry</button></div>;
   if (!data) return null;
 
