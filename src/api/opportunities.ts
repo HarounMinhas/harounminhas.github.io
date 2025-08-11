@@ -73,14 +73,23 @@ export async function fetchOpportunity(id: string): Promise<Opportunity> {
   return (await res.json()) as Opportunity;
 }
 
-export async function fetchAllOpportunities(): Promise<Opportunity[]> {
+export async function fetchAllOpportunities(
+  onPage?: (partial: Opportunity[], page: number, pages?: number) => void,
+  delayMs = 100,
+): Promise<Opportunity[]> {
   let page = 1;
   const all: Opportunity[] = [];
   while (true) {
     const res = await fetchOpportunities(page);
     all.push(...res.data);
+    if (onPage) {
+      onPage(all.slice(), page, res.pages);
+    }
     if (!res.pages || page >= res.pages) break;
     page++;
+    if (delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
   }
   return all;
 }

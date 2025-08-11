@@ -38,6 +38,7 @@ export default function OpportunitiesList() {
   const [typeOptions, setTypeOptions] = useState<Option[]>([]);
   const [countryOptions, setCountryOptions] = useState<Option[]>([]);
   const [cityOptions, setCityOptions] = useState<Option[]>([]);
+  const [progress, setProgress] = useState(0);
 
   // Restore previously used filters and pagination from session storage
   useEffect(() => {
@@ -73,16 +74,16 @@ export default function OpportunitiesList() {
 
     async function loadAll() {
       try {
-        const latest = await fetchAllOpportunities();
-        if (canceled) return;
-        const latestIds = latest.map((o) => o.id).join(',');
-        const cachedIds = allData.map((o) => o.id).join(',');
-        if (latestIds !== cachedIds) {
-          setAllData(latest);
+        await fetchAllOpportunities((partial, currentPage, pages) => {
+          if (canceled) return;
+          setAllData(partial);
           if (typeof window !== 'undefined') {
-            sessionStorage.setItem('all-opportunities', JSON.stringify(latest));
+            sessionStorage.setItem('all-opportunities', JSON.stringify(partial));
           }
-        }
+          if (pages) {
+            setProgress((currentPage / pages) * 100);
+          }
+        });
       } catch (e) {
         console.error(e);
       }
@@ -209,6 +210,18 @@ export default function OpportunitiesList() {
           <SortSelect value={sortBy} onChange={handleSortChange} />
         </div>
       </div>
+      {progress > 0 && progress < 100 && (
+        <div className="progress mb-4">
+          <div
+            className="progress-bar"
+            role="progressbar"
+            style={{ width: `${progress}%` }}
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          />
+        </div>
+      )}
       {error && (
         <div className="mb-4 rounded border border-red-200 bg-red-50 p-4">
           <p className="text-red-700">Failed to load opportunities.</p>
