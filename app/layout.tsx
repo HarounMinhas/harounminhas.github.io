@@ -31,8 +31,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <header className="border-b bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 p-4">
-            <Link href="/opportunities" className="text-xl font-semibold">
-              Opportunities
+            <Link href="/" className="text-xl font-semibold">
+              Projects
             </Link>
             <div className="flex items-center gap-2">
               <ThemeSelector />
