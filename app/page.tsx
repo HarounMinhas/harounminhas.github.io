@@ -1,10 +1,17 @@
-import React, { Suspense } from 'react';
-import OpportunitiesList from "../components/OpportunitiesList";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="py-10 text-center" role="status">Loading…</div>}>
-      <OpportunitiesList />
-    </Suspense>
+    <div className="space-y-4">
+      <h1 className="text-2xl font-semibold">Projects</h1>
+      <ul className="list-disc pl-5 space-y-2">
+        <li>
+          <Link href="/opportunities">Opportunities</Link>
+        </li>
+        <li>
+          <Link href="/projects/gsap">GSAP Scroll Demo</Link>
+        </li>
+      </ul>
+    </div>
   );
 }
