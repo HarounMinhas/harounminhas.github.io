@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger, ScrollToPlugin } from 'gsap/all';
+import ProjectVersionBanner from '../components/ProjectVersionBanner';
 import './gsap.css';
 
 export default function GsapDemo() {
@@ -56,6 +57,7 @@ export default function GsapDemo() {
 
   return (
     <>
+      <ProjectVersionBanner className="mx-auto mb-6 mt-4 max-w-3xl" />
       <div id="panel-1" className="gsap-panel">
         <span className="line"></span>
         <p>Pastel panels animate as you scroll.</p>
