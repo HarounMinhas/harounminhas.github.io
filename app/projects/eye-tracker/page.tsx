@@ -21,14 +21,25 @@ type EyeBox = {
   height: number;
 };
 
+const clamp = (value: number, min: number, max: number) => {
+  if (Number.isNaN(value)) {
+    return min;
+  }
+  return Math.min(Math.max(value, min), max);
+};
+
 const computeBoundingBox = (
   keypoints: Keypoint[],
   indices: number[],
+  dimensions: { width: number; height: number },
 ): EyeBox | null => {
+  const { width, height } = dimensions;
+
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
   let maxX = Number.NEGATIVE_INFINITY;
   let maxY = Number.NEGATIVE_INFINITY;
+  let hasValidPoint = false;
 
   indices.forEach((index) => {
     const point = keypoints[index];
@@ -36,21 +47,43 @@ const computeBoundingBox = (
       return;
     }
 
-    minX = Math.min(minX, point.x);
-    minY = Math.min(minY, point.y);
-    maxX = Math.max(maxX, point.x);
-    maxY = Math.max(maxY, point.y);
+    let x = point.x;
+    let y = point.y;
+
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      return;
+    }
+
+    // MediaPipe returns normalized coordinates in the range [0, 1]. Convert
+    // those to pixel coordinates based on the rendered video size. When the
+    // model already returns absolute pixel values (as some backends do), we
+    // keep them untouched by checking for values outside the normalized range.
+    if (Math.abs(x) <= 1.5 && Math.abs(y) <= 1.5) {
+      x *= width;
+      y *= height;
+    }
+
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+    hasValidPoint = true;
   });
 
-  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+  if (!hasValidPoint) {
     return null;
   }
 
+  const clampedMinX = clamp(minX, 0, width);
+  const clampedMinY = clamp(minY, 0, height);
+  const clampedMaxX = clamp(maxX, 0, width);
+  const clampedMaxY = clamp(maxY, 0, height);
+
   return {
-    x: minX,
-    y: minY,
-    width: maxX - minX,
-    height: maxY - minY,
+    x: clampedMinX,
+    y: clampedMinY,
+    width: Math.max(0, clampedMaxX - clampedMinX),
+    height: Math.max(0, clampedMaxY - clampedMinY),
   };
 };
 
@@ -117,8 +150,20 @@ const EyeTrackerProject = () => {
     }
 
     const { keypoints } = predictions[0];
-    const leftEyeBox = computeBoundingBox(keypoints as Keypoint[], LEFT_EYE_INDICES);
-    const rightEyeBox = computeBoundingBox(keypoints as Keypoint[], RIGHT_EYE_INDICES);
+    const dimensions = {
+      width: canvas.width,
+      height: canvas.height,
+    };
+    const leftEyeBox = computeBoundingBox(
+      keypoints as Keypoint[],
+      LEFT_EYE_INDICES,
+      dimensions,
+    );
+    const rightEyeBox = computeBoundingBox(
+      keypoints as Keypoint[],
+      RIGHT_EYE_INDICES,
+      dimensions,
+    );
 
     context.lineWidth = 3;
     context.strokeStyle = "#22d3ee";
