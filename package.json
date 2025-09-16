@@ -10,6 +10,10 @@
     "deploy": "npm run build && cp -a out/* . && touch .nojekyll"
   },
   "dependencies": {
+    "@tensorflow-models/face-landmarks-detection": "^1.0.6",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "@tensorflow/tfjs-converter": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
     "gsap": "^3.13.0",
     "next": "14.2.31",
     "react": "^18",

@@ -11,6 +11,9 @@ export default function Home() {
         <li>
           <Link href="/projects/gsap">GSAP Scroll Demo</Link>
         </li>
+        <li>
+          <Link href="/projects/eye-tracker">Eye Tracking Camera</Link>
+        </li>
       </ul>
     </div>
   );
