@@ -1,12 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 type ProjectVersionBannerProps = {
   className?: string;
 };
 
-const TIMESTAMP_SOURCES = [
+type TimestampSource = string | null | undefined;
+
+export type TimestampInfo = {
+  rawValue: string | null;
+  displayValue: string | null;
+  isParsed: boolean;
+};
+
+const TIMESTAMP_SOURCES: readonly TimestampSource[] = [
   process.env.NEXT_PUBLIC_DEPLOYED_AT,
   process.env.NEXT_PUBLIC_BUILD_TIMESTAMP,
   process.env.NEXT_PUBLIC_BUILD_TIME,
@@ -15,7 +23,7 @@ const TIMESTAMP_SOURCES = [
 
 const pad = (value: number) => value.toString().padStart(2, "0");
 
-const formatTimestampWithSeconds = (date: Date) => {
+export const formatTimestampWithSeconds = (date: Date) => {
   const day = pad(date.getDate());
   const month = pad(date.getMonth() + 1);
   const year = date.getFullYear();
@@ -32,7 +40,7 @@ const formatTimestampWithSeconds = (date: Date) => {
   return `${day}-${month}-${year} ${hours}:${minutes}:${seconds} (UTC${offsetSign}${offsetHours}:${offsetRemainingMinutes})`;
 };
 
-const parseTimestamp = (value: string): Date | null => {
+export const parseTimestamp = (value: string): Date | null => {
   const trimmed = value.trim();
   if (!trimmed) {
     return null;
@@ -54,41 +62,66 @@ const parseTimestamp = (value: string): Date | null => {
   return parsedDate;
 };
 
+export const DEFAULT_TIMESTAMP_INFO: TimestampInfo = Object.freeze({
+  rawValue: null,
+  displayValue: null,
+  isParsed: false,
+});
+
+type DeriveTimestampInfoOptions = {
+  parse?: (value: string) => Date | null;
+  format?: (date: Date) => string;
+};
+
+const findFirstCandidate = (sources: readonly TimestampSource[]) =>
+  sources.find((value) => typeof value === "string" && value.trim().length > 0) ?? null;
+
+export const deriveTimestampInfo = (
+  sources: readonly TimestampSource[],
+  options: DeriveTimestampInfoOptions = {},
+): TimestampInfo => {
+  const candidate = findFirstCandidate(sources);
+  if (!candidate) {
+    return DEFAULT_TIMESTAMP_INFO;
+  }
+
+  const trimmedCandidate = candidate.trim();
+  const parse = options.parse ?? parseTimestamp;
+  const format = options.format ?? formatTimestampWithSeconds;
+  const parsedDate = parse(trimmedCandidate);
+
+  if (!parsedDate) {
+    return {
+      rawValue: trimmedCandidate,
+      displayValue: `Onbekend formaat (${trimmedCandidate})`,
+      isParsed: false,
+    };
+  }
+
+  return {
+    rawValue: trimmedCandidate,
+    displayValue: format(parsedDate),
+    isParsed: true,
+  };
+};
+
 const getContainerClassName = (className?: string) => {
   const baseClassName = "rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900 shadow-sm";
   return className ? `${baseClassName} ${className}` : baseClassName;
 };
 
+const areTimestampInfosEqual = (a: TimestampInfo, b: TimestampInfo) =>
+  a.rawValue === b.rawValue && a.displayValue === b.displayValue && a.isParsed === b.isParsed;
+
 const ProjectVersionBanner = ({ className }: ProjectVersionBannerProps) => {
-  const { rawValue, displayValue, isParsed } = useMemo(() => {
-    const candidate = TIMESTAMP_SOURCES.find((value) => typeof value === "string" && value.trim().length > 0);
+  const [timestampInfo, setTimestampInfo] = useState<TimestampInfo>(DEFAULT_TIMESTAMP_INFO);
 
-    if (!candidate) {
-      return {
-        rawValue: null as string | null,
-        displayValue: null as string | null,
-        isParsed: false,
-      };
-    }
-
-    const trimmedCandidate = candidate.trim();
-    const parsedDate = parseTimestamp(trimmedCandidate);
-
-    if (!parsedDate) {
-      return {
-        rawValue: trimmedCandidate,
-        displayValue: `Onbekend formaat (${trimmedCandidate})`,
-        isParsed: false,
-      };
-    }
-
-    return {
-      rawValue: trimmedCandidate,
-      displayValue: formatTimestampWithSeconds(parsedDate),
-      isParsed: true,
-    };
+  useEffect(() => {
+    const info = deriveTimestampInfo(TIMESTAMP_SOURCES);
+    setTimestampInfo((previous) => (areTimestampInfosEqual(previous, info) ? previous : info));
   }, []);
 
+  const { rawValue, displayValue, isParsed } = timestampInfo;
   const containerClassName = getContainerClassName(className);
 
   return (
