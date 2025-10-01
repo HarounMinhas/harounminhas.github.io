@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "npm run build && cp -a out/* . && touch .nojekyll"
+    "deploy": "npm run build && cp -a out/* . && touch .nojekyll",
+    "test": "vitest run"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
@@ -33,6 +34,7 @@
     "eslint-config-next": "14.2.31",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.4"
   }
 }
