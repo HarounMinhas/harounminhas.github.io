@@ -1,70 +1,35 @@
-import ProjectMarkdownSection from '../components/ProjectMarkdownSection';
-import ProjectVersionBanner from '../components/ProjectVersionBanner';
-import { getProjectMarkdownMap } from '../data';
+import fs from "fs/promises";
+import path from "path";
+import ReactMarkdown from "react-markdown";
+import ProjectVersionBanner from "../components/ProjectVersionBanner";
 
 export const metadata = {
-  title: 'MusicDiscovery App',
-  description: 'Interactieve muziekontdekking met Spotify-integratie, backend + frontend stack en runbook.',
+  title: "MusicDiscovery Blueprint",
+  description: "Blueprint en runbook voor de MusicDiscovery app",
 };
 
-const SLUG = 'music-discovery' as const;
-
 export default async function MusicDiscoveryProjectPage() {
-  const docs = await getProjectMarkdownMap(SLUG, ['blueprint.md', 'runbook.md'] as const);
-
+  const blueprintPath = path.join(
+    process.cwd(),
+    "projects",
+    "music-discovery",
+    "blueprint.md",
+  );
+  const blueprint = await fs.readFile(blueprintPath, "utf8");
+  
   return (
     <div className="space-y-6">
       <ProjectVersionBanner className="mx-auto mt-4 max-w-3xl" />
-
-      <header className="space-y-3 rounded-lg border bg-white p-6 shadow-sm">
+      <header className="space-y-2 rounded-lg border bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-gray-900">MusicDiscovery</h1>
         <p className="text-sm text-gray-600">
-          Een volledige implementatie van de MusicDiscovery blueprint: Node.js/Prisma backend met Spotify-proxy en playlist export,
-          plus een Vite/React frontend met force-directed graaf, previews, favorieten en snapshots.
+          Een end-to-end blueprint voor een interactieve muziekontdekkingsapp met Spotify-integratie,
+          force-directed graaf en gedeelde snapshots.
         </p>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="rounded-md border bg-slate-50 p-4">
-            <h2 className="text-sm font-semibold text-slate-900">Backend</h2>
-            <p className="text-sm text-slate-600">
-              Express + Prisma API met Spotify-integratie, Redis caching, favorieten, snapshots en playlist export endpoints.
-            </p>
-            <a
-              className="mt-3 inline-flex text-sm font-medium text-blue-600"
-              href="https://github.com/harounminhas/harounminhas.github.io/tree/main/backend"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Bekijk backend/
-            </a>
-          </div>
-          <div className="rounded-md border bg-slate-50 p-4">
-            <h2 className="text-sm font-semibold text-slate-900">Frontend</h2>
-            <p className="text-sm text-slate-600">
-              Vite + React app met react-force-graph, globale audio player, Spotify login en Playwright E2E tests.
-            </p>
-            <a
-              className="mt-3 inline-flex text-sm font-medium text-blue-600"
-              href="https://github.com/harounminhas/harounminhas.github.io/tree/main/frontend"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Bekijk frontend/
-            </a>
-          </div>
-        </div>
       </header>
-
-      <ProjectMarkdownSection
-        title="Blueprint"
-        description="De originele productvisie, functionele eisen en architectuurkeuzes voor het platform."
-        content={docs['blueprint.md']}
-      />
-
-      <ProjectMarkdownSection
-        title="Runbook"
-        description="Stap-voor-stap handleiding voor lokale ontwikkeling, tests en deployment."
-        content={docs['runbook.md']}
-      />
+      <article className="prose prose-slate max-w-none rounded-lg border bg-white p-6 shadow-sm">
+        <ReactMarkdown>{blueprint}</ReactMarkdown>
+      </article>
     </div>
   );
 }
