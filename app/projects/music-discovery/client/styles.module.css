@@ -1,0 +1,349 @@
+.app {
+  --bg: #0b0d12;
+  --panel: #121621;
+  --muted: #9aa4b2;
+  --text: #e6e9ef;
+  --accent: #59a2ff;
+  display: grid;
+  grid-template-rows: 60px 1fr 64px;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 16px;
+  border: 1px solid rgba(89, 162, 255, 0.1);
+  overflow: hidden;
+  box-shadow: 0 32px 60px rgba(8, 10, 18, 0.45);
+  min-height: 720px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-bottom: 1px solid #1c2230;
+  background: linear-gradient(135deg, rgba(18, 22, 33, 0.95), rgba(12, 16, 26, 0.95));
+  backdrop-filter: blur(16px);
+}
+
+.logo {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  font-size: 18px;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  min-height: 0;
+}
+
+.canvasWrap {
+  position: relative;
+  background: radial-gradient(circle at top left, rgba(89, 162, 255, 0.06), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(95, 205, 241, 0.08), transparent 45%);
+}
+
+.side {
+  border-left: 1px solid #1c2230;
+  background: rgba(12, 16, 26, 0.94);
+  backdrop-filter: blur(20px);
+  overflow-y: auto;
+}
+
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid #1c2230;
+  background: rgba(12, 16, 26, 0.94);
+  backdrop-filter: blur(20px);
+}
+
+.search {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(89, 162, 255, 0.2);
+  background: rgba(8, 12, 21, 0.9);
+  color: var(--text);
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: rgba(89, 162, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(89, 162, 255, 0.2);
+}
+
+.searchList {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  right: 0;
+  background: rgba(12, 16, 26, 0.98);
+  border: 1px solid rgba(89, 162, 255, 0.15);
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 40;
+  box-shadow: 0 32px 60px rgba(8, 10, 18, 0.55);
+}
+
+.menu {
+  position: absolute;
+  background: rgba(18, 24, 40, 0.98);
+  border: 1px solid rgba(89, 162, 255, 0.18);
+  border-radius: 16px;
+  min-width: 240px;
+  padding: 12px;
+  box-shadow: 0 40px 70px rgba(8, 10, 18, 0.65);
+  backdrop-filter: blur(18px);
+}
+
+.menuTitle {
+  margin: 4px 6px 10px;
+  font-size: 13px;
+  color: rgba(230, 233, 239, 0.7);
+  letter-spacing: 0.2px;
+}
+
+.menuButton {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+  font-size: 14px;
+}
+
+.menuButton:hover:not(:disabled) {
+  background: rgba(89, 162, 255, 0.08);
+  transform: translateX(2px);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  transition: background 0.2s ease;
+}
+
+.track:hover {
+  background: rgba(89, 162, 255, 0.08);
+}
+
+.track small {
+  color: var(--muted);
+}
+
+.btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(89, 162, 255, 0.35);
+  background: rgba(14, 19, 32, 0.9);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(18, 24, 40, 0.95);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  border-color: rgba(89, 162, 255, 0.65);
+  background: linear-gradient(135deg, rgba(89, 162, 255, 0.28), rgba(95, 205, 241, 0.35));
+}
+
+.label {
+  color: rgba(230, 233, 239, 0.65);
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 9, 15, 0.75);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+}
+
+.dialog {
+  background: rgba(12, 16, 26, 0.96);
+  border: 1px solid rgba(89, 162, 255, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  width: min(420px, 90vw);
+  box-shadow: 0 40px 80px rgba(8, 10, 18, 0.7);
+}
+
+.dialogTitle {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dialogInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(89, 162, 255, 0.25);
+  background: rgba(8, 12, 21, 0.9);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.dialogActions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.sideSection {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideSectionHeader {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(230, 233, 239, 0.7);
+  letter-spacing: 0.25px;
+}
+
+.snapshotList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.snapshotCard {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(89, 162, 255, 0.15);
+  background: rgba(14, 19, 32, 0.8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.snapshotTitle {
+  font-weight: 600;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  background: rgba(89, 162, 255, 0.12);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: rgba(230, 233, 239, 0.75);
+}
+
+.footerPlayer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range {
+  width: 100%;
+}
+
+.tabs {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid rgba(89, 162, 255, 0.2);
+  background: rgba(12, 16, 26, 0.75);
+  padding: 4px;
+  gap: 4px;
+}
+
+.tabButton {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: transparent;
+  color: rgba(230, 233, 239, 0.7);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tabButtonActive {
+  background: linear-gradient(135deg, rgba(89, 162, 255, 0.4), rgba(95, 205, 241, 0.35));
+  color: white;
+}
+
+.blueprint {
+  background: white;
+  color: #0b0d12;
+  border-radius: 16px;
+  border: 1px solid rgba(12, 16, 26, 0.1);
+  padding: 24px;
+}
+
+.blueprint :global(h1) {
+  font-size: 32px;
+}
+
+.blueprint :global(h2) {
+  margin-top: 24px;
+  font-size: 24px;
+}
+
+.blueprint :global(h3) {
+  margin-top: 18px;
+  font-size: 18px;
+}
+
+.blueprint :global(code) {
+  background: rgba(12, 16, 26, 0.08);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.blueprint :global(pre) {
+  background: rgba(12, 16, 26, 0.85);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+}
