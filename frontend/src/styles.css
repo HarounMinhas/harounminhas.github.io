@@ -1,0 +1,42 @@
+* { box-sizing: border-box; }
+:root {
+  --bg: #0b0d12;
+  --panel: #121621;
+  --muted: #9aa4b2;
+  --text: #e6e9ef;
+  --accent: #59a2ff;
+}
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif;
+}
+
+.app { display: grid; grid-template-rows: 56px 1fr 56px; height: 100%; }
+.header { display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid #1c2230; background: var(--panel); }
+.logo { font-weight: 700; letter-spacing: 0.2px; }
+.main { display: grid; grid-template-columns: 1fr 360px; min-height: 0; }
+.canvasWrap { position: relative; }
+.side { border-left: 1px solid #1c2230; background: var(--panel); overflow: auto; }
+.footer { display: grid; grid-template-columns: 1fr 320px; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #1c2230; background: var(--panel); }
+
+.search { flex: 1; display: flex; }
+.search input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #293046; background: #0f1320; color: var(--text); }
+
+.menu { position: absolute; background: #1a2032; border: 1px solid #2a334c; border-radius: 10px; min-width: 240px; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.menu h4 { margin: 6px 10px; font-size: 13px; color: var(--muted); }
+.menu button { width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+.menu button:hover { background: #222941; }
+
+.track { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
+.track:hover { background: #0f1320; }
+.track small { color: var(--muted); }
+
+.btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #2a334c; background: #11162a; color: var(--text); cursor: pointer; }
+.btn.primary { border-color: var(--accent); background: #10213a; }
+
+.label { color: var(--muted); font-size: 12px; }
+
+.nodeLabel { position: absolute; pointer-events: none; color: var(--text); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }

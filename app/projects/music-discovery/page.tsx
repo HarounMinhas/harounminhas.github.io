@@ -16,7 +16,7 @@ export default async function MusicDiscoveryProjectPage() {
     "blueprint.md",
   );
   const blueprint = await fs.readFile(blueprintPath, "utf8");
-
+  
   return (
     <div className="space-y-6">
       <ProjectVersionBanner className="mx-auto mt-4 max-w-3xl" />
