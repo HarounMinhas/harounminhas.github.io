@@ -14,6 +14,9 @@ export default function Home() {
         <li>
           <Link href="/projects/eye-tracker">Eye Tracking Camera</Link>
         </li>
+        <li>
+          <Link href="/projects/music-discovery">MusicDiscovery App</Link>
+        </li>
       </ul>
     </div>
   );
