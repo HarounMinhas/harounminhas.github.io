@@ -22,8 +22,12 @@ body {
 .side { border-left: 1px solid #1c2230; background: var(--panel); overflow: auto; }
 .footer { display: grid; grid-template-columns: 1fr 320px; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #1c2230; background: var(--panel); }
 
-.search { flex: 1; display: flex; }
-.search input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #293046; background: #0f1320; color: var(--text); }
+.search { flex: 1; display: flex; align-items: center; gap: 8px; }
+.searchField { position: relative; flex: 1; }
+.searchField input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #293046; background: #0f1320; color: var(--text); }
+.searchField input:disabled { opacity: 0.7; }
+.searchResults { position: absolute; top: 44px; left: 0; right: 0; background: #0f1320; border: 1px solid #27314d; border-radius: 10px; overflow: hidden; z-index: 20; box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4); }
+.searchStatus { padding: 12px; color: var(--muted); text-align: center; }
 
 .menu { position: absolute; background: #1a2032; border: 1px solid #2a334c; border-radius: 10px; min-width: 240px; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 .menu h4 { margin: 6px 10px; font-size: 13px; color: var(--muted); }
