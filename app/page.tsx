@@ -17,6 +17,9 @@ export default function Home() {
         <li>
           <Link href="/projects/music-discovery">MusicDiscovery Blueprint</Link>
         </li>
+        <li>
+          <Link href="/projects/marieke-praktijk">Marieke Praktijk</Link>
+        </li>
       </ul>
     </div>
   );
