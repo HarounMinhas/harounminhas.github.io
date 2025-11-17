@@ -38,7 +38,7 @@ export default function Home() {
         <div className="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
       </div>
 
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-16 pt-32 text-center">
         <p className="text-sm uppercase tracking-[0.5em] text-white/60">Portfolio</p>
         <h1 className="mt-6 text-5xl font-light tracking-tight text-white sm:text-6xl md:text-7xl">
           Haroun Minhas
@@ -47,7 +47,7 @@ export default function Home() {
           Moderne ideeën, experimenten en projecten. Scrol omlaag of kies een project om meer te ontdekken.
         </p>
 
-        <section className="mt-16 w-full max-w-4xl">
+        <section id="projects" className="mt-16 w-full max-w-4xl">
           <div className="grid gap-4 sm:grid-cols-2">
             {projects.map((project) => (
               <Link
