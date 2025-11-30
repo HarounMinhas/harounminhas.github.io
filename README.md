@@ -2,14 +2,26 @@
 
 Een moderne, overzichtelijke website die bezoekers informeert over de logopediepraktijk en aanzet tot contact opnemen.
 
-## GitHub Pages publicatie
+## Ontwikkeling
 
-Deze repository is de bron voor `harounminhas.github.io`. GitHub Pages kan vanaf de `docs/` map serveren. Volg deze stappen om de live-site bij te werken:
+De frontend staat in `src/` en draait op React (Create React App). TypeScript-ondersteuning is toegevoegd zodat nieuwe componenten ook in `.ts`/`.tsx` kunnen worden geschreven. De bestaande JavaScript-bestanden blijven bruikbaar omdat `allowJs` aan staat in `tsconfig.json`.
 
-1. Draai `npm install` als dependencies ontbreken.
-2. Bouw de site lokaal: `npm run build`.
-3. Verplaats de build-output naar `docs/`: `mv build docs` (de map bestaat al en wordt overschreven).
-4. Commit en push naar de branch die GitHub Pages gebruikt (meestal `main`).
-5. Controleer in de repository-instellingen dat GitHub Pages als bron `main` > `docs/` gebruikt.
+Handige commando's:
 
-> Als je alleen naar een andere branch pusht, werkt de live-website niet bij. GitHub Pages pakt uitsluitend de geconfigureerde branch/map. Merge daarom je wijzigingen naar de Pages-bron of gebruik een workflow die automatisch naar `docs/` publiceert.
+- `npm install` – installeert alle dependencies.
+- `npm start` – draait de devserver lokaal.
+- `npm run type-check` – voert een TypeScript-check uit zonder output te schrijven.
+- `npm run build` – bouwt een geoptimaliseerde versie in `build/`.
+
+## Publicatie naar GitHub Pages
+
+GitHub Pages wordt via een workflow opgebouwd en gedeployed zodra je naar `main` pusht. De workflow vind je in `.github/workflows/deploy.yml` en doet het volgende:
+
+1. Installeert Node 20 en de npm-dependencies (`npm ci`).
+2. Draait `npm run type-check` en `npm run build`.
+3. Uploadt de `build/` map als Pages-artifact.
+4. Deployt het artifact naar de `github-pages` environment.
+
+Zet in de GitHub Pages-instellingen de bron op **GitHub Actions**. Daarna blijft de site bereikbaar via `https://harounminhas.github.io/`.
+
+De bestaande `docs/` map bevat de eerder gebouwde versie maar wordt niet meer gebruikt zodra de GitHub Actions deploy actief is.
