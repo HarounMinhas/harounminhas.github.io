@@ -17,6 +17,47 @@ body {
   font-size: 1rem;
 }
 
+.theme-switcher {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+}
+
+.theme-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  color: var(--text-dark);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.theme-dropdown {
+  min-width: 320px;
+}
+
+.theme-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 576px) {
+  .theme-switcher {
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .theme-dropdown {
+    min-width: 280px;
+  }
+}
+
 main,
 section,
 .card,
