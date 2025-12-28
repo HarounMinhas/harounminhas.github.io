@@ -1,54 +1,203 @@
-import { useState, useEffect } from 'react'
-import StartScreen from './components/StartScreen'
-import Scoreboard from './components/Scoreboard'
-import { GameState, Player } from './types'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { GameState, Player, RoundEntry, Round } from './types';
+import { PlayerSetup } from './components/PlayerSetup';
+import { Scoreboard } from './components/Scoreboard';
+import { EndRoundModal } from './components/EndRoundModal';
+import { RoundHistory } from './components/RoundHistory';
+import { PhaseGenerator } from './components/PhaseGenerator';
+import { Toast } from './components/Toast';
+import { calculatePlayerScores, recalculateFromRound } from './utils/gameLogic';
+import { saveGame, loadGame, clearGame } from './utils/storage';
+import './App.css';
 
-const STORAGE_KEY = 'phase10-game-state'
+type ModalType = 'endRound' | 'history' | 'generator' | null;
 
 function App() {
-  const [gameState, setGameState] = useState<GameState | null>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? JSON.parse(saved) : null
-  })
+  const [gameState, setGameState] = useState<GameState>(() => {
+    const saved = loadGame();
+    return saved || {
+      players: [],
+      rounds: [],
+      currentRound: 1,
+      gameStarted: false,
+    };
+  });
 
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [editingRound, setEditingRound] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ message: string; action?: { label: string; onClick: () => void } } | null>(null);
+  const [lastAction, setLastAction] = useState<{ type: 'round'; data: GameState } | null>(null);
+
+  // Auto-save whenever game state changes
   useEffect(() => {
-    if (gameState) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState))
+    if (gameState.gameStarted) {
+      saveGame(gameState);
     }
-  }, [gameState])
+  }, [gameState]);
 
   const startGame = (players: Player[]) => {
-    const newGame: GameState = {
+    setGameState({
       players,
       rounds: [],
-      currentRound: 0
+      currentRound: 1,
+      gameStarted: true,
+    });
+  };
+
+  const endRound = (entries: RoundEntry[]) => {
+    const newRound: Round = {
+      id: Date.now().toString(),
+      roundNumber: gameState.currentRound,
+      entries,
+      timestamp: Date.now(),
+    };
+
+    const previousState = { ...gameState };
+    const newState = {
+      ...gameState,
+      rounds: [...gameState.rounds, newRound],
+      currentRound: gameState.currentRound + 1,
+    };
+
+    setGameState(newState);
+    setLastAction({ type: 'round', data: previousState });
+    setActiveModal(null);
+    setToast({
+      message: 'Ronde opgeslagen!',
+      action: {
+        label: 'Ongedaan maken',
+        onClick: undoLastRound,
+      },
+    });
+  };
+
+  const undoLastRound = () => {
+    if (lastAction && lastAction.type === 'round') {
+      setGameState(lastAction.data);
+      setLastAction(null);
+      setToast({ message: 'Laatste ronde ongedaan gemaakt' });
     }
-    setGameState(newGame)
-  }
+  };
 
-  const resetGame = () => {
-    localStorage.removeItem(STORAGE_KEY)
-    setGameState(null)
-  }
+  const editRound = (roundIndex: number, entries: RoundEntry[]) => {
+    const updatedRounds = [...gameState.rounds];
+    updatedRounds[roundIndex] = {
+      ...updatedRounds[roundIndex],
+      entries,
+    };
 
-  const updateGameState = (newState: GameState) => {
-    setGameState(newState)
+    const newState = recalculateFromRound(
+      {
+        ...gameState,
+        rounds: updatedRounds,
+      },
+      roundIndex
+    );
+
+    setGameState(newState);
+    setEditingRound(null);
+    setActiveModal(null);
+    setToast({ message: 'Ronde bijgewerkt!' });
+  };
+
+  const newGame = () => {
+    if (confirm('Weet je zeker dat je een nieuw spel wilt starten? Het huidige spel wordt gewist.')) {
+      clearGame();
+      setGameState({
+        players: [],
+        rounds: [],
+        currentRound: 1,
+        gameStarted: false,
+      });
+      setLastAction(null);
+      setToast(null);
+    }
+  };
+
+  const getCurrentPhases = (): Map<string, number> => {
+    const phases = new Map<string, number>();
+    
+    gameState.players.forEach(player => {
+      let currentPhase = 1;
+      gameState.rounds.forEach(round => {
+        const entry = round.entries.find(e => e.playerId === player.id);
+        if (entry) {
+          currentPhase = entry.phaseAfterRound;
+        }
+      });
+      phases.set(player.id, currentPhase);
+    });
+    
+    return phases;
+  };
+
+  const scores = gameState.gameStarted ? calculatePlayerScores(gameState) : [];
+
+  if (!gameState.gameStarted) {
+    return (
+      <div className="app">
+        <PlayerSetup onStartGame={startGame} />
+      </div>
+    );
   }
 
   return (
     <div className="app">
-      {!gameState ? (
-        <StartScreen onStartGame={startGame} />
-      ) : (
-        <Scoreboard 
-          gameState={gameState} 
-          onResetGame={resetGame}
-          onUpdateGameState={updateGameState}
+      <Scoreboard
+        scores={scores}
+        currentRound={gameState.currentRound}
+        onEndRound={() => setActiveModal('endRound')}
+        onViewHistory={() => setActiveModal('history')}
+        onNewGame={newGame}
+        onGeneratePhase={() => setActiveModal('generator')}
+      />
+
+      {activeModal === 'endRound' && editingRound === null && (
+        <EndRoundModal
+          players={gameState.players}
+          currentPhases={getCurrentPhases()}
+          onSave={endRound}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {activeModal === 'endRound' && editingRound !== null && (
+        <EndRoundModal
+          players={gameState.players}
+          currentPhases={getCurrentPhases()}
+          onSave={(entries) => editRound(editingRound, entries)}
+          onClose={() => {
+            setEditingRound(null);
+            setActiveModal(null);
+          }}
+        />
+      )}
+
+      {activeModal === 'history' && (
+        <RoundHistory
+          rounds={gameState.rounds}
+          players={gameState.players}
+          onEditRound={(index) => {
+            setEditingRound(index);
+            setActiveModal('endRound');
+          }}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {activeModal === 'generator' && (
+        <PhaseGenerator onClose={() => setActiveModal(null)} />
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          action={toast.action}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
