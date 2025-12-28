@@ -223,6 +223,17 @@
             display: inline-block;
             margin: 0.25rem;
         }
+        
+        .badge-coming-soon {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -234,14 +245,14 @@
                 <p class="hero-subtitle">Full Stack Developer & Creative Problem Solver</p>
                 
                 <div class="social-links">
-                    <a href="https://github.com/HarounMinhas" class="social-link" target="_blank" rel="noopener">
+                    <a href="https://github.com/HarounMinhas" class="social-link" target="_blank" rel="noopener" title="GitHub">
                         <i class="bi bi-github"></i>
                     </a>
-                    <a href="https://linkedin.com/in/harounminhas" class="social-link" target="_blank" rel="noopener">
+                    <a href="https://www.linkedin.com/in/haroun-minhas-848b8896/" class="social-link" target="_blank" rel="noopener" title="LinkedIn">
                         <i class="bi bi-linkedin"></i>
                     </a>
-                    <a href="mailto:haroun@example.com" class="social-link">
-                        <i class="bi bi-envelope-fill"></i>
+                    <a href="https://www.instagram.com/harounminhas" class="social-link" target="_blank" rel="noopener" title="Instagram">
+                        <i class="bi bi-instagram"></i>
                     </a>
                 </div>
             </div>
@@ -255,7 +266,7 @@
             
             <div class="row g-4">
                 <!-- Marieke Logopedie Project -->
-                <div class="col-lg-6 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="bi bi-chat-square-heart-fill"></i>
@@ -268,7 +279,7 @@
                         <div class="mb-3">
                             <span class="badge-tech">React</span>
                             <span class="badge-tech">TypeScript</span>
-                            <span class="badge-tech">CSS3</span>
+                            <span class="badge-tech">Bootstrap</span>
                         </div>
                         <a href="./marieke/" class="btn-project">
                             Bekijk Project <i class="bi bi-arrow-right"></i>
@@ -276,18 +287,41 @@
                     </div>
                 </div>
                 
+                <!-- Phase 10 Scorekeeper Project -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="project-card">
+                        <div class="project-icon">
+                            <i class="bi bi-dice-5-fill"></i>
+                        </div>
+                        <h3 class="project-title">Phase 10 Scorekeeper</h3>
+                        <p class="project-description">
+                            Een snelle en intuïtieve webapp om scores bij te houden tijdens Phase 10 spelletjes. 
+                            Inclusief rondegeschiedenis, undo-functie en random fase generator.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge-tech">React</span>
+                            <span class="badge-tech">TypeScript</span>
+                            <span class="badge-tech">Vite</span>
+                            <span class="badge-coming-soon">In ontwikkeling</span>
+                        </div>
+                        <a href="#" class="btn-project" style="opacity: 0.6; cursor: not-allowed;">
+                            Binnenkort beschikbaar
+                        </a>
+                    </div>
+                </div>
+                
                 <!-- Placeholder voor toekomstige projecten -->
-                <div class="col-lg-6 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="bi bi-code-square"></i>
                         </div>
-                        <h3 class="project-title">Meer projecten komen eraan...</h3>
+                        <h3 class="project-title">Meer projecten...</h3>
                         <p class="project-description">
-                            Binnenkort vind je hier meer van mijn projecten. Stay tuned!
+                            Binnenkort vind je hier meer van mijn projecten. Van webapps tot API integraties. Stay tuned!
                         </p>
                         <div class="mb-3">
-                            <span class="badge-tech">Coming Soon</span>
+                            <span class="badge-coming-soon">Coming Soon</span>
                         </div>
                         <a href="https://github.com/HarounMinhas" class="btn-project" target="_blank" rel="noopener">
                             Bekijk GitHub <i class="bi bi-arrow-right"></i>
