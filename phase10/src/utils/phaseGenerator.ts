@@ -3,7 +3,8 @@ import { PhaseDefinition } from '../types';
 // Official Phase 10 Rules:
 // - Players have exactly 10 cards in hand
 // - A phase must be completed with max 10 cards
-// - Set = 2+ cards with same number
+// - Each number (1-12) appears 8 times in the deck (2 per color)
+// - Set = 2+ cards with same number (max 8 possible)
 // - Run = 4+ consecutive cards of same color
 // - All One Color = 7+ cards of same color (any numbers)
 // - Wild cards can substitute any card
@@ -83,15 +84,15 @@ const PHASE_POOL: Record<number, PhaseDefinition[]> = {
 
   // Level 4: Hard - Maximum 10 cards with complex combinations
   4: [
-    { level: 4, title: '1 run van 10', description: 'Je hele hand in volgorde (10 kaarten - extreem moeilijk!)' },
+    { level: 4, title: '1 run van 10', description: 'Je hele hand in perfecte volgorde (10 kaarten - zeer moeilijk!)' },
     { level: 4, title: '9 kaarten van 1 kleur', description: '90% van je hand moet dezelfde kleur zijn (9 kaarten)' },
-    { level: 4, title: '1 set van 8', description: 'Acht identieke kaarten (8 kaarten)' },
+    { level: 4, title: '1 set van 8', description: 'Acht identieke kaarten - alle kaarten van dat getal! (8 kaarten)' },
     { level: 4, title: '1 set van 7 + 1 set van 3', description: 'Zeer groot set met middel set (10 kaarten totaal - vol!)' },
     { level: 4, title: '1 run van 8 + 1 set van 2', description: 'Zeer lange run met pair (10 kaarten totaal - vol!)' },
     { level: 4, title: '1 set van 6 + 1 run van 4', description: 'Groot set met middelgrote run (10 kaarten totaal - vol!)' },
     { level: 4, title: '10 kaarten van 2 kleuren', description: 'Je hele hand verdeeld over exact 2 kleuren (10 kaarten)' },
     { level: 4, title: '5 paren met verschillende nummers', description: 'Vijf unieke paren (10 kaarten totaal - vol!)' },
-    { level: 4, title: '1 run van 9 + 1 wild card', description: 'Bijna volledige run met 1 extra kaart (10 kaarten totaal)' },
+    { level: 4, title: '1 run van 9 + 1 kaart', description: 'Bijna volledige run met 1 extra kaart (10 kaarten totaal)' },
     { level: 4, title: '8 even of 8 oneven kaarten', description: 'Consistent patroon in getallen (8 kaarten)' },
     { level: 4, title: '2 sets van 5', description: 'Twee grote sets (10 kaarten totaal - vol!)' },
     { level: 4, title: '1 set van 5 + 1 run van 5', description: 'Groot set met lange run (10 kaarten totaal - vol!)' },
@@ -101,32 +102,32 @@ const PHASE_POOL: Record<number, PhaseDefinition[]> = {
     { level: 4, title: '1 set van 4 + 2 runs van 3', description: 'Een set met twee korte runs (10 kaarten totaal - vol!)' },
     { level: 4, title: '9 opeenvolgende nummers', description: '9 kaarten in volgorde, kleuren mogen verschillen (9 kaarten)' },
     { level: 4, title: '2 sets van 3 + 2 runs van 2', description: 'Mix van sets en mini-runs (10 kaarten totaal - vol!)' },
-    { level: 4, title: '1 set van 8 + 1 set van 2', description: 'Zeer groot set met pair (10 kaarten totaal - vol!)' },
+    { level: 4, title: '1 set van 7 + 1 run van 3', description: 'Zeer groot set met korte run (10 kaarten totaal - vol!)' },
     { level: 4, title: '10 kaarten allemaal verschillend', description: 'Elk getal hooguit 1x, perfecte spreiding (10 kaarten)' },
   ],
 
-  // Level 5: Expert - Full 10 card combinations, extremely challenging
+  // Level 5: Expert - Full 10 card combinations, extremely challenging but possible
   5: [
-    { level: 5, title: '10 kaarten van 1 kleur', description: 'Je hele hand moet exact dezelfde kleur zijn (10 kaarten - extreem!)' },
-    { level: 5, title: '1 set van 9', description: 'Negen identieke kaarten (9 kaarten - bijna onmogelijk!)' },
-    { level: 5, title: '1 set van 10', description: 'Tien identieke kaarten (10 kaarten - theoretisch onmogelijk!)' },
-    { level: 5, title: '1 run van 10', description: 'Je hele hand als 1 perfecte run (10 kaarten - extreem moeilijk!)' },
+    { level: 5, title: '10 kaarten van 1 kleur', description: 'Je hele hand van exact 1 kleur - extreem moeilijk! (10 kaarten)' },
+    { level: 5, title: '1 set van 8 + 1 set van 2', description: 'Alle kaarten van 1 getal + een pair (10 kaarten - vol!)' },
+    { level: 5, title: '1 run van 10', description: 'Je hele hand als 1 perfecte run (10 kaarten - zeer zeldzaam!)' },
     { level: 5, title: '2 sets van 4 + 1 run van 2', description: 'Twee sets met mini-run (10 kaarten totaal - vol!)' },
     { level: 5, title: '10 opeenvolgende nummers', description: 'Je hele hand in perfecte volgorde, kleuren mogen verschillen (10 kaarten)' },
     { level: 5, title: '1 set van 6 + 2 sets van 2', description: 'Een groot set met twee paren (10 kaarten totaal - vol!)' },
     { level: 5, title: '4 sets van 2 + 1 run van 2', description: 'Vier paren plus mini-run (10 kaarten totaal - vol!)' },
     { level: 5, title: '10 verschillende kaarten (1-10)', description: 'Elk getal van 1-10 exact 1x (10 kaarten - perfecte spreiding!)' },
     { level: 5, title: '1 run van 8 + 1 run van 2', description: 'Zeer lange run met mini-run (10 kaarten totaal - vol!)' },
-    { level: 5, title: '3 sets van 3 + 1 set van 1', description: 'Drie sets met single kaart (10 kaarten totaal - vol!)' },
+    { level: 5, title: '3 sets van 3 + 1 kaart', description: 'Drie sets met single kaart (10 kaarten totaal - vol!)' },
     { level: 5, title: '1 set van 7 + 1 run van 3', description: 'Zeer groot set met korte run (10 kaarten totaal - vol!)' },
     { level: 5, title: '2 runs van 4 + 1 set van 2', description: 'Twee runs met pair (10 kaarten totaal - vol!)' },
-    { level: 5, title: '10 kaarten boven 2 en onder 11', description: 'Alleen 3-10, geen 1,2,11,12 (10 kaarten)' },
+    { level: 5, title: '10 kaarten tussen 3 en 12', description: 'Geen kaarten 1 of 2 toegestaan (10 kaarten)' },
     { level: 5, title: '5 even + 5 oneven kaarten', description: 'Perfecte balans tussen even en oneven (10 kaarten - vol!)' },
     { level: 5, title: '1 set van 5 + 1 set van 5', description: 'Twee identieke grote sets (10 kaarten totaal - vol!)' },
     { level: 5, title: '1 run van 6 + 2 runs van 2', description: 'Een lange run met twee mini-runs (10 kaarten totaal - vol!)' },
-    { level: 5, title: '1 set van 8 + 1 run van 2', description: 'Zeer groot set met mini-run (10 kaarten totaal - vol!)' },
+    { level: 5, title: '1 set van 8 + 1 run van 2', description: 'Alle kaarten van 1 getal + mini-run (10 kaarten totaal - vol!)' },
     { level: 5, title: '10 kaarten in 2 kleuren (5 per kleur)', description: 'Perfect verdeeld over 2 kleuren (10 kaarten - vol!)' },
     { level: 5, title: '1 run van 9 + 1 kaart', description: 'Bijna volledige run met 1 extra (10 kaarten totaal - vol!)' },
+    { level: 5, title: '2 sets van 3 + 2 sets van 2', description: 'Vier verschillende sets (10 kaarten totaal - vol!)' },
   ],
 };
 
