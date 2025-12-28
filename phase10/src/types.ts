@@ -1,37 +1,39 @@
 export interface Player {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
-export interface RoundScore {
-  playerId: string
-  points: number
-  phaseAfterRound: number
-  phaseCompleted: boolean
+export interface RoundEntry {
+  playerId: string;
+  points: number;
+  phaseAfterRound: number;
+  phaseCompleted: boolean;
 }
 
 export interface Round {
-  roundNumber: number
-  scores: RoundScore[]
+  id: string;
+  roundNumber: number;
+  entries: RoundEntry[];
+  timestamp: number;
 }
 
 export interface GameState {
-  players: Player[]
-  rounds: Round[]
-  currentRound: number
+  players: Player[];
+  rounds: Round[];
+  currentRound: number;
+  gameStarted: boolean;
 }
 
-export interface PlayerStats {
-  playerId: string
-  name: string
-  currentPhase: number
-  totalPoints: number
-  lastRoundPoints: number
+export interface PlayerScore {
+  playerId: string;
+  name: string;
+  currentPhase: number;
+  totalPoints: number;
+  lastRoundPoints: number;
 }
 
 export interface PhaseDefinition {
-  id: number
-  title: string
-  description: string
-  difficulty: number
+  level: number;
+  title: string;
+  description: string;
 }
