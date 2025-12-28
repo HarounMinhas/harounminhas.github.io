@@ -32,8 +32,14 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      - name: Build site
+      - name: Build React app
         run: npm run build
+
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p deploy
+          cp -r build/* deploy/marieke/
+          cp docs/index.html deploy/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -41,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./build
+          path: ./deploy
 
   deploy:
     environment:
