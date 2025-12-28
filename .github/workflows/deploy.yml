@@ -37,9 +37,9 @@ jobs:
 
       - name: Prepare deployment folder
         run: |
-          mkdir -p deploy
+          mkdir -p deploy/marieke
           cp -r build/* deploy/marieke/
-          cp docs/index.html deploy/index.html
+          cp portfolio-index.html deploy/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
