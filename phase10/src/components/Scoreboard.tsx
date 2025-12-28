@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlayerScore } from '../types';
 import { getWinner } from '../utils/gameLogic';
 

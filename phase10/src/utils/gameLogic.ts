@@ -1,4 +1,4 @@
-import { GameState, PlayerScore, Round, RoundEntry } from '../types';
+import { GameState, PlayerScore } from '../types';
 
 export function calculatePlayerScores(gameState: GameState): PlayerScore[] {
   return gameState.players.map(player => {

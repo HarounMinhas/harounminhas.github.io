@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Player, RoundEntry } from '../types';
 
 interface EndRoundModalProps {

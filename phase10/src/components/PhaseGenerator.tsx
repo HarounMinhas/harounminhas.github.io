@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { generateRandomPhase } from '../utils/phaseGenerator';
 import { PhaseDefinition } from '../types';
 
