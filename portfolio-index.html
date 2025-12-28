@@ -75,7 +75,8 @@
         .card,
         .project-card,
         .btn,
-        .social-link {
+        .social-link,
+        .scroll-indicator {
             transition: background-color 500ms ease-in-out, 
                         color 500ms ease-in-out, 
                         border-color 500ms ease-in-out,
@@ -113,6 +114,84 @@
             color: var(--muted);
             margin-bottom: 3rem;
             animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        /* Glassmorphism Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(-20px);
+        }
+        
+        .scroll-indicator:hover {
+            opacity: 1;
+            transform: translateX(-50%) translateY(5px);
+        }
+        
+        .scroll-indicator-inner {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px var(--shadow);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .scroll-indicator-inner::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .scroll-indicator:hover .scroll-indicator-inner::before {
+            opacity: 0.3;
+        }
+        
+        .scroll-indicator-icon {
+            font-size: 1.5rem;
+            color: var(--text);
+            animation: chevronPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes chevronPulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
         }
         
         .projects-section {
@@ -306,6 +385,15 @@
                 animation-duration: 0.01ms !important;
                 transition-duration: 0.01ms !important;
             }
+            
+            .scroll-indicator-inner {
+                animation: none !important;
+            }
+            
+            .scroll-indicator-icon {
+                animation: none !important;
+                opacity: 0.7 !important;
+            }
         }
         
         /* Responsive */
@@ -319,6 +407,19 @@
                 width: 42px;
                 height: 42px;
                 font-size: 1rem;
+            }
+            
+            .scroll-indicator {
+                bottom: 2rem;
+            }
+            
+            .scroll-indicator-inner {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .scroll-indicator-icon {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -345,10 +446,17 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator" id="scrollIndicator" aria-label="Scroll naar beneden" title="Scroll naar projecten">
+                <div class="scroll-indicator-inner">
+                    <i class="bi bi-chevron-down scroll-indicator-icon"></i>
+                </div>
+            </div>
         </section>
         
         <!-- Projects Section -->
-        <section class="projects-section">
+        <section class="projects-section" id="projectsSection">
             <div class="container">
                 <h2 class="section-title">Mijn Projecten</h2>
                 
@@ -526,6 +634,45 @@
             };
         }
         
+        // Scroll Indicator Manager
+        class ScrollIndicatorManager {
+            constructor() {
+                this.indicator = document.getElementById('scrollIndicator');
+                this.projectsSection = document.getElementById('projectsSection');
+                this.hasScrolled = false;
+                
+                this.init();
+            }
+            
+            init() {
+                if (!this.indicator) return;
+                
+                // Smooth scroll on click
+                this.indicator.addEventListener('click', () => {
+                    this.projectsSection.scrollIntoView({ behavior: 'smooth' });
+                });
+                
+                // Hide on scroll
+                let scrollTimeout;
+                window.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimeout);
+                    
+                    if (window.scrollY > 100 && !this.hasScrolled) {
+                        this.hasScrolled = true;
+                        this.indicator.classList.add('hidden');
+                    }
+                    
+                    // Show again if scrolled back to top
+                    scrollTimeout = setTimeout(() => {
+                        if (window.scrollY < 100) {
+                            this.hasScrolled = false;
+                            this.indicator.classList.remove('hidden');
+                        }
+                    }, 150);
+                }, { passive: true });
+            }
+        }
+        
         // Theme Drift Manager
         class ThemeDriftManager {
             constructor() {
@@ -653,9 +800,11 @@
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 new ThemeDriftManager();
+                new ScrollIndicatorManager();
             });
         } else {
             new ThemeDriftManager();
+            new ScrollIndicatorManager();
         }
     </script>
 </body>
