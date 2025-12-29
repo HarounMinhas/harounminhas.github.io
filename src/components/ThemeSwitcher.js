@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dropdown, Button } from 'react-bootstrap';
+import AccessibilityControls from './AccessibilityControls';
 
 const colorPalettes = [
   {
@@ -157,6 +158,7 @@ const ThemeSwitcher = () => {
           </div>
         </Dropdown.Menu>
       </Dropdown>
+      <AccessibilityControls variant="inline" />
     </div>
   );
 };
