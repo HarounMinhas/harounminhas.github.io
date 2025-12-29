@@ -17,12 +17,10 @@ import EditorialOpmaakPage from './pages/alternatives/EditorialOpmaakPage';
 import ContrastOpmaakPage from './pages/alternatives/ContrastOpmaakPage';
 import GridOpmaakPage from './pages/alternatives/GridOpmaakPage';
 import SereneOpmaakPage from './pages/alternatives/SereneOpmaakPage';
-import ThemeSwitcher from './components/ThemeSwitcher';
 
 function App() {
   return (
     <div className="d-flex flex-column min-vh-100">
-      <ThemeSwitcher />
       <MainNavbar />
       <main className="flex-fill" style={{ paddingTop: '4.5rem' }}>
         <Routes>
