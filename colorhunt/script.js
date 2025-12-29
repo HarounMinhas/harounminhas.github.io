@@ -1,3 +1,12 @@
+// UUID Generator
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 // State
 let palettes = [];
 let highlightedId = null;
@@ -143,7 +152,8 @@ function createPaletteCard(palette, index) {
     
     const paletteId = document.createElement('span');
     paletteId.className = 'palette-id';
-    paletteId.textContent = `#${palette.id.toString().slice(-4)}`;
+    // Show first 8 characters of UUID for readability
+    paletteId.textContent = `#${palette.id.substring(0, 8)}`;
     
     const colorCodes = document.createElement('span');
     colorCodes.className = 'palette-codes';
@@ -209,9 +219,9 @@ function addPalette(url, colors) {
         
         return false;
     } else {
-        // NEW PALETTE: Add to list
+        // NEW PALETTE: Add to list with unique UUID
         const newPalette = {
-            id: Date.now(),
+            id: generateUUID(),
             url: url,
             colors: colors,
             colorKey: uniqueColorKey,
