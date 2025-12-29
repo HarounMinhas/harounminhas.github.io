@@ -22,6 +22,9 @@ body {
   top: 1rem;
   left: 1rem;
   z-index: 1100;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
 }
 
 .theme-toggle {
@@ -51,6 +54,7 @@ body {
   .theme-switcher {
     top: 0.75rem;
     left: 0.75rem;
+    flex-direction: column;
   }
 
   .theme-dropdown {
@@ -264,9 +268,11 @@ a:hover {
 
 /* Accessibility utility classes */
 
+/* Lazy load Lexend font only when dyslexic mode is activated */
 html.accessibility-dyslexic body {
-  font-family: 'Atkinson Hyperlegible', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Lexend', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 0.5px;
+  line-height: 1.8;
 }
 
 html.accessibility-grayscale body {
@@ -313,14 +319,10 @@ html.accessibility-high-contrast textarea:focus {
 }
 
 .accessibility-controls {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  z-index: 1050;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
+  position: relative;
 }
 
 .accessibility-controls-inline {
@@ -334,19 +336,22 @@ html.accessibility-high-contrast textarea:focus {
 }
 
 .accessibility-toggle {
-  border-radius: 999px;
+  border-radius: 50%;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   padding: 0;
+  background-color: var(--background);
+  color: var(--text-dark);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .accessibility-controls-inline .accessibility-toggle {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
 }
 
 .accessibility-icon {
@@ -355,19 +360,15 @@ html.accessibility-high-contrast textarea:focus {
 }
 
 .accessibility-panel {
-  width: min(320px, calc(100vw - 2rem));
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.accessibility-controls-inline .accessibility-panel {
   position: absolute;
   top: calc(100% + 0.5rem);
   left: 0;
   width: min(320px, 80vw);
   z-index: 1080;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .accessibility-panel.show {
@@ -377,15 +378,10 @@ html.accessibility-high-contrast textarea:focus {
 }
 
 @media (max-width: 576px) {
-  .accessibility-controls {
-    right: 1rem;
-    left: 1rem;
-    bottom: 1rem;
-    align-items: stretch;
-  }
-
   .accessibility-panel {
-    width: 100%;
+    width: min(300px, calc(100vw - 2rem));
+    left: auto;
+    right: 0;
   }
 }
 
