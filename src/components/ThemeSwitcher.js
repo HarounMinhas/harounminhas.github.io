@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dropdown, Button } from 'react-bootstrap';
-import AccessibilityControls from './AccessibilityControls';
 
 const colorPalettes = [
   {
@@ -112,54 +111,51 @@ const ThemeSwitcher = () => {
   const selectedPalette = paletteMap[selectedId];
 
   return (
-    <div className="theme-switcher">
-      <Dropdown show={open} onToggle={setOpen} align="start">
-        <Dropdown.Toggle
-          as={Button}
-          variant="light"
-          size="sm"
-          className="theme-toggle shadow-sm"
-          aria-label="Kleurenschema kiezen"
-        >
-          <span role="img" aria-hidden="true">
-            🎨
-          </span>
-        </Dropdown.Toggle>
-        <Dropdown.Menu className="theme-dropdown p-2 shadow-sm border-0">
-          <div className="px-2 pb-2">
-            <div className="fw-semibold">Kleurenschema</div>
-            <div className="text-muted small">Kies een palet voor de hele pagina</div>
-          </div>
-          {colorPalettes.map((palette) => (
-            <Dropdown.Item
-              key={palette.id}
-              onClick={() => handlePaletteSelect(palette.id)}
-              active={selectedId === palette.id}
-              className="d-flex justify-content-between align-items-center gap-2 rounded-3"
-            >
-              <div>
-                <div className="fw-semibold">{palette.name}</div>
-                <div className="text-muted small">{palette.description}</div>
-              </div>
-              <div className="d-flex align-items-center gap-1">
-                {palette.swatch.map((color) => (
-                  <span
-                    key={color}
-                    className="theme-swatch"
-                    style={{ backgroundColor: color }}
-                    aria-hidden="true"
-                  />
-                ))}
-              </div>
-            </Dropdown.Item>
-          ))}
-          <div className="px-2 pt-2 border-top small text-muted">
-            Actief: <strong>{selectedPalette?.name}</strong>
-          </div>
-        </Dropdown.Menu>
-      </Dropdown>
-      <AccessibilityControls variant="inline" />
-    </div>
+    <Dropdown show={open} onToggle={setOpen} align="start">
+      <Dropdown.Toggle
+        as={Button}
+        variant="light"
+        size="sm"
+        className="theme-toggle shadow-sm"
+        aria-label="Kleurenschema kiezen"
+      >
+        <span role="img" aria-hidden="true">
+          🎨
+        </span>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="theme-dropdown p-2 shadow-sm border-0">
+        <div className="px-2 pb-2">
+          <div className="fw-semibold">Kleurenschema</div>
+          <div className="text-muted small">Kies een palet voor de hele pagina</div>
+        </div>
+        {colorPalettes.map((palette) => (
+          <Dropdown.Item
+            key={palette.id}
+            onClick={() => handlePaletteSelect(palette.id)}
+            active={selectedId === palette.id}
+            className="d-flex justify-content-between align-items-center gap-2 rounded-3"
+          >
+            <div>
+              <div className="fw-semibold">{palette.name}</div>
+              <div className="text-muted small">{palette.description}</div>
+            </div>
+            <div className="d-flex align-items-center gap-1">
+              {palette.swatch.map((color) => (
+                <span
+                  key={color}
+                  className="theme-swatch"
+                  style={{ backgroundColor: color }}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          </Dropdown.Item>
+        ))}
+        <div className="px-2 pt-2 border-top small text-muted">
+          Actief: <strong>{selectedPalette?.name}</strong>
+        </div>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 };
 
