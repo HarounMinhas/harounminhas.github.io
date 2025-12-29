@@ -56,6 +56,18 @@ export const AccessibilityProvider = ({ children }) => {
         root.classList.remove(className);
       }
     });
+
+    // Lazy load Lexend font when dyslexic mode is enabled
+    if (preferences.dyslexicFont) {
+      const linkId = 'lexend-font';
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap';
+        document.head.appendChild(link);
+      }
+    }
   }, [preferences]);
 
   const value = useMemo(
