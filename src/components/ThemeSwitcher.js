@@ -158,49 +158,52 @@ const ThemeSwitcher = () => {
           </span>
         </Button>
         
+        {/* Only render modal and backdrop when open */}
         {open && (
-          <div 
-            className="theme-backdrop" 
-            onClick={handleBackdropClick}
-            aria-hidden="true"
-          />
+          <>
+            <div 
+              className="theme-backdrop" 
+              onClick={handleBackdropClick}
+              aria-hidden="true"
+            />
+            
+            <div className="theme-modal show">
+              <div className="theme-modal-content shadow-sm border-0">
+                <div className="px-3 py-3 border-bottom">
+                  <div className="fw-semibold">Kleurenschema</div>
+                  <div className="text-muted small">Kies een palet voor de hele pagina</div>
+                </div>
+                <div className="theme-modal-body p-2">
+                  {colorPalettes.map((palette) => (
+                    <button
+                      key={palette.id}
+                      onClick={() => handlePaletteSelect(palette.id)}
+                      className={`theme-modal-item ${selectedId === palette.id ? 'active' : ''}`}
+                    >
+                      <div>
+                        <div className="fw-semibold">{palette.name}</div>
+                        <div className="text-muted small">{palette.description}</div>
+                      </div>
+                      <div className="d-flex align-items-center gap-1">
+                        {palette.swatch.map((color) => (
+                          <span
+                            key={color}
+                            className="theme-swatch"
+                            style={{ backgroundColor: color }}
+                            aria-hidden="true"
+                          />
+                        ))}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="px-3 py-2 border-top small text-muted">
+                  Actief: <strong>{selectedPalette?.name}</strong>
+                </div>
+              </div>
+            </div>
+          </>
         )}
-        
-        <div className={`theme-modal ${open ? 'show' : ''}`}>
-          <div className="theme-modal-content shadow-sm border-0">
-            <div className="px-3 py-3 border-bottom">
-              <div className="fw-semibold">Kleurenschema</div>
-              <div className="text-muted small">Kies een palet voor de hele pagina</div>
-            </div>
-            <div className="theme-modal-body p-2">
-              {colorPalettes.map((palette) => (
-                <button
-                  key={palette.id}
-                  onClick={() => handlePaletteSelect(palette.id)}
-                  className={`theme-modal-item ${selectedId === palette.id ? 'active' : ''}`}
-                >
-                  <div>
-                    <div className="fw-semibold">{palette.name}</div>
-                    <div className="text-muted small">{palette.description}</div>
-                  </div>
-                  <div className="d-flex align-items-center gap-1">
-                    {palette.swatch.map((color) => (
-                      <span
-                        key={color}
-                        className="theme-swatch"
-                        style={{ backgroundColor: color }}
-                        aria-hidden="true"
-                      />
-                    ))}
-                  </div>
-                </button>
-              ))}
-            </div>
-            <div className="px-3 py-2 border-top small text-muted">
-              Actief: <strong>{selectedPalette?.name}</strong>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
