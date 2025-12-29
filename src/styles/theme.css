@@ -40,9 +40,114 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* Mobile backdrop for theme and accessibility modals */
+.theme-backdrop,
+.accessibility-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1100;
+  opacity: 0;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Theme Modal for Mobile */
+.theme-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  z-index: 1101;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  width: 90%;
+  max-width: 400px;
+}
+
+.theme-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.theme-modal-content {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-modal-body {
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.theme-modal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.theme-modal-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.theme-modal-item.active {
+  background-color: rgba(50, 142, 110, 0.1);
+}
+
+/* Accessibility Modal for Mobile */
+.accessibility-panel.mobile-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  right: auto;
+  width: 90%;
+  max-width: 400px;
+  z-index: 1101;
+}
+
+.accessibility-panel.mobile-modal.show {
+  transform: translate(-50%, -50%) scale(1);
+}
+
 @media (max-width: 576px) {
   .theme-dropdown {
     min-width: 280px;
+  }
+  
+  .theme-toggle,
+  .accessibility-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .theme-modal,
+  .accessibility-panel.mobile-modal {
+    width: 92%;
+    max-width: 340px;
   }
 }
 
@@ -343,50 +448,24 @@ html.accessibility-high-contrast textarea:focus {
   line-height: 1;
 }
 
-.accessibility-panel {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  width: min(320px, calc(100vw - 2rem));
-  z-index: 1080;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.accessibility-panel.show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-/* Desktop: align dropdown from right side */
-@media (min-width: 992px) {
+/* Desktop: dropdown positioning */
+@media (min-width: 768px) {
   .accessibility-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
     right: 0;
-    left: auto;
+    width: min(320px, calc(100vw - 2rem));
+    z-index: 1080;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
-}
 
-/* Mobile and tablet: ensure panel stays within screen */
-@media (max-width: 991px) {
-  .accessibility-panel {
-    right: 0;
-    left: auto;
-    width: min(300px, calc(100vw - 2rem));
-  }
-}
-
-@media (max-width: 576px) {
-  .accessibility-panel {
-    width: min(280px, calc(100vw - 2rem));
-  }
-  
-  .theme-toggle,
-  .accessibility-toggle {
-    width: 40px;
-    height: 40px;
+  .accessibility-panel.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
   }
 }
 
