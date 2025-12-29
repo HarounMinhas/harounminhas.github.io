@@ -13,6 +13,7 @@ const MainNavbar = () => {
         </Navbar.Brand>
         <div className="d-flex align-items-center ms-auto gap-2">
           <ThemeSwitcher />
+          <AccessibilityControls variant="navbar" />
           <Navbar.Toggle aria-controls="main-navbar" aria-label="Navigatie tonen" />
         </div>
         <Navbar.Collapse id="main-navbar" className="justify-content-end">
@@ -32,12 +33,6 @@ const MainNavbar = () => {
             <Nav.Link as={NavLink} to="/alternatieve-opmaak">
               Alternatieve opmaak
             </Nav.Link>
-            <div className="d-lg-none">
-              <hr className="my-2" />
-            </div>
-            <div className="ms-lg-3">
-              <AccessibilityControls variant="navbar" />
-            </div>
           </Nav>
         </Navbar.Collapse>
       </Container>
