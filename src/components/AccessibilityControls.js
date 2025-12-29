@@ -54,54 +54,59 @@ const AccessibilityControls = ({ variant = 'floating' }) => {
         <span className="visually-hidden">Toegankelijkheidsopties</span>
       </Button>
       
-      {isMobile && open && (
-        <div 
-          className="accessibility-backdrop" 
-          onClick={handleBackdropClick}
-          aria-hidden="true"
-        />
+      {/* Only render panel and backdrop when open OR on desktop */}
+      {(open || !isMobile) && (
+        <>
+          {isMobile && (
+            <div 
+              className="accessibility-backdrop" 
+              onClick={handleBackdropClick}
+              aria-hidden="true"
+            />
+          )}
+          
+          <Card
+            id="accessibility-panel"
+            className={`accessibility-panel shadow ${open ? 'show' : ''} ${isMobile ? 'mobile-modal' : ''}`}
+            aria-hidden={!open}
+            role="dialog"
+            aria-modal={isMobile}
+            aria-label="Toegankelijkheidsvoorkeuren"
+          >
+            <Card.Body>
+              <Card.Title as="h2" className="h5">
+                Voorkeuren
+              </Card.Title>
+              <Form>
+                <Form.Check
+                  type="switch"
+                  id="dyslexicFont"
+                  label="Dyslexievriendelijk lettertype"
+                  checked={preferences.dyslexicFont}
+                  onChange={() => togglePreference('dyslexicFont')}
+                />
+                <Form.Check
+                  type="switch"
+                  id="grayscale"
+                  label="Zwart-wit modus"
+                  checked={preferences.grayscale}
+                  onChange={() => togglePreference('grayscale')}
+                />
+                <Form.Check
+                  type="switch"
+                  id="highContrast"
+                  label="Hoog contrast"
+                  checked={preferences.highContrast}
+                  onChange={() => togglePreference('highContrast')}
+                />
+                <Button variant="outline-secondary" size="sm" className="mt-3" onClick={resetPreferences}>
+                  Herstel standaardinstellingen
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
+        </>
       )}
-      
-      <Card
-        id="accessibility-panel"
-        className={`accessibility-panel shadow ${open ? 'show' : ''} ${isMobile ? 'mobile-modal' : ''}`}
-        aria-hidden={!open}
-        role="dialog"
-        aria-modal={isMobile}
-        aria-label="Toegankelijkheidsvoorkeuren"
-      >
-        <Card.Body>
-          <Card.Title as="h2" className="h5">
-            Voorkeuren
-          </Card.Title>
-          <Form>
-            <Form.Check
-              type="switch"
-              id="dyslexicFont"
-              label="Dyslexievriendelijk lettertype"
-              checked={preferences.dyslexicFont}
-              onChange={() => togglePreference('dyslexicFont')}
-            />
-            <Form.Check
-              type="switch"
-              id="grayscale"
-              label="Zwart-wit modus"
-              checked={preferences.grayscale}
-              onChange={() => togglePreference('grayscale')}
-            />
-            <Form.Check
-              type="switch"
-              id="highContrast"
-              label="Hoog contrast"
-              checked={preferences.highContrast}
-              onChange={() => togglePreference('highContrast')}
-            />
-            <Button variant="outline-secondary" size="sm" className="mt-3" onClick={resetPreferences}>
-              Herstel standaardinstellingen
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
     </div>
   );
 };
