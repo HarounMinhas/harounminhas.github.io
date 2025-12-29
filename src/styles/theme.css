@@ -346,8 +346,8 @@ html.accessibility-high-contrast textarea:focus {
 .accessibility-panel {
   position: absolute;
   top: calc(100% + 0.5rem);
-  left: 0;
-  width: min(320px, 80vw);
+  right: 0;
+  width: min(320px, calc(100vw - 2rem));
   z-index: 1080;
   opacity: 0;
   pointer-events: none;
@@ -361,26 +361,32 @@ html.accessibility-high-contrast textarea:focus {
   transform: translateY(0);
 }
 
-@media (max-width: 991px) {
-  /* Mobile menu styling for accessibility controls */
-  .navbar-collapse .accessibility-controls {
-    width: 100%;
-    justify-content: flex-start;
-    padding: 0.5rem 0;
+/* Desktop: align dropdown from right side */
+@media (min-width: 992px) {
+  .accessibility-panel {
+    right: 0;
+    left: auto;
   }
-  
-  .navbar-collapse .accessibility-panel {
-    position: relative;
-    top: 0.5rem;
-    left: 0;
-    width: 100%;
-    max-width: 100%;
+}
+
+/* Mobile and tablet: ensure panel stays within screen */
+@media (max-width: 991px) {
+  .accessibility-panel {
+    right: 0;
+    left: auto;
+    width: min(300px, calc(100vw - 2rem));
   }
 }
 
 @media (max-width: 576px) {
   .accessibility-panel {
-    width: min(300px, calc(100vw - 2rem));
+    width: min(280px, calc(100vw - 2rem));
+  }
+  
+  .theme-toggle,
+  .accessibility-toggle {
+    width: 40px;
+    height: 40px;
   }
 }
 
