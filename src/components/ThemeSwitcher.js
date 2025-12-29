@@ -77,11 +77,23 @@ const colorPalettes = [
 const ThemeSwitcher = () => {
   const [selectedId, setSelectedId] = useState('default');
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const paletteMap = useMemo(
     () => Object.fromEntries(colorPalettes.map((palette) => [palette.id, palette])),
     []
   );
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('preferredPalette');
@@ -92,6 +104,18 @@ const ThemeSwitcher = () => {
       applyPalette(paletteMap.default.colors);
     }
   }, [paletteMap]);
+
+  useEffect(() => {
+    if (isMobile && open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobile, open]);
 
   const applyPalette = (colors) => {
     const root = document.documentElement.style;
@@ -106,9 +130,80 @@ const ThemeSwitcher = () => {
     setSelectedId(id);
     applyPalette(palette.colors);
     localStorage.setItem('preferredPalette', id);
+    if (isMobile) {
+      setOpen(false);
+    }
+  };
+
+  const handleBackdropClick = (e) => {
+    if (e.target.classList.contains('theme-backdrop')) {
+      setOpen(false);
+    }
   };
 
   const selectedPalette = paletteMap[selectedId];
+
+  if (isMobile) {
+    return (
+      <div className="theme-switcher-mobile">
+        <Button
+          variant="light"
+          size="sm"
+          className="theme-toggle shadow-sm"
+          onClick={() => setOpen(!open)}
+          aria-label="Kleurenschema kiezen"
+        >
+          <span role="img" aria-hidden="true">
+            🎨
+          </span>
+        </Button>
+        
+        {open && (
+          <div 
+            className="theme-backdrop" 
+            onClick={handleBackdropClick}
+            aria-hidden="true"
+          />
+        )}
+        
+        <div className={`theme-modal ${open ? 'show' : ''}`}>
+          <div className="theme-modal-content shadow-sm border-0">
+            <div className="px-3 py-3 border-bottom">
+              <div className="fw-semibold">Kleurenschema</div>
+              <div className="text-muted small">Kies een palet voor de hele pagina</div>
+            </div>
+            <div className="theme-modal-body p-2">
+              {colorPalettes.map((palette) => (
+                <button
+                  key={palette.id}
+                  onClick={() => handlePaletteSelect(palette.id)}
+                  className={`theme-modal-item ${selectedId === palette.id ? 'active' : ''}`}
+                >
+                  <div>
+                    <div className="fw-semibold">{palette.name}</div>
+                    <div className="text-muted small">{palette.description}</div>
+                  </div>
+                  <div className="d-flex align-items-center gap-1">
+                    {palette.swatch.map((color) => (
+                      <span
+                        key={color}
+                        className="theme-swatch"
+                        style={{ backgroundColor: color }}
+                        aria-hidden="true"
+                      />
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="px-3 py-2 border-top small text-muted">
+              Actief: <strong>{selectedPalette?.name}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Dropdown show={open} onToggle={setOpen} align="start">
