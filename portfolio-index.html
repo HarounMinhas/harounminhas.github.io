@@ -25,10 +25,8 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
-            transition: color 1200ms ease-in-out;
         }
         
         /* Theme Root with Background Layers */
@@ -70,20 +68,6 @@
             opacity: 1;
         }
         
-        /* Smooth transitions for all theme-aware elements */
-        .hero-section,
-        .projects-section,
-        .card,
-        .project-card,
-        .btn,
-        .social-link,
-        .scroll-indicator {
-            transition: background-color 1200ms ease-in-out, 
-                        color 1200ms ease-in-out, 
-                        border-color 1200ms ease-in-out,
-                        box-shadow 1200ms ease-in-out;
-        }
-        
         .hero-section {
             min-height: 100vh;
             display: flex;
@@ -99,13 +83,15 @@
             padding: 2rem;
         }
         
-        /* Smooth gradient title with blend approach */
+        /* Hero title with layered gradients */
         .hero-title {
             font-size: clamp(2.5rem, 8vw, 5rem);
             font-weight: 700;
             margin-bottom: 1rem;
             position: relative;
             animation: fadeInUp 0.8s ease-out;
+            /* Invisible text to maintain layout */
+            color: transparent;
         }
         
         .hero-title::before,
@@ -124,6 +110,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             opacity: 1;
+            z-index: 2;
         }
         
         .hero-title::after {
@@ -132,6 +119,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             opacity: 0;
+            z-index: 1;
         }
         
         .theme-root[data-fading="true"] .hero-title::before {
@@ -142,12 +130,43 @@
             opacity: 1;
         }
         
+        /* Subtitle with layered text */
         .hero-subtitle {
             font-size: clamp(1rem, 3vw, 1.5rem);
-            color: var(--muted);
             margin-bottom: 3rem;
             animation: fadeInUp 0.8s ease-out 0.2s both;
-            transition: color 1200ms ease-in-out;
+            position: relative;
+            color: transparent;
+        }
+        
+        .hero-subtitle::before,
+        .hero-subtitle::after {
+            content: 'Full Stack Developer & Creative Problem Solver';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .hero-subtitle::before {
+            color: var(--muted);
+            opacity: 1;
+            z-index: 2;
+        }
+        
+        .hero-subtitle::after {
+            color: var(--next-muted);
+            opacity: 0;
+            z-index: 1;
+        }
+        
+        .theme-root[data-fading="true"] .hero-subtitle::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .hero-subtitle::after {
+            opacity: 1;
         }
         
         /* Glassmorphism Scroll Indicator */
@@ -178,40 +197,67 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: var(--surface);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 32px var(--shadow);
             animation: bounce 2s ease-in-out infinite;
-            transition: background 1200ms ease-in-out, 
-                        border-color 1200ms ease-in-out,
-                        box-shadow 1200ms ease-in-out;
+        }
+        
+        .scroll-indicator-inner::before,
+        .scroll-indicator-inner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            transition: opacity 1200ms ease-in-out;
         }
         
         .scroll-indicator-inner::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s ease, background 1200ms ease-in-out;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px var(--shadow);
+            opacity: 1;
+            z-index: 1;
         }
         
-        .scroll-indicator:hover .scroll-indicator-inner::before {
-            opacity: 0.3;
+        .scroll-indicator-inner::after {
+            background: var(--next-surface);
+            border: 1px solid var(--next-border);
+            box-shadow: 0 8px 32px var(--next-shadow);
+            opacity: 0;
+            z-index: 0;
+        }
+        
+        .theme-root[data-fading="true"] .scroll-indicator-inner::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .scroll-indicator-inner::after {
+            opacity: 1;
         }
         
         .scroll-indicator-icon {
+            position: relative;
+            z-index: 2;
             font-size: 1.5rem;
-            color: var(--text);
             animation: chevronPulse 2s ease-in-out infinite;
-            transition: color 1200ms ease-in-out;
+        }
+        
+        .scroll-indicator-icon::before,
+        .scroll-indicator-icon::after {
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .scroll-indicator-icon::before {
+            color: var(--text);
+            opacity: 1;
+        }
+        
+        .scroll-indicator-icon::after {
+            color: var(--next-text);
+            opacity: 0;
         }
         
         @keyframes bounce {
@@ -237,31 +283,98 @@
             animation: fadeInUp 0.8s ease-out 0.4s both;
         }
         
+        /* Section title with layers */
         .section-title {
             text-align: center;
             font-size: 2.5rem;
             font-weight: 600;
             margin-bottom: 3rem;
+            position: relative;
+            color: transparent;
+        }
+        
+        .section-title::before,
+        .section-title::after {
+            content: 'Mijn Projecten';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .section-title::before {
             color: var(--text);
-            transition: color 1200ms ease-in-out;
+            opacity: 1;
+            z-index: 2;
+        }
+        
+        .section-title::after {
+            color: var(--next-text);
+            opacity: 0;
+            z-index: 1;
+        }
+        
+        .theme-root[data-fading="true"] .section-title::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .section-title::after {
+            opacity: 1;
         }
         
         .project-card {
-            background: var(--surface);
             border-radius: 20px;
             padding: 2rem;
             height: 100%;
-            transition: transform 0.3s ease, 
-                        box-shadow 0.3s ease, 
-                        background-color 1200ms ease-in-out,
-                        border-color 1200ms ease-in-out;
-            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid transparent;
             position: relative;
             overflow: hidden;
         }
         
-        .project-card::before {
+        .project-card::before,
+        .project-card::after {
             content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            border: 1px solid;
+            pointer-events: none;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .project-card::before {
+            background: var(--surface);
+            border-color: var(--border);
+            opacity: 1;
+            z-index: -1;
+        }
+        
+        .project-card::after {
+            background: var(--next-surface);
+            border-color: var(--next-border);
+            opacity: 0;
+            z-index: -2;
+        }
+        
+        .theme-root[data-fading="true"] .project-card::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .project-card::after {
+            opacity: 1;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .project-card:hover .project-card-top-bar {
+            transform: scaleX(1);
+        }
+        
+        .project-card-top-bar {
             position: absolute;
             top: 0;
             left: 0;
@@ -269,16 +382,8 @@
             height: 4px;
             background: linear-gradient(90deg, var(--accent), var(--accent2));
             transform: scaleX(0);
-            transition: transform 0.3s ease, background 1200ms ease-in-out;
-        }
-        
-        .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px var(--shadow);
-        }
-        
-        .project-card:hover::before {
-            transform: scaleX(1);
+            transition: transform 0.3s ease;
+            z-index: 10;
         }
         
         .project-icon {
@@ -292,7 +397,14 @@
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
             color: white;
-            transition: background 1200ms ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .project-title,
+        .project-description {
+            position: relative;
+            z-index: 1;
         }
         
         .project-title {
@@ -300,14 +412,12 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text);
-            transition: color 1200ms ease-in-out;
         }
         
         .project-description {
             color: var(--muted);
             margin-bottom: 1.5rem;
             line-height: 1.6;
-            transition: color 1200ms ease-in-out;
         }
         
         .btn-project {
@@ -321,14 +431,13 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: transform 0.3s ease, 
-                        box-shadow 0.3s ease,
-                        background 1200ms ease-in-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
         }
         
         .btn-project:hover {
             transform: translateX(5px);
-            box-shadow: 0 10px 20px var(--shadow);
             color: white;
         }
         
@@ -343,25 +452,66 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: var(--surface);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text);
             font-size: 1.2rem;
-            transition: all 0.3s ease,
-                        background 1200ms ease-in-out,
-                        color 1200ms ease-in-out,
-                        border-color 1200ms ease-in-out;
+            transition: all 0.3s ease;
             text-decoration: none;
-            border: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .social-link::before,
+        .social-link::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .social-link::before {
+            background: var(--surface);
+            border-color: var(--border);
+            opacity: 1;
+            z-index: -1;
+        }
+        
+        .social-link::after {
+            background: var(--next-surface);
+            border-color: var(--next-border);
+            opacity: 0;
+            z-index: -2;
+        }
+        
+        .theme-root[data-fading="true"] .social-link::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .social-link::after {
+            opacity: 1;
+        }
+        
+        .social-link i {
+            position: relative;
+            z-index: 1;
+            color: var(--text);
         }
         
         .social-link:hover {
             background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: white;
             transform: translateY(-5px);
             border-color: transparent;
+        }
+        
+        .social-link:hover::before,
+        .social-link:hover::after {
+            opacity: 0;
+        }
+        
+        .social-link:hover i {
+            color: white;
         }
         
         @keyframes fadeInUp {
@@ -376,18 +526,47 @@
         }
         
         .badge-tech {
-            background: var(--badge-bg);
-            color: var(--text);
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.875rem;
             font-weight: 500;
             display: inline-block;
             margin: 0.25rem;
-            border: 1px solid var(--border);
-            transition: background 1200ms ease-in-out,
-                        color 1200ms ease-in-out,
-                        border-color 1200ms ease-in-out;
+            border: 1px solid;
+            position: relative;
+        }
+        
+        .badge-tech::before,
+        .badge-tech::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 20px;
+            border: 1px solid;
+            pointer-events: none;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .badge-tech::before {
+            background: var(--badge-bg);
+            border-color: var(--border);
+            opacity: 1;
+            z-index: -1;
+        }
+        
+        .badge-tech::after {
+            background: var(--next-badge-bg);
+            border-color: var(--next-border);
+            opacity: 0;
+            z-index: -2;
+        }
+        
+        .theme-root[data-fading="true"] .badge-tech::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .badge-tech::after {
+            opacity: 1;
         }
         
         /* Theme Controls */
@@ -404,27 +583,68 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
+            border: 1px solid transparent;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            transition: all 0.3s ease,
-                        background 1200ms ease-in-out,
-                        border-color 1200ms ease-in-out,
-                        color 1200ms ease-in-out,
-                        box-shadow 1200ms ease-in-out;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .theme-btn::before,
+        .theme-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .theme-btn::before {
+            background: var(--surface);
+            border-color: var(--border);
             box-shadow: 0 4px 12px var(--shadow);
+            opacity: 1;
+            z-index: -1;
+        }
+        
+        .theme-btn::after {
+            background: var(--next-surface);
+            border-color: var(--next-border);
+            box-shadow: 0 4px 12px var(--next-shadow);
+            opacity: 0;
+            z-index: -2;
+        }
+        
+        .theme-root[data-fading="true"] .theme-btn::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .theme-btn::after {
+            opacity: 1;
+        }
+        
+        .theme-btn i {
+            color: var(--text);
+            position: relative;
+            z-index: 1;
         }
         
         .theme-btn:hover {
             background: var(--accent);
-            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px var(--shadow);
+        }
+        
+        .theme-btn:hover::before,
+        .theme-btn:hover::after {
+            opacity: 0;
+        }
+        
+        .theme-btn:hover i {
+            color: white;
         }
         
         .theme-btn:active {
@@ -521,6 +741,7 @@
                     <!-- Marieke Logopedie Project -->
                     <div class="col-lg-4 col-md-6">
                         <div class="project-card">
+                            <div class="project-card-top-bar"></div>
                             <div class="project-icon">
                                 <i class="bi bi-chat-square-heart-fill"></i>
                             </div>
@@ -543,6 +764,7 @@
                     <!-- Phase 10 Scorekeeper Project -->
                     <div class="col-lg-4 col-md-6">
                         <div class="project-card">
+                            <div class="project-card-top-bar"></div>
                             <div class="project-icon">
                                 <i class="bi bi-dice-5-fill"></i>
                             </div>
@@ -565,6 +787,7 @@
                     <!-- ColorHunt Palette Tester Project -->
                     <div class="col-lg-4 col-md-6">
                         <div class="project-card">
+                            <div class="project-card-top-bar"></div>
                             <div class="project-icon">
                                 <i class="bi bi-palette-fill"></i>
                             </div>
