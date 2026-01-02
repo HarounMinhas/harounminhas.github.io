@@ -1,0 +1,40 @@
+/* Global styles for main page elements */
+
+/* Make theme switcher transparent and blend with background */
+.AppHeader-appearanceSettings button,
+.HeaderMenu-link.border {
+  background: rgba(44, 44, 46, 0.3) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.AppHeader-appearanceSettings button:hover,
+.HeaderMenu-link.border:hover {
+  background: rgba(58, 58, 60, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  transform: scale(1.02);
+}
+
+/* Control buttons on main page - transparent glassmorphism */
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Sign in button transparency */
+a.HeaderMenu-button {
+  background: rgba(44, 44, 46, 0.3) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+a.HeaderMenu-button:hover {
+  background: rgba(58, 58, 60, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
