@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateRandomPhase } from '../utils/phaseGenerator';
 import { PhaseDefinition } from '../types';
 
@@ -6,11 +6,36 @@ interface PhaseGeneratorProps {
   onClose: () => void;
 }
 
+interface CustomPhase extends PhaseDefinition {
+  id: string;
+}
+
+const STORAGE_KEY = 'phase10_custom_phases';
+
 export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   const [difficulty, setDifficulty] = useState(3);
   const [customPhases, setCustomPhases] = useState<PhaseDefinition[]>([]);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
   const [currentPhase, setCurrentPhase] = useState<PhaseDefinition | null>(null);
+
+  // Load saved phase list from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        setPhaseList(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load saved phases:', e);
+      }
+    }
+  }, []);
+
+  // Save phase list to localStorage whenever it changes
+  useEffect(() => {
+    if (phaseList.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(phaseList));
+    }
+  }, [phaseList]);
 
   const generate = () => {
     const phase = generateRandomPhase(difficulty);
@@ -83,7 +108,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
         <div className="modal-header">
           <h2 className="modal-title">🎯 Custom Fasen</h2>
           <button className="modal-close" onClick={onClose}>
@@ -108,7 +133,6 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
               <span>Makkelijk</span>
               <span>Moeilijk</span>
             </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-2 mb-3">
