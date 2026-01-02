@@ -28,6 +28,7 @@
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
+            transition: color 1200ms ease-in-out;
         }
         
         /* Theme Root with Background Layers */
@@ -77,10 +78,10 @@
         .btn,
         .social-link,
         .scroll-indicator {
-            transition: background-color 500ms ease-in-out, 
-                        color 500ms ease-in-out, 
-                        border-color 500ms ease-in-out,
-                        box-shadow 500ms ease-in-out;
+            transition: background-color 1200ms ease-in-out, 
+                        color 1200ms ease-in-out, 
+                        border-color 1200ms ease-in-out,
+                        box-shadow 1200ms ease-in-out;
         }
         
         .hero-section {
@@ -98,15 +99,47 @@
             padding: 2rem;
         }
         
+        /* Smooth gradient title with blend approach */
         .hero-title {
             font-size: clamp(2.5rem, 8vw, 5rem);
             font-weight: 700;
             margin-bottom: 1rem;
+            position: relative;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .hero-title::before,
+        .hero-title::after {
+            content: 'Haroun Minhas';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .hero-title::before {
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: fadeInUp 0.8s ease-out;
+            opacity: 1;
+        }
+        
+        .hero-title::after {
+            background: linear-gradient(135deg, var(--next-accent), var(--next-accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .hero-title::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .hero-title::after {
+            opacity: 1;
         }
         
         .hero-subtitle {
@@ -114,6 +147,7 @@
             color: var(--muted);
             margin-bottom: 3rem;
             animation: fadeInUp 0.8s ease-out 0.2s both;
+            transition: color 1200ms ease-in-out;
         }
         
         /* Glassmorphism Scroll Indicator */
@@ -153,6 +187,9 @@
             justify-content: center;
             box-shadow: 0 8px 32px var(--shadow);
             animation: bounce 2s ease-in-out infinite;
+            transition: background 1200ms ease-in-out, 
+                        border-color 1200ms ease-in-out,
+                        box-shadow 1200ms ease-in-out;
         }
         
         .scroll-indicator-inner::before {
@@ -163,7 +200,7 @@
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             opacity: 0;
             z-index: -1;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, background 1200ms ease-in-out;
         }
         
         .scroll-indicator:hover .scroll-indicator-inner::before {
@@ -174,6 +211,7 @@
             font-size: 1.5rem;
             color: var(--text);
             animation: chevronPulse 2s ease-in-out infinite;
+            transition: color 1200ms ease-in-out;
         }
         
         @keyframes bounce {
@@ -205,6 +243,7 @@
             font-weight: 600;
             margin-bottom: 3rem;
             color: var(--text);
+            transition: color 1200ms ease-in-out;
         }
         
         .project-card {
@@ -212,7 +251,10 @@
             border-radius: 20px;
             padding: 2rem;
             height: 100%;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 500ms ease-in-out;
+            transition: transform 0.3s ease, 
+                        box-shadow 0.3s ease, 
+                        background-color 1200ms ease-in-out,
+                        border-color 1200ms ease-in-out;
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
@@ -227,7 +269,7 @@
             height: 4px;
             background: linear-gradient(90deg, var(--accent), var(--accent2));
             transform: scaleX(0);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, background 1200ms ease-in-out;
         }
         
         .project-card:hover {
@@ -250,6 +292,7 @@
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
             color: white;
+            transition: background 1200ms ease-in-out;
         }
         
         .project-title {
@@ -257,12 +300,14 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text);
+            transition: color 1200ms ease-in-out;
         }
         
         .project-description {
             color: var(--muted);
             margin-bottom: 1.5rem;
             line-height: 1.6;
+            transition: color 1200ms ease-in-out;
         }
         
         .btn-project {
@@ -276,7 +321,9 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, 
+                        box-shadow 0.3s ease,
+                        background 1200ms ease-in-out;
         }
         
         .btn-project:hover {
@@ -302,7 +349,10 @@
             justify-content: center;
             color: var(--text);
             font-size: 1.2rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease,
+                        background 1200ms ease-in-out,
+                        color 1200ms ease-in-out,
+                        border-color 1200ms ease-in-out;
             text-decoration: none;
             border: 1px solid var(--border);
         }
@@ -335,6 +385,9 @@
             display: inline-block;
             margin: 0.25rem;
             border: 1px solid var(--border);
+            transition: background 1200ms ease-in-out,
+                        color 1200ms ease-in-out,
+                        border-color 1200ms ease-in-out;
         }
         
         /* Theme Controls */
@@ -359,7 +412,11 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease,
+                        background 1200ms ease-in-out,
+                        border-color 1200ms ease-in-out,
+                        color 1200ms ease-in-out,
+                        box-shadow 1200ms ease-in-out;
             box-shadow: 0 4px 12px var(--shadow);
         }
         
