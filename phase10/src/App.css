@@ -455,7 +455,7 @@ body {
   border-radius: var(--radius-md);
   border: 1px solid var(--glass-border);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
@@ -498,6 +498,7 @@ body {
 .phase-content {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .phase-title {
@@ -506,20 +507,24 @@ body {
   color: var(--text-primary);
   margin-bottom: 0.25rem;
   letter-spacing: -0.3px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .phase-description {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.5;
 }
 
 .phase-actions {
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .phase-action-btn {
