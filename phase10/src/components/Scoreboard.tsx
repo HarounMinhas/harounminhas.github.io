@@ -58,7 +58,7 @@ export function Scoreboard({
         </div>
         <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
           <button className="btn btn-secondary" onClick={onGeneratePhase} style={{ flex: 1, minWidth: '200px' }}>
-            🎲 Random Fase
+            🎯 Custom Fasen
           </button>
           <button className="btn btn-danger" onClick={onNewGame} style={{ flex: 1, minWidth: '200px' }}>
             🔄 Nieuw Spel

@@ -46,7 +46,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(180deg, #1c1c1e 0%, #2c2c2e 50%, #1c1c1e 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
@@ -458,12 +458,26 @@ body {
   align-items: center;
   gap: 1rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
 }
 
 .phase-item:hover {
   background: var(--glass-hover);
   border-color: rgba(255, 255, 255, 0.18);
   transform: translateX(4px);
+}
+
+.phase-item.selected {
+  background: var(--glass-highlight);
+  border-color: var(--primary);
+  border-width: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), var(--shadow);
+  transform: translateX(0);
+}
+
+.phase-item.selected .phase-number {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  box-shadow: 0 0 12px rgba(0, 122, 255, 0.4);
 }
 
 .phase-number {
@@ -478,6 +492,7 @@ body {
   font-weight: 700;
   font-size: 0.875rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .phase-content {
@@ -562,6 +577,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background: var(--text-muted);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .difficulty-dot.active {
