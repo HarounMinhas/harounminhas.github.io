@@ -6,24 +6,21 @@ interface PhaseGeneratorProps {
   onClose: () => void;
 }
 
-interface CustomPhase extends PhaseDefinition {
-  id: string;
-}
-
 const STORAGE_KEY = 'phase10_custom_phases';
+const MAX_PHASES = 10;
+const DIFFICULTY_DISTRIBUTION = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
 
 export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   const [difficulty, setDifficulty] = useState(3);
   const [customPhases, setCustomPhases] = useState<PhaseDefinition[]>([]);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
-  const [currentPhase, setCurrentPhase] = useState<PhaseDefinition | null>(null);
 
   // Load saved phase list from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        setPhaseList(JSON.parse(saved));
+        setCustomPhases(JSON.parse(saved));
       } catch (e) {
         console.error('Failed to load saved phases:', e);
       }
@@ -32,14 +29,13 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
 
   // Save phase list to localStorage whenever it changes
   useEffect(() => {
-    if (phaseList.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(phaseList));
+    if (customPhases.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customPhases));
     }
-  }, [phaseList]);
+  }, [customPhases]);
 
   const generate = () => {
     const phase = generateRandomPhase(difficulty);
-    setCurrentPhase(phase);
     
     if (selectedPhaseIndex !== null) {
       // Replace selected phase
@@ -47,7 +43,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
       newPhases[selectedPhaseIndex] = phase;
       setCustomPhases(newPhases);
       setSelectedPhaseIndex(null);
-    } else if (customPhases.length < 10) {
+    } else if (customPhases.length < MAX_PHASES) {
       // Add new phase
       setCustomPhases([...customPhases, phase]);
     }
@@ -56,8 +52,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   const removePhase = (index: number) => {
     const newPhases = customPhases.filter((_, i) => i !== index);
     setCustomPhases(newPhases);
+    
     if (selectedPhaseIndex === index) {
       setSelectedPhaseIndex(null);
+    } else if (selectedPhaseIndex !== null && selectedPhaseIndex > index) {
+      setSelectedPhaseIndex(selectedPhaseIndex - 1);
     }
   };
 
@@ -70,26 +69,19 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   };
 
   const surpriseMe = () => {
-    const newPhases: PhaseDefinition[] = [];
-    
-    // Generate 10 phases with increasing difficulty
-    // 2x difficulty 1, 2x difficulty 2, 2x difficulty 3, 2x difficulty 4, 2x difficulty 5
-    const difficulties = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
-    
-    difficulties.forEach(diff => {
-      newPhases.push(generateRandomPhase(diff));
-    });
+    const newPhases = DIFFICULTY_DISTRIBUTION.map(diff => 
+      generateRandomPhase(diff)
+    );
     
     setCustomPhases(newPhases);
     setSelectedPhaseIndex(null);
-    setCurrentPhase(null);
   };
 
   const clearList = () => {
     if (confirm('Weet je zeker dat je alle fasen wilt verwijderen?')) {
       setCustomPhases([]);
       setSelectedPhaseIndex(null);
-      setCurrentPhase(null);
+      localStorage.removeItem(STORAGE_KEY);
     }
   };
 
@@ -133,13 +125,14 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
               <span>Makkelijk</span>
               <span>Moeilijk</span>
             </div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-2 mb-3">
             <button 
               className="btn btn-primary" 
               onClick={generate} 
-              disabled={customPhases.length >= 10 && selectedPhaseIndex === null}
+              disabled={customPhases.length >= MAX_PHASES && selectedPhaseIndex === null}
               style={{ flex: 1 }}
             >
               {selectedPhaseIndex !== null ? '🔄 Vervang Fase' : '➕ Genereer Fase'}
@@ -158,7 +151,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             <>
               <div className="flex justify-between align-center mb-2">
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Mijn Fasen ({customPhases.length}/10)
+                  Mijn Fasen ({customPhases.length}/{MAX_PHASES})
                 </h3>
                 <button 
                   className="btn btn-small btn-secondary" 
