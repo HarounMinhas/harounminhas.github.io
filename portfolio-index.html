@@ -83,14 +83,13 @@
             padding: 2rem;
         }
         
-        /* Hero title with layered gradients */
+        /* Hero title - NO background-clip transition */
         .hero-title {
             font-size: clamp(2.5rem, 8vw, 5rem);
             font-weight: 700;
             margin-bottom: 1rem;
             position: relative;
             animation: fadeInUp 0.8s ease-out;
-            /* Invisible text to maintain layout */
             color: transparent;
         }
         
@@ -100,12 +99,13 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
+            width: 100%;
             transition: opacity 1200ms ease-in-out;
+            pointer-events: none;
         }
         
         .hero-title::before {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            background-image: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -114,7 +114,7 @@
         }
         
         .hero-title::after {
-            background: linear-gradient(135deg, var(--next-accent), var(--next-accent2));
+            background-image: linear-gradient(135deg, var(--next-accent), var(--next-accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -130,43 +130,12 @@
             opacity: 1;
         }
         
-        /* Subtitle with layered text */
+        /* Subtitle - white text always */
         .hero-subtitle {
             font-size: clamp(1rem, 3vw, 1.5rem);
             margin-bottom: 3rem;
             animation: fadeInUp 0.8s ease-out 0.2s both;
-            position: relative;
-            color: transparent;
-        }
-        
-        .hero-subtitle::before,
-        .hero-subtitle::after {
-            content: 'Full Stack Developer & Creative Problem Solver';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            transition: opacity 1200ms ease-in-out;
-        }
-        
-        .hero-subtitle::before {
-            color: var(--muted);
-            opacity: 1;
-            z-index: 2;
-        }
-        
-        .hero-subtitle::after {
-            color: var(--next-muted);
-            opacity: 0;
-            z-index: 1;
-        }
-        
-        .theme-root[data-fading="true"] .hero-subtitle::before {
-            opacity: 0;
-        }
-        
-        .theme-root[data-fading="true"] .hero-subtitle::after {
-            opacity: 1;
+            color: var(--text);
         }
         
         /* Glassmorphism Scroll Indicator */
@@ -243,21 +212,7 @@
             z-index: 2;
             font-size: 1.5rem;
             animation: chevronPulse 2s ease-in-out infinite;
-        }
-        
-        .scroll-indicator-icon::before,
-        .scroll-indicator-icon::after {
-            transition: opacity 1200ms ease-in-out;
-        }
-        
-        .scroll-indicator-icon::before {
             color: var(--text);
-            opacity: 1;
-        }
-        
-        .scroll-indicator-icon::after {
-            color: var(--next-text);
-            opacity: 0;
         }
         
         @keyframes bounce {
@@ -283,44 +238,13 @@
             animation: fadeInUp 0.8s ease-out 0.4s both;
         }
         
-        /* Section title with layers */
+        /* Section title - white text always */
         .section-title {
             text-align: center;
             font-size: 2.5rem;
             font-weight: 600;
             margin-bottom: 3rem;
-            position: relative;
-            color: transparent;
-        }
-        
-        .section-title::before,
-        .section-title::after {
-            content: 'Mijn Projecten';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            transition: opacity 1200ms ease-in-out;
-        }
-        
-        .section-title::before {
             color: var(--text);
-            opacity: 1;
-            z-index: 2;
-        }
-        
-        .section-title::after {
-            color: var(--next-text);
-            opacity: 0;
-            z-index: 1;
-        }
-        
-        .theme-root[data-fading="true"] .section-title::before {
-            opacity: 0;
-        }
-        
-        .theme-root[data-fading="true"] .section-title::after {
-            opacity: 1;
         }
         
         .project-card {
@@ -380,17 +304,41 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
             transform: scaleX(0);
             transition: transform 0.3s ease;
             z-index: 10;
+        }
+        
+        .project-card-top-bar::before,
+        .project-card-top-bar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            transition: opacity 1200ms ease-in-out;
+        }
+        
+        .project-card-top-bar::before {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            opacity: 1;
+        }
+        
+        .project-card-top-bar::after {
+            background: linear-gradient(90deg, var(--next-accent), var(--next-accent2));
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .project-card-top-bar::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .project-card-top-bar::after {
+            opacity: 1;
         }
         
         .project-icon {
             width: 60px;
             height: 60px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -401,27 +349,53 @@
             z-index: 1;
         }
         
-        .project-title,
-        .project-description {
-            position: relative;
-            z-index: 1;
+        .project-icon::before,
+        .project-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            transition: opacity 1200ms ease-in-out;
+            z-index: -1;
         }
         
+        .project-icon::before {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            opacity: 1;
+        }
+        
+        .project-icon::after {
+            background: linear-gradient(135deg, var(--next-accent), var(--next-accent2));
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .project-icon::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .project-icon::after {
+            opacity: 1;
+        }
+        
+        /* White text for project content */
         .project-title {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text);
+            position: relative;
+            z-index: 1;
         }
         
         .project-description {
             color: var(--muted);
             margin-bottom: 1.5rem;
             line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
         
         .btn-project {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
             color: white;
             border: none;
             padding: 0.75rem 2rem;
@@ -434,6 +408,34 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             z-index: 1;
+        }
+        
+        .btn-project::before,
+        .btn-project::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            transition: opacity 1200ms ease-in-out;
+            z-index: -1;
+        }
+        
+        .btn-project::before {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            opacity: 1;
+        }
+        
+        .btn-project::after {
+            background: linear-gradient(135deg, var(--next-accent), var(--next-accent2));
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .btn-project::before {
+            opacity: 0;
+        }
+        
+        .theme-root[data-fading="true"] .btn-project::after {
+            opacity: 1;
         }
         
         .btn-project:hover {
@@ -500,14 +502,31 @@
         }
         
         .social-link:hover {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
             transform: translateY(-5px);
-            border-color: transparent;
         }
         
         .social-link:hover::before,
         .social-link:hover::after {
+            opacity: 0 !important;
+        }
+        
+        .social-link:hover::after {
+            opacity: 1 !important;
+        }
+        
+        /* Hover gradient layer */
+        .social-link-hover {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
             opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        .social-link:hover .social-link-hover {
+            opacity: 1;
         }
         
         .social-link:hover i {
@@ -525,6 +544,7 @@
             }
         }
         
+        /* Badge tech - white text always */
         .badge-tech {
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -532,33 +552,32 @@
             font-weight: 500;
             display: inline-block;
             margin: 0.25rem;
-            border: 1px solid;
             position: relative;
+            color: var(--text);
         }
         
         .badge-tech::before,
         .badge-tech::after {
             content: '';
             position: absolute;
-            inset: -1px;
+            inset: 0;
             border-radius: 20px;
             border: 1px solid;
             pointer-events: none;
             transition: opacity 1200ms ease-in-out;
+            z-index: -1;
         }
         
         .badge-tech::before {
             background: var(--badge-bg);
             border-color: var(--border);
             opacity: 1;
-            z-index: -1;
         }
         
         .badge-tech::after {
             background: var(--next-badge-bg);
             border-color: var(--next-border);
             opacity: 0;
-            z-index: -2;
         }
         
         .theme-root[data-fading="true"] .badge-tech::before {
@@ -634,13 +653,27 @@
         }
         
         .theme-btn:hover {
-            background: var(--accent);
             transform: translateY(-2px);
         }
         
         .theme-btn:hover::before,
         .theme-btn:hover::after {
+            opacity: 0 !important;
+        }
+        
+        /* Hover gradient layer for theme btn */
+        .theme-btn-hover {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: var(--accent);
             opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        .theme-btn:hover .theme-btn-hover {
+            opacity: 1;
         }
         
         .theme-btn:hover i {
@@ -712,12 +745,15 @@
                     
                     <div class="social-links">
                         <a href="https://github.com/HarounMinhas" class="social-link" target="_blank" rel="noopener" title="GitHub">
+                            <span class="social-link-hover"></span>
                             <i class="bi bi-github"></i>
                         </a>
                         <a href="https://www.linkedin.com/in/haroun-minhas-848b8896/" class="social-link" target="_blank" rel="noopener" title="LinkedIn">
+                            <span class="social-link-hover"></span>
                             <i class="bi bi-linkedin"></i>
                         </a>
                         <a href="https://www.instagram.com/harounminhas" class="social-link" target="_blank" rel="noopener" title="Instagram">
+                            <span class="social-link-hover"></span>
                             <i class="bi bi-instagram"></i>
                         </a>
                     </div>
@@ -813,9 +849,11 @@
         <!-- Theme Controls -->
         <div class="theme-controls">
             <button class="theme-btn" id="playPauseBtn" title="Pause theme drift" aria-label="Pause">
+                <span class="theme-btn-hover"></span>
                 <i class="bi bi-pause-fill"></i>
             </button>
             <button class="theme-btn" id="nextBtn" title="Next theme" aria-label="Next">
+                <span class="theme-btn-hover"></span>
                 <i class="bi bi-skip-forward-fill"></i>
             </button>
         </div>
