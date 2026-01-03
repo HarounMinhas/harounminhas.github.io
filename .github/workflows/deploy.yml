@@ -51,6 +51,7 @@ jobs:
           cp -r build deploy/marieke
           cp -r phase10/dist deploy/phase10
           cp -r colorhunt deploy/colorhunt
+          cp -r regex-playground deploy/regex-playground
           cp portfolio-index.html deploy/index.html
           echo "Deployment structure:"
           ls -la deploy/
@@ -60,6 +61,8 @@ jobs:
           ls -la deploy/phase10/
           echo "ColorHunt folder:"
           ls -la deploy/colorhunt/
+          echo "Regex Playground folder:"
+          ls -la deploy/regex-playground/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
