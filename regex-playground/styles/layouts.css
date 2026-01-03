@@ -1,0 +1,156 @@
+/* Playground Layouts */
+.playground {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Topbar */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.topbar-left,
+.topbar-center,
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.project-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Tabs */
+.tab-group {
+    display: flex;
+    gap: var(--spacing-xs);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+}
+
+.tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.tab:hover {
+    background: var(--bg-tertiary);
+}
+
+.tab.active {
+    background: var(--accent-primary);
+    color: white;
+}
+
+/* Main Playground Area */
+.playground-main {
+    flex: 1;
+    overflow: hidden;
+    padding: var(--spacing-md);
+}
+
+.layout-grid {
+    display: grid;
+    gap: var(--spacing-md);
+    height: 100%;
+}
+
+/* Layout A - 3 Panel IDE */
+.layout-a {
+    grid-template-columns: 250px 1fr 350px;
+}
+
+.layout-a .middle-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.layout-a .regex-editor {
+    flex-shrink: 0;
+}
+
+.layout-a .input-panel {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Layout B - Split View */
+.layout-b {
+    grid-template-columns: 1fr 400px;
+}
+
+.layout-b .left-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.layout-b .regex-editor {
+    flex-shrink: 0;
+}
+
+.layout-b .input-panel {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Layout C - Notebook */
+.notebook-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-width: 900px;
+    margin: 0 auto;
+    height: 100%;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.notebook-column .panel {
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .layout-a {
+        grid-template-columns: 200px 1fr 300px;
+    }
+}
+
+@media (max-width: 968px) {
+    .layout-a {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+    }
+    
+    .layout-b {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+    }
+    
+    .topbar {
+        flex-direction: column;
+        height: auto;
+        gap: var(--spacing-sm);
+    }
+}
