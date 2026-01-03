@@ -1,0 +1,88 @@
+/* Dark Theme */
+body.dark-theme {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d30;
+    --text-primary: #d4d4d4;
+    --text-secondary: #9d9d9d;
+    --border-color: #3e3e42;
+    --accent-primary: #0E639C;
+    --accent-hover: #1177BB;
+}
+
+/* Auto-detect system preference */
+@media (prefers-color-scheme: dark) {
+    body:not(.light-theme) {
+        --bg-primary: #1e1e1e;
+        --bg-secondary: #252526;
+        --bg-tertiary: #2d2d30;
+        --text-primary: #d4d4d4;
+        --text-secondary: #9d9d9d;
+        --border-color: #3e3e42;
+        --accent-primary: #0E639C;
+        --accent-hover: #1177BB;
+    }
+}
+
+/* Dark theme specific adjustments */
+body.dark-theme .wf-box {
+    background: var(--bg-tertiary);
+}
+
+body.dark-theme .highlight {
+    background: rgba(255, 235, 59, 0.2) !important;
+}
+
+body.dark-theme .match-0 { background: rgba(255, 235, 59, 0.2); }
+body.dark-theme .match-1 { background: rgba(76, 175, 80, 0.2); }
+body.dark-theme .match-2 { background: rgba(33, 150, 243, 0.2); }
+body.dark-theme .match-3 { background: rgba(255, 152, 0, 0.2); }
+body.dark-theme .match-4 { background: rgba(156, 39, 176, 0.2); }
+
+body.dark-theme .error-display {
+    background: rgba(244, 67, 54, 0.1);
+    border-top-color: rgba(244, 67, 54, 0.3);
+}
+
+body.dark-theme .test-result.pass {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+body.dark-theme .test-result.fail {
+    background: rgba(244, 67, 54, 0.1);
+}
+
+/* Theme transition */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.panel,
+.btn-secondary,
+.test-input,
+textarea,
+input {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Print styles */
+@media print {
+    .topbar,
+    .sidebar,
+    .btn-primary,
+    .btn-secondary,
+    .btn-tiny,
+    .btn-icon {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .panel {
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+}

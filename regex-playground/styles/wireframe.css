@@ -1,0 +1,120 @@
+/* Wireframe Components for Layout Previews */
+.wf-canvas {
+    border: 2px solid var(--border-color);
+    background: var(--bg-primary);
+    padding: 8px;
+    height: 180px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+    margin: var(--spacing-md) 0;
+}
+
+.wf-box {
+    border: 1px dashed var(--border-color);
+    background: var(--bg-secondary);
+    position: relative;
+    min-height: 32px;
+    border-radius: 2px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 4px;
+}
+
+.wf-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg-primary);
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid var(--border-color);
+}
+
+.wf-grid {
+    display: grid;
+    gap: 6px;
+    height: 100%;
+}
+
+.wf-column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+}
+
+/* Layout-specific grids */
+.wf-layout-a {
+    grid-template-columns: 1fr 2fr 1.5fr;
+}
+
+.wf-layout-b {
+    grid-template-columns: 2.5fr 1.5fr;
+}
+
+/* Layout Chooser Page */
+.layout-chooser {
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chooser-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.chooser-header h1 {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.chooser-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.layout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+    max-width: 1200px;
+    width: 100%;
+}
+
+.layout-card {
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.layout-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-primary);
+}
+
+.layout-card h3 {
+    color: var(--accent-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.layout-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: var(--spacing-md);
+}
+
+.layout-card button {
+    width: 100%;
+    margin-top: var(--spacing-md);
+}
