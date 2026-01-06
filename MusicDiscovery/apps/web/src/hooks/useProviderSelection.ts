@@ -1,8 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
 import { PROVIDERS, type ProviderId, type ProviderMetadata } from '@musicdiscovery/shared';
-
-import { getProviderCatalog } from '../api';
-import { getSelectedProvider, setSelectedProvider, syncProviderSelection } from '../providerSelection';
 
 export type ProviderStatus = 'loading' | 'ready' | 'error';
 
@@ -14,67 +11,20 @@ interface ProviderSelectionState {
   selectProvider: (next: ProviderId) => void;
 }
 
+// Locked provider selection: always use Deezer (primary) with iTunes links available.
+// This intentionally disables runtime switching and removes any persisted selection.
+const LOCKED_PROVIDER: ProviderId = 'deezer';
+
 export function useProviderSelection(): ProviderSelectionState {
-  const [provider, setProvider] = useState<ProviderId>(() => getSelectedProvider());
-  const [providers, setProviders] = useState<ProviderMetadata[]>(PROVIDERS);
-  const [status, setStatus] = useState<ProviderStatus>('loading');
-  const [error, setError] = useState<string | null>(null);
-  const providerRef = useRef(provider);
-
-  useEffect(() => {
-    providerRef.current = provider;
-  }, [provider]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setStatus('loading');
-        const catalog = await getProviderCatalog();
-        if (cancelled) return;
-
-        setProviders(catalog.items);
-        setStatus('ready');
-        setError(null);
-
-        const next = syncProviderSelection(
-          catalog.items.map((item) => item.id),
-          catalog.default
-        );
-
-        if (next !== providerRef.current) {
-          setSelectedProvider(next);
-          setProvider(next);
-        }
-      } catch (err) {
-        if (cancelled) return;
-        console.error('Failed to load provider metadata', err);
-        setError('Kon providers niet laden');
-        setStatus('error');
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const selectProvider = useCallback((next: ProviderId) => {
-    setProvider((current) => {
-      if (current === next) {
-        return current;
-      }
-      setSelectedProvider(next);
-      return next;
-    });
+  const selectProvider = useCallback(() => {
+    // no-op: provider selection removed
   }, []);
 
   return {
-    provider,
-    providers,
-    status,
-    error,
+    provider: LOCKED_PROVIDER,
+    providers: PROVIDERS.filter((p) => p.id === 'deezer' || p.id === 'itunes'),
+    status: 'ready',
+    error: null,
     selectProvider
   };
 }

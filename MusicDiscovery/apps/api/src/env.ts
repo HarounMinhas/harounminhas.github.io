@@ -7,7 +7,8 @@ config();
 
 const EnvSchema = z
   .object({
-    DATA_MODE: z.enum(['tokenless', 'spotify', 'itunes']).default('tokenless'),
+    // Spotify mode removed: this GitHub Pages deployment uses public endpoints only.
+    DATA_MODE: z.enum(['tokenless', 'itunes']).default('tokenless'),
     MARKET: z.string().default('BE'),
     PORT: z.coerce.number().default(8080),
     NODE_ENV: z.string().default('development'),
@@ -15,13 +16,6 @@ const EnvSchema = z
     LOG_LEVEL: z
       .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
       .default('info'),
-    SPOTIFY_CLIENT_ID: z.string().optional(),
-    SPOTIFY_CLIENT_SECRET: z.string().optional(),
-    SPOTIFY_REDIRECT_URI: z.string().optional(),
-    SPOTIFY_ENABLED: z
-      .union([z.boolean(), z.string()])
-      .optional()
-      .transform((value) => parseBoolean(value, false)),
     SMART_RELATED_ENABLED: z
       .union([z.boolean(), z.string()])
       .optional()
@@ -34,13 +28,6 @@ const EnvSchema = z
       .min(1)
       .default('MusicDiscoverySmartRelated/1.0 (musicdiscovery.local; dev@musicdiscovery.local)'),
     SMART_RELATED_MUSICBRAINZ_RATE_LIMIT_MS: z.coerce.number().min(200).max(60000).default(1000)
-  })
-  .superRefine((val, ctx) => {
-  if (val.DATA_MODE === 'spotify' && val.SPOTIFY_ENABLED) {
-    if (!val.SPOTIFY_CLIENT_ID) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SPOTIFY_CLIENT_ID'], message: 'Required in spotify mode' });
-    if (!val.SPOTIFY_CLIENT_SECRET) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SPOTIFY_CLIENT_SECRET'], message: 'Required in spotify mode' });
-    if (!val.SPOTIFY_REDIRECT_URI) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SPOTIFY_REDIRECT_URI'], message: 'Required in spotify mode' });
-  }
-});
+  });
 
 export const env = EnvSchema.parse(process.env);
