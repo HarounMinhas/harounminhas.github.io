@@ -11,9 +11,9 @@ interface ProviderSelectionState {
   selectProvider: (next: ProviderId) => void;
 }
 
-// Locked provider selection: always use Deezer (primary) with iTunes links available.
+// Locked provider selection: always use Deezer-first tokenless mode with iTunes links available.
 // This intentionally disables runtime switching and removes any persisted selection.
-const LOCKED_PROVIDER: ProviderId = 'deezer';
+const LOCKED_PROVIDER: ProviderId = 'tokenless';
 
 export function useProviderSelection(): ProviderSelectionState {
   const selectProvider = useCallback(() => {
@@ -22,7 +22,7 @@ export function useProviderSelection(): ProviderSelectionState {
 
   return {
     provider: LOCKED_PROVIDER,
-    providers: PROVIDERS.filter((p) => p.id === 'deezer' || p.id === 'itunes'),
+    providers: PROVIDERS.filter((p) => p.id === 'tokenless' || p.id === 'itunes'),
     status: 'ready',
     error: null,
     selectProvider

@@ -9,7 +9,13 @@ This folder is reserved for the **MusicDiscovery** webapp that will be published
 - Work in progress: the portfolio tile already links to the app path.
 - The GitHub Pages deploy workflow is prepared to build and publish this app once the source is placed here.
 
+## Data sources
+
+This project intentionally uses only public endpoints:
+
+- Deezer (primary) for related artists and top tracks.
+- iTunes Search API for discovery links and previews.
+
 ## Security
 
 Do **not** commit any `.env` files or secrets in this repository.
-
