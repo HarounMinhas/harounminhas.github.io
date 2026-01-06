@@ -173,6 +173,7 @@
             background: var(--bg-secondary);
             color: var(--text);
             border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
         }
         
         .btn-secondary:hover {
@@ -246,8 +247,115 @@
         
         .playground-main {
             flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Layout A: 3-Panel IDE */
+        .layout-a .playground-main {
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            gap: 0;
+        }
+        
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
             padding: 1.5rem;
-            overflow: auto;
+        }
+        
+        .sidebar h3 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .example-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+        
+        .example-item:hover {
+            border-color: var(--primary);
+            transform: translateX(3px);
+        }
+        
+        .example-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            color: var(--primary);
+        }
+        
+        .example-pattern {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+        
+        .demo-note {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            margin-top: 1rem;
+            color: #92400e;
+        }
+        
+        .middle-section {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .right-section {
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        /* Layout B: Split View */
+        .layout-b .playground-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        
+        .layout-b .left-section {
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .layout-b .right-section {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        /* Layout C: Notebook Mode */
+        .layout-c .playground-main {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
         }
         
         /* Panel Styles */
@@ -409,6 +517,16 @@
             .tab-group {
                 width: 100%;
             }
+            
+            .layout-a .playground-main,
+            .layout-b .playground-main {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
         }
     </style>
 </head>
@@ -416,13 +534,43 @@
     <div id="app"></div>
     
     <script>
-        // ========================================
-        // COMPLETE STANDALONE JAVASCRIPT - NO DEPENDENCIES
-        // ========================================
+        const EXAMPLES = [
+            {
+                name: 'Email Validator',
+                pattern: '^[\\w.-]+@[\\w.-]+\\.\\w+$',
+                input: 'test@example.com\nhello@world.co.uk\ninvalid.email\nuser+tag@domain.org'
+            },
+            {
+                name: 'Phone Numbers',
+                pattern: '\\+?\\d{1,3}[-.\\s]?\\(?\\d{2,3}\\)?[-.\\s]?\\d{3,4}[-.\\s]?\\d{4}',
+                input: '+31 6 12345678\n020-1234567\n(06) 12345678\n+1-800-555-0123'
+            },
+            {
+                name: 'URL Extractor',
+                pattern: 'https?:\\/\\/[^\\s]+',
+                input: 'Check https://example.com and http://test.org\nAlso visit https://github.com/user/repo'
+            },
+            {
+                name: 'Hex Colors',
+                pattern: '#[0-9A-Fa-f]{6}\\b',
+                input: 'Primary: #667eea\nSecondary: #764ba2\nError: #ef4444\nInvalid: #xyz'
+            },
+            {
+                name: 'Date Format (DD-MM-YYYY)',
+                pattern: '\\b\\d{2}-\\d{2}-\\d{4}\\b',
+                input: 'Born on 15-03-1990\nEvent: 01-12-2024\nInvalid: 32-13-2024'
+            },
+            {
+                name: 'HTML Tags',
+                pattern: '<[^>]+>',
+                input: '<div class="test">Hello</div>\n<p>Paragraph</p>\n<img src="test.jpg" />'
+            }
+        ];
         
         class RegexPlaygroundApp {
             constructor() {
                 this.app = document.getElementById('app');
+                this.currentLayout = 'A';
                 this.state = {
                     pattern: '\\w+@\\w+\\.\\w+',
                     flags: { g: true, i: false, m: false },
@@ -439,7 +587,8 @@
                 if (!activeLayout) {
                     this.showLayoutChooser();
                 } else {
-                    this.showPlayground(activeLayout);
+                    this.currentLayout = activeLayout;
+                    this.showPlayground();
                 }
             }
             
@@ -458,12 +607,12 @@
                     </div>
                 `;
                 
-                // Add event listeners
                 document.querySelectorAll('[data-layout]').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const layout = e.target.dataset.layout;
                         localStorage.setItem('activeLayout', layout);
-                        this.showPlayground(layout);
+                        this.currentLayout = layout;
+                        this.showPlayground();
                     });
                 });
             }
@@ -512,9 +661,56 @@
                 }
             }
             
-            showPlayground(layout) {
+            showPlayground() {
+                const layoutClass = `layout-${this.currentLayout.toLowerCase()}`;
+                
+                let mainContent = '';
+                
+                if (this.currentLayout === 'A') {
+                    // 3-Panel IDE: Sidebar | Middle | Results
+                    mainContent = `
+                        <div class="sidebar">
+                            <h3>📚 Voorbeelden</h3>
+                            ${EXAMPLES.map(ex => `
+                                <div class="example-item" data-example='${JSON.stringify(ex)}'>
+                                    <div class="example-name">${ex.name}</div>
+                                    <div class="example-pattern">/${ex.pattern}/</div>
+                                </div>
+                            `).join('')}
+                            <div class="demo-note">
+                                💡 <strong>Demo:</strong> Deze voorbeelden zijn ter demonstratie. Klik om te laden!
+                            </div>
+                        </div>
+                        <div class="middle-section">
+                            ${this.createEditorPanel()}
+                            ${this.createInputPanel()}
+                        </div>
+                        <div class="right-section">
+                            ${this.createResultsPanel()}
+                        </div>
+                    `;
+                } else if (this.currentLayout === 'B') {
+                    // Split View: Left | Right
+                    mainContent = `
+                        <div class="left-section">
+                            ${this.createEditorPanel()}
+                            ${this.createInputPanel()}
+                        </div>
+                        <div class="right-section">
+                            ${this.createResultsPanel()}
+                        </div>
+                    `;
+                } else {
+                    // Notebook Mode: Vertical stack
+                    mainContent = `
+                        ${this.createEditorPanel()}
+                        ${this.createInputPanel()}
+                        ${this.createResultsPanel()}
+                    `;
+                }
+                
                 this.app.innerHTML = `
-                    <div class="playground">
+                    <div class="playground ${layoutClass}">
                         <div class="topbar">
                             <div class="topbar-left">
                                 <button class="btn-icon" id="btn-home" title="Terug naar layout keuze">🏠</button>
@@ -530,59 +726,74 @@
                             </div>
                         </div>
                         <div class="playground-main">
-                            <!-- Regex Editor Panel -->
-                            <div class="panel">
-                                <div class="panel-header">Regex Pattern</div>
-                                <div class="panel-body">
-                                    <div class="regex-input-wrapper">
-                                        <span class="regex-delimiter">/</span>
-                                        <input type="text" class="regex-input" id="pattern" value="${this.state.pattern}">
-                                        <span class="regex-delimiter">/</span>
-                                    </div>
-                                    <div class="flags">
-                                        <label class="flag-label">
-                                            <input type="checkbox" id="flag-g" ${this.state.flags.g ? 'checked' : ''}>
-                                            <span>g (global)</span>
-                                        </label>
-                                        <label class="flag-label">
-                                            <input type="checkbox" id="flag-i" ${this.state.flags.i ? 'checked' : ''}>
-                                            <span>i (case insensitive)</span>
-                                        </label>
-                                        <label class="flag-label">
-                                            <input type="checkbox" id="flag-m" ${this.state.flags.m ? 'checked' : ''}>
-                                            <span>m (multiline)</span>
-                                        </label>
-                                    </div>
-                                    <div id="error-display"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Input Panel -->
-                            <div class="panel">
-                                <div class="panel-header">
-                                    <span>Test Input</span>
-                                    <button class="btn btn-primary" id="btn-test">▶ Test Pattern</button>
-                                </div>
-                                <div class="panel-body">
-                                    <textarea id="input" placeholder="Voer je test text hier in...">${this.state.input}</textarea>
-                                </div>
-                            </div>
-                            
-                            <!-- Results Panel -->
-                            <div class="panel">
-                                <div class="panel-header">
-                                    <span>Matches</span>
-                                    <span class="match-count" id="match-count">0 matches</span>
-                                </div>
-                                <div class="panel-body" id="results">
-                                    <div class="empty-state">Klik op "Test Pattern" om te beginnen</div>
-                                </div>
-                            </div>
+                            ${mainContent}
                         </div>
                     </div>
                 `;
                 
-                // Setup event listeners
+                this.attachEventListeners();
+                this.runRegex();
+            }
+            
+            createEditorPanel() {
+                return `
+                    <div class="panel">
+                        <div class="panel-header">Regex Pattern</div>
+                        <div class="panel-body">
+                            <div class="regex-input-wrapper">
+                                <span class="regex-delimiter">/</span>
+                                <input type="text" class="regex-input" id="pattern" value="${this.state.pattern}">
+                                <span class="regex-delimiter">/</span>
+                            </div>
+                            <div class="flags">
+                                <label class="flag-label">
+                                    <input type="checkbox" id="flag-g" ${this.state.flags.g ? 'checked' : ''}>
+                                    <span>g (global)</span>
+                                </label>
+                                <label class="flag-label">
+                                    <input type="checkbox" id="flag-i" ${this.state.flags.i ? 'checked' : ''}>
+                                    <span>i (case insensitive)</span>
+                                </label>
+                                <label class="flag-label">
+                                    <input type="checkbox" id="flag-m" ${this.state.flags.m ? 'checked' : ''}>
+                                    <span>m (multiline)</span>
+                                </label>
+                            </div>
+                            <div id="error-display"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            createInputPanel() {
+                return `
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Test Input</span>
+                            <button class="btn btn-primary" id="btn-test">▶ Test Pattern</button>
+                        </div>
+                        <div class="panel-body">
+                            <textarea id="input" placeholder="Voer je test text hier in...">${this.state.input}</textarea>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            createResultsPanel() {
+                return `
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Matches</span>
+                            <span class="match-count" id="match-count">0 matches</span>
+                        </div>
+                        <div class="panel-body" id="results">
+                            <div class="empty-state">Klik op "Test Pattern" om te beginnen</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            attachEventListeners() {
                 document.getElementById('btn-home').onclick = () => {
                     localStorage.removeItem('activeLayout');
                     this.showLayoutChooser();
@@ -598,7 +809,20 @@
                     document.getElementById(id).addEventListener('change', () => this.runRegex());
                 });
                 
-                // Initial run
+                // Example click handlers (only for layout A)
+                document.querySelectorAll('.example-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const example = JSON.parse(e.currentTarget.dataset.example);
+                        this.loadExample(example);
+                    });
+                });
+            }
+            
+            loadExample(example) {
+                this.state.pattern = example.pattern;
+                this.state.input = example.input;
+                document.getElementById('pattern').value = example.pattern;
+                document.getElementById('input').value = example.input;
                 this.runRegex();
             }
             
@@ -685,7 +909,7 @@
                     p: this.state.pattern,
                     i: this.state.input,
                     g: this.state.flags.g ? '1' : '0',
-                    i: this.state.flags.i ? '1' : '0',
+                    ci: this.state.flags.i ? '1' : '0',
                     m: this.state.flags.m ? '1' : '0'
                 });
                 const url = `${window.location.origin}${window.location.pathname}?${params}`;
