@@ -243,18 +243,36 @@
             text-align: center;
             font-size: 2.5rem;
             font-weight: 600;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             color: var(--text);
+        }
+        
+        .section-intro {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+        
+        /* Card wrapper to ensure consistent height */
+        .card-wrapper {
+            height: 100%;
         }
         
         .project-card {
             border-radius: 20px;
             padding: 2rem;
             height: 100%;
+            display: flex;
+            flex-direction: column;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid transparent;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
         }
         
         .project-card::before,
@@ -335,6 +353,12 @@
             opacity: 1;
         }
         
+        .project-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
         .project-icon {
             width: 60px;
             height: 60px;
@@ -393,6 +417,13 @@
             line-height: 1.6;
             position: relative;
             z-index: 1;
+            flex: 1;
+        }
+        
+        .project-footer {
+            margin-top: auto;
+            position: relative;
+            z-index: 1;
         }
         
         .btn-project {
@@ -408,6 +439,8 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             z-index: 1;
+            width: 100%;
+            justify-content: center;
         }
         
         .btn-project::before,
@@ -772,96 +805,153 @@
         <section class="projects-section" id="projectsSection">
             <div class="container">
                 <h2 class="section-title">Projecten</h2>
+                <p class="section-intro">
+                    In mijn vrije tijd werk ik aan deze projecten. Het houdt mijn skills scherp, 
+                    ik leer nieuwe dingen en het is gewoon leuk om te doen.
+                </p>
                 
                 <div class="row g-4">
+                    <!-- Marieke Logopedie Project -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-wrapper">
+                            <a href="./marieke/" class="project-card">
+                                <div class="project-card-top-bar"></div>
+                                <div class="project-content">
+                                    <div class="project-icon">
+                                        <i class="bi bi-chat-heart-fill"></i>
+                                    </div>
+                                    <h3 class="project-title">Marieke Logopedie</h3>
+                                    <p class="project-description">
+                                        Moderne website voor logopediepraktijk. 
+                                        Responsive design, contact formulier en duidelijke info over behandelingen.
+                                    </p>
+                                    <div class="mb-3">
+                                        <span class="badge-tech">React</span>
+                                        <span class="badge-tech">TypeScript</span>
+                                        <span class="badge-tech">Vite</span>
+                                    </div>
+                                </div>
+                                <div class="project-footer">
+                                    <span class="btn-project">
+                                        Bekijk <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
                     <!-- Zen Writer Project -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="project-card">
-                            <div class="project-card-top-bar"></div>
-                            <div class="project-icon">
-                                <i class="bi bi-pencil-square"></i>
-                            </div>
-                            <h3 class="project-title">Zen Writer</h3>
-                            <p class="project-description">
-                                Schrijf zonder afleiding. Focus mode verbergt alles behalve je tekst. 
-                                Gebruik Bold, Italic en Underline. Sla op als JSON of XML.
-                            </p>
-                            <div class="mb-3">
-                                <span class="badge-tech">Vanilla JS</span>
-                                <span class="badge-tech">SOLID</span>
-                                <span class="badge-tech">Modulair</span>
-                            </div>
-                            <a href="./zen-writer/" class="btn-project">
-                                Start <i class="bi bi-arrow-right"></i>
+                        <div class="card-wrapper">
+                            <a href="./zen-writer/" class="project-card">
+                                <div class="project-card-top-bar"></div>
+                                <div class="project-content">
+                                    <div class="project-icon">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </div>
+                                    <h3 class="project-title">Zen Writer</h3>
+                                    <p class="project-description">
+                                        Schrijf zonder afleiding. Focus mode verbergt alles behalve je tekst. 
+                                        Gebruik Bold, Italic en Underline. Sla op als JSON of XML.
+                                    </p>
+                                    <div class="mb-3">
+                                        <span class="badge-tech">Vanilla JS</span>
+                                        <span class="badge-tech">SOLID</span>
+                                        <span class="badge-tech">Modulair</span>
+                                    </div>
+                                </div>
+                                <div class="project-footer">
+                                    <span class="btn-project">
+                                        Start <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </div>
                             </a>
                         </div>
                     </div>
                     
                     <!-- Regex Playground Project -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="project-card">
-                            <div class="project-card-top-bar"></div>
-                            <div class="project-icon">
-                                <i class="bi bi-code-slash"></i>
-                            </div>
-                            <h3 class="project-title">Regex Playground</h3>
-                            <p class="project-description">
-                                Test regex patterns direct in je browser. 
-                                Zie matches live. Kies uit 3 layouts. Deel je pattern via URL.
-                            </p>
-                            <div class="mb-3">
-                                <span class="badge-tech">Vanilla JS</span>
-                                <span class="badge-tech">IndexedDB</span>
-                                <span class="badge-tech">ES6</span>
-                            </div>
-                            <a href="./regex-playground/" class="btn-project">
-                                Open <i class="bi bi-arrow-right"></i>
+                        <div class="card-wrapper">
+                            <a href="./regex-playground/" class="project-card">
+                                <div class="project-card-top-bar"></div>
+                                <div class="project-content">
+                                    <div class="project-icon">
+                                        <i class="bi bi-code-slash"></i>
+                                    </div>
+                                    <h3 class="project-title">Regex Playground</h3>
+                                    <p class="project-description">
+                                        Test regex patterns direct in je browser. 
+                                        Zie matches live. Kies uit 3 layouts. Deel je pattern via URL.
+                                    </p>
+                                    <div class="mb-3">
+                                        <span class="badge-tech">Vanilla JS</span>
+                                        <span class="badge-tech">IndexedDB</span>
+                                        <span class="badge-tech">ES6</span>
+                                    </div>
+                                </div>
+                                <div class="project-footer">
+                                    <span class="btn-project">
+                                        Open <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </div>
                             </a>
                         </div>
                     </div>
                     
                     <!-- Phase 10 Scorekeeper Project -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="project-card">
-                            <div class="project-card-top-bar"></div>
-                            <div class="project-icon">
-                                <i class="bi bi-dice-5-fill"></i>
-                            </div>
-                            <h3 class="project-title">Phase 10 Scorekeeper</h3>
-                            <p class="project-description">
-                                Houd scores bij tijdens Phase 10. 
-                                Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.
-                            </p>
-                            <div class="mb-3">
-                                <span class="badge-tech">React</span>
-                                <span class="badge-tech">TypeScript</span>
-                                <span class="badge-tech">Vite</span>
-                            </div>
-                            <a href="./phase10/" class="btn-project">
-                                Start <i class="bi bi-arrow-right"></i>
+                        <div class="card-wrapper">
+                            <a href="./phase10/" class="project-card">
+                                <div class="project-card-top-bar"></div>
+                                <div class="project-content">
+                                    <div class="project-icon">
+                                        <i class="bi bi-dice-5-fill"></i>
+                                    </div>
+                                    <h3 class="project-title">Phase 10 Scorekeeper</h3>
+                                    <p class="project-description">
+                                        Houd scores bij tijdens Phase 10. 
+                                        Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.
+                                    </p>
+                                    <div class="mb-3">
+                                        <span class="badge-tech">React</span>
+                                        <span class="badge-tech">TypeScript</span>
+                                        <span class="badge-tech">Vite</span>
+                                    </div>
+                                </div>
+                                <div class="project-footer">
+                                    <span class="btn-project">
+                                        Start <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </div>
                             </a>
                         </div>
                     </div>
                     
                     <!-- ColorHunt Palette Tester Project -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="project-card">
-                            <div class="project-card-top-bar"></div>
-                            <div class="project-icon">
-                                <i class="bi bi-palette-fill"></i>
-                            </div>
-                            <h3 class="project-title">ColorHunt Tester</h3>
-                            <p class="project-description">
-                                Test ColorHunt palettes op Bootstrap componenten. 
-                                Zie direct hoe kleuren werken. Pas ze live toe.
-                            </p>
-                            <div class="mb-3">
-                                <span class="badge-tech">JavaScript</span>
-                                <span class="badge-tech">Bootstrap</span>
-                                <span class="badge-tech">CSS</span>
-                            </div>
-                            <a href="./colorhunt/" class="btn-project">
-                                Test <i class="bi bi-arrow-right"></i>
+                        <div class="card-wrapper">
+                            <a href="./colorhunt/" class="project-card">
+                                <div class="project-card-top-bar"></div>
+                                <div class="project-content">
+                                    <div class="project-icon">
+                                        <i class="bi bi-palette-fill"></i>
+                                    </div>
+                                    <h3 class="project-title">ColorHunt Tester</h3>
+                                    <p class="project-description">
+                                        Test ColorHunt palettes op Bootstrap componenten. 
+                                        Zie direct hoe kleuren werken. Pas ze live toe.
+                                    </p>
+                                    <div class="mb-3">
+                                        <span class="badge-tech">JavaScript</span>
+                                        <span class="badge-tech">Bootstrap</span>
+                                        <span class="badge-tech">CSS</span>
+                                    </div>
+                                </div>
+                                <div class="project-footer">
+                                    <span class="btn-project">
+                                        Test <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </div>
                             </a>
                         </div>
                     </div>
