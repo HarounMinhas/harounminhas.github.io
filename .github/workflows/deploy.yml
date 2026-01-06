@@ -44,23 +44,20 @@ jobs:
         working-directory: ./phase10
         run: npm run build
 
-      # Checkout + build MusicDiscovery into a GitHub Pages subfolder
-      # IMPORTANT: this requires HarounMinhas/MusicDiscovery to be PUBLIC (no secrets needed).
-      - name: Checkout MusicDiscovery repo
-        uses: actions/checkout@v4
-        with:
-          repository: HarounMinhas/MusicDiscovery
-          path: MusicDiscovery
-
-      - name: Build MusicDiscovery web app
+      # Build MusicDiscovery (Option C: source lives INSIDE this repo under ./MusicDiscovery)
+      - name: Build MusicDiscovery (if present)
         run: |
-          set -e
-          cd MusicDiscovery
-          corepack enable
-          pnpm install --frozen-lockfile
-          pnpm --filter @musicdiscovery/web exec tsc -p tsconfig.json
-          pnpm --filter @musicdiscovery/web exec vite build --base=/MusicDiscovery/
-          cd ..
+          if [ -d "MusicDiscovery" ]; then
+            echo "MusicDiscovery folder found - building..."
+            cd MusicDiscovery
+            corepack enable
+            pnpm install --frozen-lockfile
+            pnpm --filter @musicdiscovery/web exec tsc -p tsconfig.json
+            pnpm --filter @musicdiscovery/web exec vite build --base=/MusicDiscovery/
+            cd ..
+          else
+            echo "MusicDiscovery folder not found - skipping build."
+          fi
 
       # Prepare deployment folder
       - name: Prepare deployment folder
@@ -73,8 +70,12 @@ jobs:
           cp -r zen-writer deploy/zen-writer
           cp portfolio-index.html deploy/index.html
 
-          # MusicDiscovery output
-          cp -r MusicDiscovery/apps/web/dist deploy/MusicDiscovery
+          # MusicDiscovery output (only if built)
+          if [ -d "MusicDiscovery/apps/web/dist" ]; then
+            cp -r MusicDiscovery/apps/web/dist deploy/MusicDiscovery
+          else
+            echo "MusicDiscovery dist not found - skipping copy."
+          fi
 
           echo "Deployment structure:"
           ls -la deploy/
