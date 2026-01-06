@@ -741,7 +741,7 @@
             <div class="container">
                 <div class="hero-content">
                     <h1 class="hero-title">Haroun Minhas</h1>
-                    <p class="hero-subtitle">Full Stack Developer & Creative Problem Solver</p>
+                    <p class="hero-subtitle">Full Stack Developer & Creatieve Probleemoplosser</p>
                     
                     <div class="social-links">
                         <a href="https://github.com/HarounMinhas" class="social-link" target="_blank" rel="noopener" title="GitHub">
@@ -771,7 +771,7 @@
         <!-- Projects Section -->
         <section class="projects-section" id="projectsSection">
             <div class="container">
-                <h2 class="section-title">Mijn Projecten</h2>
+                <h2 class="section-title">Projecten</h2>
                 
                 <div class="row g-4">
                     <!-- Zen Writer Project -->
@@ -783,16 +783,16 @@
                             </div>
                             <h3 class="project-title">Zen Writer</h3>
                             <p class="project-description">
-                                Een minimalistische, distraction-free text editor met fullscreen focus mode. 
-                                Ondersteunt Bold, Italic & Underline styling. Export naar JSON of XML met modulaire SOLID architectuur.
+                                Schrijf zonder afleiding. Focus mode verbergt alles behalve je tekst. 
+                                Gebruik Bold, Italic en Underline. Sla op als JSON of XML.
                             </p>
                             <div class="mb-3">
                                 <span class="badge-tech">Vanilla JS</span>
                                 <span class="badge-tech">SOLID</span>
-                                <span class="badge-tech">Modular Design</span>
+                                <span class="badge-tech">Modulair</span>
                             </div>
                             <a href="./zen-writer/" class="btn-project">
-                                Start Writing <i class="bi bi-arrow-right"></i>
+                                Start <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -806,16 +806,16 @@
                             </div>
                             <h3 class="project-title">Regex Playground</h3>
                             <p class="project-description">
-                                Een krachtige client-side regex tool met live matching, test suites en local storage. 
-                                Kies uit 3 layouts en deel je patterns via URL. Perfect voor debuggen en leren!
+                                Test regex patterns direct in je browser. 
+                                Zie matches live. Kies uit 3 layouts. Deel je pattern via URL.
                             </p>
                             <div class="mb-3">
                                 <span class="badge-tech">Vanilla JS</span>
                                 <span class="badge-tech">IndexedDB</span>
-                                <span class="badge-tech">ES6 Modules</span>
+                                <span class="badge-tech">ES6</span>
                             </div>
                             <a href="./regex-playground/" class="btn-project">
-                                Open Playground <i class="bi bi-arrow-right"></i>
+                                Open <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -829,8 +829,8 @@
                             </div>
                             <h3 class="project-title">Phase 10 Scorekeeper</h3>
                             <p class="project-description">
-                                Een snelle en intuïtieve webapp om scores bij te houden tijdens Phase 10 spelletjes. 
-                                Inclusief rondegeschiedenis, undo-functie en random fase generator.
+                                Houd scores bij tijdens Phase 10. 
+                                Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.
                             </p>
                             <div class="mb-3">
                                 <span class="badge-tech">React</span>
@@ -838,7 +838,7 @@
                                 <span class="badge-tech">Vite</span>
                             </div>
                             <a href="./phase10/" class="btn-project">
-                                Start App <i class="bi bi-arrow-right"></i>
+                                Start <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -850,10 +850,10 @@
                             <div class="project-icon">
                                 <i class="bi bi-palette-fill"></i>
                             </div>
-                            <h3 class="project-title">ColorHunt Palette Tester</h3>
+                            <h3 class="project-title">ColorHunt Tester</h3>
                             <p class="project-description">
-                                Een interactieve tool om ColorHunt palettes te importeren en direct toe te passen op Bootstrap componenten. 
-                                Test kleurenschema's in real-time!
+                                Test ColorHunt palettes op Bootstrap componenten. 
+                                Zie direct hoe kleuren werken. Pas ze live toe.
                             </p>
                             <div class="mb-3">
                                 <span class="badge-tech">JavaScript</span>
@@ -861,7 +861,7 @@
                                 <span class="badge-tech">CSS</span>
                             </div>
                             <a href="./colorhunt/" class="btn-project">
-                                Test Palettes <i class="bi bi-arrow-right"></i>
+                                Test <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -871,11 +871,11 @@
         
         <!-- Theme Controls -->
         <div class="theme-controls">
-            <button class="theme-btn" id="playPauseBtn" title="Pause theme drift" aria-label="Pause">
+            <button class="theme-btn" id="playPauseBtn" title="Pauzeer thema" aria-label="Pauze">
                 <span class="theme-btn-hover"></span>
                 <i class="bi bi-pause-fill"></i>
             </button>
-            <button class="theme-btn" id="nextBtn" title="Next theme" aria-label="Next">
+            <button class="theme-btn" id="nextBtn" title="Volgend thema" aria-label="Volgende">
                 <span class="theme-btn-hover"></span>
                 <i class="bi bi-skip-forward-fill"></i>
             </button>
@@ -1130,12 +1130,12 @@
                 const icon = this.playPauseBtn.querySelector('i');
                 if (this.isPlaying) {
                     icon.className = 'bi bi-pause-fill';
-                    this.playPauseBtn.title = 'Pause theme drift';
-                    this.playPauseBtn.setAttribute('aria-label', 'Pause');
+                    this.playPauseBtn.title = 'Pauzeer thema';
+                    this.playPauseBtn.setAttribute('aria-label', 'Pauze');
                 } else {
                     icon.className = 'bi bi-play-fill';
-                    this.playPauseBtn.title = 'Play theme drift';
-                    this.playPauseBtn.setAttribute('aria-label', 'Play');
+                    this.playPauseBtn.title = 'Start thema';
+                    this.playPauseBtn.setAttribute('aria-label', 'Afspelen');
                 }
             }
         }
