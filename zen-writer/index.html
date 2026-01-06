@@ -14,6 +14,7 @@
         :root {
             --bg-gradient: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
             --text-color: #2a2a2a;
+            --text-muted: #6b7280;
             --toolbar-bg: #f5f5f5;
             --toolbar-border: #e0e0e0;
             --button-hover: #e8e8e8;
@@ -89,10 +90,47 @@
             padding: 5rem 2rem;
         }
         
+        .editor-wrapper {
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        /* Document Title */
+        .document-title {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 2.5rem;
+            font-weight: 600;
+            line-height: 1.2;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            background: transparent;
+            resize: none;
+            padding: 0 0 1rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        
+        .document-title:focus {
+            border-bottom-color: var(--toolbar-border);
+        }
+        
+        .document-title::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        /* Auto-resize textarea */
+        .document-title {
+            overflow: hidden;
+            min-height: 60px;
+        }
+        
         /* Editor */
         .editor {
             width: 100%;
-            max-width: 800px;
             min-height: 500px;
             border: none;
             outline: none;
@@ -182,8 +220,11 @@
     </div>
     
     <div class="editor-container">
-        <div class="editor" contenteditable="true" id="editor" spellcheck="true">
-            <!-- Editor content here -->
+        <div class="editor-wrapper">
+            <textarea class="document-title" id="docTitle" placeholder="Titel van document..." rows="1"></textarea>
+            <div class="editor" contenteditable="true" id="editor" spellcheck="true">
+                <!-- Editor content here -->
+            </div>
         </div>
     </div>
     
@@ -213,7 +254,7 @@
             }
             
             // Abstract methods - moet geïmplementeerd worden door subclasses
-            serialize(content) {
+            serialize(data) {
                 throw new Error('serialize() must be implemented');
             }
             
@@ -231,21 +272,25 @@
                 super('json', 'application/json');
             }
             
-            serialize(content) {
-                const data = {
-                    content: content,
+            serialize(data) {
+                const document = {
+                    title: data.title,
+                    content: data.content,
                     created: new Date().toISOString(),
                     format: 'zen-writer-v1'
                 };
-                return JSON.stringify(data, null, 2);
+                return JSON.stringify(document, null, 2);
             }
             
             deserialize(data) {
                 try {
                     const parsed = JSON.parse(data);
-                    return parsed.content || data;
+                    return {
+                        title: parsed.title || '',
+                        content: parsed.content || data
+                    };
                 } catch (e) {
-                    return data; // Fallback naar raw data
+                    return { title: '', content: data };
                 }
             }
         }
@@ -259,14 +304,16 @@
                 super('xml', 'application/xml');
             }
             
-            serialize(content) {
-                const escapedContent = this.escapeXml(content);
+            serialize(data) {
+                const escapedTitle = this.escapeXml(data.title);
+                const escapedContent = this.escapeXml(data.content);
                 return `<?xml version="1.0" encoding="UTF-8"?>
 <document>
     <metadata>
         <created>${new Date().toISOString()}</created>
         <format>zen-writer-v1</format>
     </metadata>
+    <title>${escapedTitle}</title>
     <content>${escapedContent}</content>
 </document>`;
             }
@@ -275,13 +322,15 @@
                 try {
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(data, 'text/xml');
+                    const titleNode = xmlDoc.querySelector('title');
                     const contentNode = xmlDoc.querySelector('content');
-                    if (contentNode) {
-                        return this.unescapeXml(contentNode.textContent);
-                    }
-                    return data;
+                    
+                    return {
+                        title: titleNode ? this.unescapeXml(titleNode.textContent) : '',
+                        content: contentNode ? this.unescapeXml(contentNode.textContent) : data
+                    };
                 } catch (e) {
-                    return data;
+                    return { title: '', content: data };
                 }
             }
             
@@ -327,7 +376,7 @@
                 return this.handlers.get(extension.toLowerCase());
             }
             
-            async save(content, filename = 'document') {
+            async save(data, filename = 'document') {
                 // Vraag gebruiker om file type te kiezen
                 const format = await this.promptFormat();
                 if (!format) return;
@@ -338,7 +387,7 @@
                     return;
                 }
                 
-                const serialized = handler.serialize(content);
+                const serialized = handler.serialize(data);
                 this.downloadFile(serialized, `${filename}.${handler.extension}`, handler.mimeType);
             }
             
@@ -386,6 +435,7 @@
         class ZenWriter {
             constructor() {
                 this.editor = document.getElementById('editor');
+                this.docTitle = document.getElementById('docTitle');
                 this.fileManager = new FileManager();
                 this.isFullscreen = false;
                 
@@ -395,6 +445,7 @@
             init() {
                 this.setupEventListeners();
                 this.setupKeyboardShortcuts();
+                this.setupTitleAutoResize();
                 this.showHint();
             }
             
@@ -411,6 +462,13 @@
                 // Fullscreen change
                 document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
                 document.addEventListener('webkitfullscreenchange', () => this.handleFullscreenChange());
+            }
+            
+            setupTitleAutoResize() {
+                this.docTitle.addEventListener('input', () => {
+                    this.docTitle.style.height = 'auto';
+                    this.docTitle.style.height = this.docTitle.scrollHeight + 'px';
+                });
             }
             
             setupKeyboardShortcuts() {
@@ -454,11 +512,13 @@
             }
             
             newDocument() {
-                if (this.editor.innerHTML.trim() && !confirm('Weet je zeker dat je een nieuw document wilt starten? Niet-opgeslagen wijzigingen gaan verloren.')) {
+                const hasContent = this.docTitle.value.trim() || this.editor.innerHTML.trim();
+                if (hasContent && !confirm('Weet je zeker dat je een nieuw document wilt starten? Niet-opgeslagen wijzigingen gaan verloren.')) {
                     return;
                 }
+                this.docTitle.value = '';
                 this.editor.innerHTML = '';
-                this.editor.focus();
+                this.docTitle.focus();
             }
             
             openDocument() {
@@ -473,9 +533,12 @@
                 loading.classList.add('active');
                 
                 try {
-                    const content = await this.fileManager.load(file);
-                    if (content !== null) {
-                        this.editor.innerHTML = content;
+                    const data = await this.fileManager.load(file);
+                    if (data !== null) {
+                        this.docTitle.value = data.title || '';
+                        this.editor.innerHTML = data.content || '';
+                        // Trigger resize
+                        this.docTitle.dispatchEvent(new Event('input'));
                     }
                 } catch (e) {
                     alert('Fout bij laden van bestand: ' + e.message);
@@ -486,14 +549,16 @@
             }
             
             async saveDocument() {
+                const title = this.docTitle.value.trim();
                 const content = this.editor.innerHTML;
-                if (!content.trim()) {
+                
+                if (!title && !content.trim()) {
                     alert('Er is geen inhoud om op te slaan!');
                     return;
                 }
                 
-                const filename = prompt('Bestandsnaam:', 'document') || 'document';
-                await this.fileManager.save(content, filename);
+                const filename = title || prompt('Bestandsnaam:', 'document') || 'document';
+                await this.fileManager.save({ title, content }, filename);
             }
             
             toggleFullscreen() {
