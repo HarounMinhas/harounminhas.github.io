@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen Writer - Distraction-Free Writing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+            --text-color: #2a2a2a;
+            --toolbar-bg: #f5f5f5;
+            --toolbar-border: #e0e0e0;
+            --button-hover: #e8e8e8;
+            --button-active: #d0d0d0;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Toolbar - alleen zichtbaar wanneer niet fullscreen */
+        .toolbar {
+            background: var(--toolbar-bg);
+            border-bottom: 1px solid var(--toolbar-border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
+        
+        body.fullscreen .toolbar {
+            display: none;
+        }
+        
+        .toolbar-btn {
+            background: white;
+            border: 1px solid var(--toolbar-border);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toolbar-btn:hover {
+            background: var(--button-hover);
+        }
+        
+        .toolbar-btn:active {
+            background: var(--button-active);
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--toolbar-border);
+            margin: 0 0.5rem;
+        }
+        
+        /* Editor Container */
+        .editor-container {
+            width: 100%;
+            height: calc(100vh - 57px);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 3rem 2rem;
+            overflow-y: auto;
+            transition: height 0.3s ease;
+        }
+        
+        body.fullscreen .editor-container {
+            height: 100vh;
+            padding: 5rem 2rem;
+        }
+        
+        /* Editor */
+        .editor {
+            width: 100%;
+            max-width: 800px;
+            min-height: 500px;
+            border: none;
+            outline: none;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            background: transparent;
+            resize: none;
+            padding: 0;
+        }
+        
+        .editor:focus {
+            outline: none;
+        }
+        
+        /* Fullscreen hint */
+        .fullscreen-hint {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            opacity: 0;
+            animation: fadeInOut 4s ease-in-out;
+            pointer-events: none;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+        
+        body.fullscreen .fullscreen-hint {
+            display: none;
+        }
+        
+        /* Hidden file input */
+        #fileInput {
+            display: none;
+        }
+        
+        /* Loading overlay */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            z-index: 1000;
+        }
+        
+        .loading.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button class="toolbar-btn" id="btnNew" title="Nieuw document (Ctrl+N)">
+            <span>📄</span> Nieuw
+        </button>
+        <button class="toolbar-btn" id="btnOpen" title="Open bestand (Ctrl+O)">
+            <span>📂</span> Open
+        </button>
+        <button class="toolbar-btn" id="btnSave" title="Opslaan (Ctrl+S)">
+            <span>💾</span> Opslaan
+        </button>
+        
+        <div class="toolbar-divider"></div>
+        
+        <button class="toolbar-btn" id="btnFullscreen" title="Fullscreen (F11)">
+            <span>⛶</span> Focus Mode
+        </button>
+        
+        <div style="margin-left: auto; font-size: 0.75rem; color: #666;">
+            <strong>Shortcuts:</strong> Ctrl+B (Bold), Ctrl+I (Italic), Ctrl+U (Underline)
+        </div>
+    </div>
+    
+    <div class="editor-container">
+        <div class="editor" contenteditable="true" id="editor" spellcheck="true">
+            <!-- Editor content here -->
+        </div>
+    </div>
+    
+    <div class="fullscreen-hint" id="hint">
+        💡 Druk op Esc om fullscreen te verlaten
+    </div>
+    
+    <div class="loading" id="loading">
+        Laden...
+    </div>
+    
+    <input type="file" id="fileInput" accept=".json,.xml" />
+    
+    <script>
+        // ============================================
+        // MODULAR FILE HANDLER SYSTEM (SOLID Principles)
+        // ============================================
+        
+        /**
+         * Interface voor file handlers
+         * Single Responsibility: Elke handler doet één ding
+         */
+        class FileHandler {
+            constructor(extension, mimeType) {
+                this.extension = extension;
+                this.mimeType = mimeType;
+            }
+            
+            // Abstract methods - moet geïmplementeerd worden door subclasses
+            serialize(content) {
+                throw new Error('serialize() must be implemented');
+            }
+            
+            deserialize(data) {
+                throw new Error('deserialize() must be implemented');
+            }
+        }
+        
+        /**
+         * JSON File Handler
+         * Open/Closed Principle: Open voor extensie, gesloten voor modificatie
+         */
+        class JSONFileHandler extends FileHandler {
+            constructor() {
+                super('json', 'application/json');
+            }
+            
+            serialize(content) {
+                const data = {
+                    content: content,
+                    created: new Date().toISOString(),
+                    format: 'zen-writer-v1'
+                };
+                return JSON.stringify(data, null, 2);
+            }
+            
+            deserialize(data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    return parsed.content || data;
+                } catch (e) {
+                    return data; // Fallback naar raw data
+                }
+            }
+        }
+        
+        /**
+         * XML File Handler
+         * Liskov Substitution: Kan JSONFileHandler vervangen zonder problemen
+         */
+        class XMLFileHandler extends FileHandler {
+            constructor() {
+                super('xml', 'application/xml');
+            }
+            
+            serialize(content) {
+                const escapedContent = this.escapeXml(content);
+                return `<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <metadata>
+        <created>${new Date().toISOString()}</created>
+        <format>zen-writer-v1</format>
+    </metadata>
+    <content>${escapedContent}</content>
+</document>`;
+            }
+            
+            deserialize(data) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(data, 'text/xml');
+                    const contentNode = xmlDoc.querySelector('content');
+                    if (contentNode) {
+                        return this.unescapeXml(contentNode.textContent);
+                    }
+                    return data;
+                } catch (e) {
+                    return data;
+                }
+            }
+            
+            escapeXml(str) {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&apos;');
+            }
+            
+            unescapeXml(str) {
+                return str
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&apos;/g, "'");
+            }
+        }
+        
+        /**
+         * File Manager
+         * Dependency Inversion: Depends op abstractions (FileHandler), niet op concrete classes
+         * Interface Segregation: Kleine, focused methods
+         */
+        class FileManager {
+            constructor() {
+                this.handlers = new Map();
+                this.currentHandler = null;
+                
+                // Register handlers
+                this.registerHandler(new JSONFileHandler());
+                this.registerHandler(new XMLFileHandler());
+            }
+            
+            registerHandler(handler) {
+                this.handlers.set(handler.extension, handler);
+            }
+            
+            getHandler(extension) {
+                return this.handlers.get(extension.toLowerCase());
+            }
+            
+            async save(content, filename = 'document') {
+                // Vraag gebruiker om file type te kiezen
+                const format = await this.promptFormat();
+                if (!format) return;
+                
+                const handler = this.getHandler(format);
+                if (!handler) {
+                    alert('Onbekend formaat!');
+                    return;
+                }
+                
+                const serialized = handler.serialize(content);
+                this.downloadFile(serialized, `${filename}.${handler.extension}`, handler.mimeType);
+            }
+            
+            async load(file) {
+                const extension = file.name.split('.').pop();
+                const handler = this.getHandler(extension);
+                
+                if (!handler) {
+                    alert('Onbekend bestandstype!');
+                    return null;
+                }
+                
+                const text = await file.text();
+                return handler.deserialize(text);
+            }
+            
+            promptFormat() {
+                return new Promise((resolve) => {
+                    const format = prompt('Kies formaat: json of xml', 'json');
+                    if (format && (format === 'json' || format === 'xml')) {
+                        resolve(format);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            }
+            
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // ============================================
+        // EDITOR APPLICATION
+        // ============================================
+        
+        class ZenWriter {
+            constructor() {
+                this.editor = document.getElementById('editor');
+                this.fileManager = new FileManager();
+                this.isFullscreen = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.setupKeyboardShortcuts();
+                this.showHint();
+            }
+            
+            setupEventListeners() {
+                // Toolbar buttons
+                document.getElementById('btnNew').onclick = () => this.newDocument();
+                document.getElementById('btnOpen').onclick = () => this.openDocument();
+                document.getElementById('btnSave').onclick = () => this.saveDocument();
+                document.getElementById('btnFullscreen').onclick = () => this.toggleFullscreen();
+                
+                // File input
+                document.getElementById('fileInput').onchange = (e) => this.handleFileSelect(e);
+                
+                // Fullscreen change
+                document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
+                document.addEventListener('webkitfullscreenchange', () => this.handleFullscreenChange());
+            }
+            
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + B = Bold
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                        e.preventDefault();
+                        document.execCommand('bold');
+                    }
+                    
+                    // Ctrl/Cmd + I = Italic
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+                        e.preventDefault();
+                        document.execCommand('italic');
+                    }
+                    
+                    // Ctrl/Cmd + U = Underline
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+                        e.preventDefault();
+                        document.execCommand('underline');
+                    }
+                    
+                    // Ctrl/Cmd + N = New
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                        e.preventDefault();
+                        this.newDocument();
+                    }
+                    
+                    // Ctrl/Cmd + O = Open
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+                        e.preventDefault();
+                        this.openDocument();
+                    }
+                    
+                    // Ctrl/Cmd + S = Save
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        this.saveDocument();
+                    }
+                });
+            }
+            
+            newDocument() {
+                if (this.editor.innerHTML.trim() && !confirm('Weet je zeker dat je een nieuw document wilt starten? Niet-opgeslagen wijzigingen gaan verloren.')) {
+                    return;
+                }
+                this.editor.innerHTML = '';
+                this.editor.focus();
+            }
+            
+            openDocument() {
+                document.getElementById('fileInput').click();
+            }
+            
+            async handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const loading = document.getElementById('loading');
+                loading.classList.add('active');
+                
+                try {
+                    const content = await this.fileManager.load(file);
+                    if (content !== null) {
+                        this.editor.innerHTML = content;
+                    }
+                } catch (e) {
+                    alert('Fout bij laden van bestand: ' + e.message);
+                } finally {
+                    loading.classList.remove('active');
+                    event.target.value = ''; // Reset input
+                }
+            }
+            
+            async saveDocument() {
+                const content = this.editor.innerHTML;
+                if (!content.trim()) {
+                    alert('Er is geen inhoud om op te slaan!');
+                    return;
+                }
+                
+                const filename = prompt('Bestandsnaam:', 'document') || 'document';
+                await this.fileManager.save(content, filename);
+            }
+            
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        alert('Fullscreen niet mogelijk: ' + err.message);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+            
+            handleFullscreenChange() {
+                this.isFullscreen = !!document.fullscreenElement;
+                document.body.classList.toggle('fullscreen', this.isFullscreen);
+                
+                if (this.isFullscreen) {
+                    this.editor.focus();
+                }
+            }
+            
+            showHint() {
+                const hint = document.getElementById('hint');
+                hint.style.animation = 'fadeInOut 4s ease-in-out';
+            }
+        }
+        
+        // Initialize application
+        new ZenWriter();
+    </script>
+</body>
+</html>
