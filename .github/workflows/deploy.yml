@@ -44,6 +44,21 @@ jobs:
         working-directory: ./phase10
         run: npm run build
 
+      # Build MusicDiscovery (Option C: source lives INSIDE this repo under ./MusicDiscovery)
+      - name: Build MusicDiscovery (if present)
+        run: |
+          if [ -d "MusicDiscovery" ]; then
+            echo "MusicDiscovery folder found - building..."
+            cd MusicDiscovery
+            corepack enable
+            pnpm install --frozen-lockfile
+            pnpm --filter @musicdiscovery/web exec tsc -p tsconfig.json
+            pnpm --filter @musicdiscovery/web exec vite build --base=/MusicDiscovery/
+            cd ..
+          else
+            echo "MusicDiscovery folder not found - skipping build."
+          fi
+
       # Prepare deployment folder
       - name: Prepare deployment folder
         run: |
@@ -54,18 +69,16 @@ jobs:
           cp -r regex-playground deploy/regex-playground
           cp -r zen-writer deploy/zen-writer
           cp portfolio-index.html deploy/index.html
+
+          # MusicDiscovery output (only if built)
+          if [ -d "MusicDiscovery/apps/web/dist" ]; then
+            cp -r MusicDiscovery/apps/web/dist deploy/MusicDiscovery
+          else
+            echo "MusicDiscovery dist not found - skipping copy."
+          fi
+
           echo "Deployment structure:"
           ls -la deploy/
-          echo "Marieke folder:"
-          ls -la deploy/marieke/
-          echo "Phase 10 folder:"
-          ls -la deploy/phase10/
-          echo "ColorHunt folder:"
-          ls -la deploy/colorhunt/
-          echo "Regex Playground folder:"
-          ls -la deploy/regex-playground/
-          echo "Zen Writer folder:"
-          ls -la deploy/zen-writer/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
