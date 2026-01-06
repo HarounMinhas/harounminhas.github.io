@@ -15,7 +15,9 @@ class InvalidProviderError extends HttpError {
 
 const providers = new Map<ProviderId, MusicProvider>();
 
-const ENABLED_PROVIDER_IDS: ProviderId[] = env.SPOTIFY_ENABLED ? ['tokenless', 'itunes', 'spotify'] : ['tokenless', 'itunes'];
+// GitHub Pages deployment: public endpoints only.
+// Tokenless = Deezer-first (no OAuth), plus iTunes links.
+const ENABLED_PROVIDER_IDS: ProviderId[] = ['tokenless', 'itunes'];
 const ENABLED_PROVIDER_SET = new Set<ProviderId>(ENABLED_PROVIDER_IDS);
 
 function parseMode(value: unknown): ProviderId | null {
