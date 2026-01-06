@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zen Writer - Distraction-Free Writing</title>
+    <title>Zen Writer - Schrijf zonder afleiding</title>
     <style>
         * {
             margin: 0;
@@ -211,7 +211,7 @@
         <div class="toolbar-divider"></div>
         
         <button class="toolbar-btn" id="btnFullscreen" title="Fullscreen (F11)">
-            <span>⛶</span> Focus Mode
+            <span>⛶</span> Focus
         </button>
         
         <div style="margin-left: auto; font-size: 0.75rem; color: #666;">
@@ -221,7 +221,7 @@
     
     <div class="editor-container">
         <div class="editor-wrapper">
-            <textarea class="document-title" id="docTitle" placeholder="Titel van document..." rows="1"></textarea>
+            <textarea class="document-title" id="docTitle" placeholder="Titel..." rows="1"></textarea>
             <div class="editor" contenteditable="true" id="editor" spellcheck="true">
                 <!-- Editor content here -->
             </div>
@@ -229,11 +229,11 @@
     </div>
     
     <div class="fullscreen-hint" id="hint">
-        💡 Druk op Esc om fullscreen te verlaten
+        💡 Druk Esc om te sluiten
     </div>
     
     <div class="loading" id="loading">
-        Laden...
+        Bezig met laden...
     </div>
     
     <input type="file" id="fileInput" accept=".json,.xml" />
@@ -513,7 +513,7 @@
             
             newDocument() {
                 const hasContent = this.docTitle.value.trim() || this.editor.innerHTML.trim();
-                if (hasContent && !confirm('Weet je zeker dat je een nieuw document wilt starten? Niet-opgeslagen wijzigingen gaan verloren.')) {
+                if (hasContent && !confirm('Nieuw document starten? Niet-opgeslagen tekst gaat verloren.')) {
                     return;
                 }
                 this.docTitle.value = '';
@@ -541,7 +541,7 @@
                         this.docTitle.dispatchEvent(new Event('input'));
                     }
                 } catch (e) {
-                    alert('Fout bij laden van bestand: ' + e.message);
+                    alert('Fout bij laden: ' + e.message);
                 } finally {
                     loading.classList.remove('active');
                     event.target.value = ''; // Reset input
@@ -553,7 +553,7 @@
                 const content = this.editor.innerHTML;
                 
                 if (!title && !content.trim()) {
-                    alert('Er is geen inhoud om op te slaan!');
+                    alert('Geen inhoud om op te slaan!');
                     return;
                 }
                 
@@ -564,7 +564,7 @@
             toggleFullscreen() {
                 if (!document.fullscreenElement) {
                     document.documentElement.requestFullscreen().catch(err => {
-                        alert('Fullscreen niet mogelijk: ' + err.message);
+                        alert('Fullscreen mislukt: ' + err.message);
                     });
                 } else {
                     document.exitFullscreen();
