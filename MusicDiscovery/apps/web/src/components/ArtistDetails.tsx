@@ -129,7 +129,7 @@ export default function ArtistDetails({
                                 audioRef={previewAudioRef}
                                 fftSize={1024}
                                 smoothing={0.86}
-                                barColor="rgba(244, 247, 255, 0.05)"
+                                barColor="rgba(255, 255, 255, 0.55)"
                               />
                             ) : null}
                           </span>
