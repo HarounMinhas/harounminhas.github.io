@@ -29,7 +29,7 @@
             overflow: hidden;
         }
         
-        /* Toolbar - alleen zichtbaar wanneer niet fullscreen */
+        /* Toolbar */
         .toolbar {
             background: var(--toolbar-bg);
             border-bottom: 1px solid var(--toolbar-border);
@@ -41,7 +41,7 @@
         }
         
         body.fullscreen .toolbar {
-            display: none;
+            display: none !important;
         }
         
         .toolbar-btn {
@@ -122,7 +122,6 @@
             opacity: 0.5;
         }
         
-        /* Auto-resize textarea */
         .document-title {
             overflow: hidden;
             min-height: 60px;
@@ -194,9 +193,182 @@
         .loading.active {
             display: flex;
         }
+        
+        /* Welcome Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .modal-overlay.hidden {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        
+        .modal-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+        
+        .modal-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        
+        .modal-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .modal-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Format Selector Modal */
+        .format-modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .format-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+        
+        .format-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .format-btn {
+            flex: 1;
+            background: white;
+            border: 2px solid var(--toolbar-border);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .format-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+        
+        .format-btn:active {
+            transform: translateY(0);
+        }
+        
+        .format-icon {
+            font-size: 2rem;
+        }
+        
+        .format-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .format-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
+    <!-- Welcome Modal -->
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="modal-content">
+            <h2 class="modal-title">👋 Welkom bij Zen Writer</h2>
+            <p class="modal-text">
+                Klik op de <strong>Focus</strong> knop in de werkbalk voor een volledig wit scherm zonder afleidingen. 
+                Druk <strong>Esc</strong> om terug te keren.
+            </p>
+            <button class="modal-button" id="closeWelcome">Oké, begrepen!</button>
+        </div>
+    </div>
+    
+    <!-- Format Selector Modal -->
+    <div class="modal-overlay hidden" id="formatModal">
+        <div class="format-modal">
+            <h3 class="format-title">Kies een formaat</h3>
+            <div class="format-buttons">
+                <button class="format-btn" data-format="json">
+                    <span class="format-icon">{ }</span>
+                    <span class="format-name">JSON</span>
+                    <span class="format-desc">Modern formaat</span>
+                </button>
+                <button class="format-btn" data-format="xml">
+                    <span class="format-icon">&lt;/&gt;</span>
+                    <span class="format-name">XML</span>
+                    <span class="format-desc">Universeel formaat</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <div class="toolbar">
         <button class="toolbar-btn" id="btnNew" title="Nieuw document (Ctrl+N)">
             <span>📄</span> Nieuw
@@ -243,17 +415,12 @@
         // MODULAR FILE HANDLER SYSTEM (SOLID Principles)
         // ============================================
         
-        /**
-         * Interface voor file handlers
-         * Single Responsibility: Elke handler doet één ding
-         */
         class FileHandler {
             constructor(extension, mimeType) {
                 this.extension = extension;
                 this.mimeType = mimeType;
             }
             
-            // Abstract methods - moet geïmplementeerd worden door subclasses
             serialize(data) {
                 throw new Error('serialize() must be implemented');
             }
@@ -263,10 +430,6 @@
             }
         }
         
-        /**
-         * JSON File Handler
-         * Open/Closed Principle: Open voor extensie, gesloten voor modificatie
-         */
         class JSONFileHandler extends FileHandler {
             constructor() {
                 super('json', 'application/json');
@@ -295,10 +458,6 @@
             }
         }
         
-        /**
-         * XML File Handler
-         * Liskov Substitution: Kan JSONFileHandler vervangen zonder problemen
-         */
         class XMLFileHandler extends FileHandler {
             constructor() {
                 super('xml', 'application/xml');
@@ -353,17 +512,11 @@
             }
         }
         
-        /**
-         * File Manager
-         * Dependency Inversion: Depends op abstractions (FileHandler), niet op concrete classes
-         * Interface Segregation: Kleine, focused methods
-         */
         class FileManager {
             constructor() {
                 this.handlers = new Map();
                 this.currentHandler = null;
                 
-                // Register handlers
                 this.registerHandler(new JSONFileHandler());
                 this.registerHandler(new XMLFileHandler());
             }
@@ -377,7 +530,6 @@
             }
             
             async save(data, filename = 'document') {
-                // Vraag gebruiker om file type te kiezen
                 const format = await this.promptFormat();
                 if (!format) return;
                 
@@ -406,12 +558,31 @@
             
             promptFormat() {
                 return new Promise((resolve) => {
-                    const format = prompt('Kies formaat: json of xml', 'json');
-                    if (format && (format === 'json' || format === 'xml')) {
-                        resolve(format);
-                    } else {
-                        resolve(null);
-                    }
+                    const modal = document.getElementById('formatModal');
+                    const overlay = modal;
+                    
+                    modal.classList.remove('hidden');
+                    
+                    const handleFormat = (e) => {
+                        if (e.target.classList.contains('format-btn')) {
+                            const format = e.target.dataset.format;
+                            modal.classList.add('hidden');
+                            document.removeEventListener('click', handleClick);
+                            resolve(format);
+                        }
+                    };
+                    
+                    const handleClick = (e) => {
+                        if (e.target === overlay) {
+                            modal.classList.add('hidden');
+                            document.removeEventListener('click', handleClick);
+                            resolve(null);
+                        } else {
+                            handleFormat(e);
+                        }
+                    };
+                    
+                    document.addEventListener('click', handleClick);
                 });
             }
             
@@ -443,23 +614,37 @@
             }
             
             init() {
+                this.setupWelcomeModal();
                 this.setupEventListeners();
                 this.setupKeyboardShortcuts();
                 this.setupTitleAutoResize();
-                this.showHint();
+            }
+            
+            setupWelcomeModal() {
+                const modal = document.getElementById('welcomeModal');
+                const closeBtn = document.getElementById('closeWelcome');
+                
+                const closeModal = () => {
+                    modal.classList.add('hidden');
+                    this.docTitle.focus();
+                };
+                
+                closeBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
             }
             
             setupEventListeners() {
-                // Toolbar buttons
                 document.getElementById('btnNew').onclick = () => this.newDocument();
                 document.getElementById('btnOpen').onclick = () => this.openDocument();
                 document.getElementById('btnSave').onclick = () => this.saveDocument();
                 document.getElementById('btnFullscreen').onclick = () => this.toggleFullscreen();
                 
-                // File input
                 document.getElementById('fileInput').onchange = (e) => this.handleFileSelect(e);
                 
-                // Fullscreen change
                 document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
                 document.addEventListener('webkitfullscreenchange', () => this.handleFullscreenChange());
             }
@@ -473,37 +658,31 @@
             
             setupKeyboardShortcuts() {
                 document.addEventListener('keydown', (e) => {
-                    // Ctrl/Cmd + B = Bold
                     if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
                         e.preventDefault();
                         document.execCommand('bold');
                     }
                     
-                    // Ctrl/Cmd + I = Italic
                     if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
                         e.preventDefault();
                         document.execCommand('italic');
                     }
                     
-                    // Ctrl/Cmd + U = Underline
                     if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
                         e.preventDefault();
                         document.execCommand('underline');
                     }
                     
-                    // Ctrl/Cmd + N = New
                     if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
                         e.preventDefault();
                         this.newDocument();
                     }
                     
-                    // Ctrl/Cmd + O = Open
                     if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
                         e.preventDefault();
                         this.openDocument();
                     }
                     
-                    // Ctrl/Cmd + S = Save
                     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                         e.preventDefault();
                         this.saveDocument();
@@ -537,14 +716,13 @@
                     if (data !== null) {
                         this.docTitle.value = data.title || '';
                         this.editor.innerHTML = data.content || '';
-                        // Trigger resize
                         this.docTitle.dispatchEvent(new Event('input'));
                     }
                 } catch (e) {
                     alert('Fout bij laden: ' + e.message);
                 } finally {
                     loading.classList.remove('active');
-                    event.target.value = ''; // Reset input
+                    event.target.value = '';
                 }
             }
             
@@ -557,7 +735,7 @@
                     return;
                 }
                 
-                const filename = title || prompt('Bestandsnaam:', 'document') || 'document';
+                const filename = title || 'document';
                 await this.fileManager.save({ title, content }, filename);
             }
             
@@ -577,12 +755,16 @@
                 
                 if (this.isFullscreen) {
                     this.editor.focus();
+                    this.showHint();
                 }
             }
             
             showHint() {
                 const hint = document.getElementById('hint');
-                hint.style.animation = 'fadeInOut 4s ease-in-out';
+                hint.style.animation = 'none';
+                setTimeout(() => {
+                    hint.style.animation = 'fadeInOut 4s ease-in-out';
+                }, 10);
             }
         }
         
