@@ -13,10 +13,10 @@ const defaultCache = new LRUCache<string, CacheEntry<unknown>>({
   ttlAutopurge: true
 });
 
-export type CacheStore<T> = LRUCache<string, CacheEntry<T>>;
+export type CacheStore<T> = LRUCache<string, CacheEntry<T>, unknown>;
 
-export function createCache<T>(options: LRUCache.Options<string, CacheEntry<T>> = {}): CacheStore<T> {
-  return new LRUCache<string, CacheEntry<T>>({
+export function createCache<T>(options: LRUCache.Options<string, CacheEntry<T>, unknown> = {}): CacheStore<T> {
+  return new LRUCache<string, CacheEntry<T>, unknown>({
     max: DEFAULT_MAX_ITEMS,
     ttl: DEFAULT_TTL_MS,
     ttlAutopurge: true,
@@ -28,11 +28,11 @@ export async function withCache<T>(
   key: string,
   ttlMs: number,
   loader: () => Promise<T>,
-  store: CacheStore<T> = defaultCache as CacheStore<T>
+  store: CacheStore<unknown> = defaultCache
 ): Promise<T> {
   const cached = store.get(key);
   if (cached) {
-    return cached.value;
+    return cached.value as T;
   }
   const value = await loader();
   store.set(key, { value }, { ttl: ttlMs });
