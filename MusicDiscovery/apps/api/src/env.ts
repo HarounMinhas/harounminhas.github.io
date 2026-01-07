@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { z } from 'zod';
 
-import { parseBoolean } from './utils/parseBoolean';
+import { parseBoolean } from './utils/parseBoolean.js';
 
 config();
 
