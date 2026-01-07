@@ -17,7 +17,7 @@ const defaultCache = new LRUCache<string, CacheEntry<unknown>>({
 export type CacheStore<T> = LRUCache<string, CacheEntry<T>, unknown>;
 export type { CacheEntry };
 
-export function createCache<T>(options: CacheOptions<T> = {}): CacheStore<T> {
+export function createCache<T>(options: Partial<CacheOptions<T>> = {}): CacheStore<T> {
   return new LRUCache<string, CacheEntry<T>, unknown>({
     max: DEFAULT_MAX_ITEMS,
     ttl: DEFAULT_TTL_MS,

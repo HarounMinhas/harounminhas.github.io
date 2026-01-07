@@ -39,7 +39,7 @@ function mapErrorToStatus(code: SmartRelatedError['code']): number {
 }
 
 interface RequestWithLogger extends Request {
-  log?: Logger;
+  log: Logger;
 }
 
 function getLog(req: Request) {

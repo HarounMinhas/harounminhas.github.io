@@ -52,10 +52,15 @@ async function proxyTrackPreview(req: Request, res: Response, next: NextFunction
   try {
     const { mode, provider } = resolveProvider(req);
     const log = getRequestLogger(req, { route: 'preview', providerMode: mode, trackId: req.params.id });
+    const trackId = req.params.id;
+    if (!trackId) {
+      res.status(400).json({ error: { code: 'bad_request', message: 'Track ID is required' } });
+      return;
+    }
     const track = await withCache(
-      `track:${mode}:${req.params.id}`,
+      `track:${mode}:${trackId}`,
       1000 * 60 * 5,
-      () => provider.getTrack(req.params.id)
+      () => provider.getTrack(trackId)
     );
     if (!track || !track.previewUrl) {
       log.warn('Preview not available for requested track');
@@ -209,7 +214,7 @@ router.get('/music/artists/:id', async (req, res, next) => {
     const artist = await withCache(
       `artist:${mode}:${req.params.id}`,
       1000 * 60 * 60 * 24,
-      () => provider.getArtist(req.params.id)
+      () => provider.getArtist(req.params.id!)
     );
     if (!artist) {
       res.status(404).json({ error: { code: 'not_found', message: 'Artist not found' } });
@@ -228,7 +233,7 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
     const items = await withCache(
       `artist:${mode}:${req.params.id}:related:${limit}`,
       1000 * 60 * 60 * 24,
-      () => provider.getRelatedArtists(req.params.id, limit)
+      () => provider.getRelatedArtists(req.params.id!, limit)
     );
     const parsed = RelatedArtistsResponseSchema.parse({ items });
     res.json(parsed);
@@ -245,7 +250,7 @@ router.get('/music/artists/:id/top-tracks', async (req, res, next) => {
     const items = await withCache(
       `artist:${mode}:${req.params.id}:top:${market}:${limit}`,
       1000 * 60 * 5,
-      () => provider.getTopTracks(req.params.id, market, limit)
+      () => provider.getTopTracks(req.params.id!, market, limit)
     );
     const decorated = items.map((track) => attachPreviewProxy(track));
     const parsed = TopTracksResponseSchema.parse({ items: decorated });
@@ -261,7 +266,7 @@ router.get('/music/tracks/:id', async (req, res, next) => {
     const track = await withCache(
       `track:${mode}:${req.params.id}`,
       1000 * 60 * 5,
-      () => provider.getTrack(req.params.id)
+      () => provider.getTrack(req.params.id!)
     );
     if (!track) {
       res.status(404).json({ error: { code: 'not_found', message: 'Track not found' } });
