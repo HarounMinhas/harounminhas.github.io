@@ -12,7 +12,7 @@ const app = express();
 
 app.use(helmet());
 app.use(express.json());
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+app.use(cors({ origin: env.CORS_ORIGIN as string, credentials: true }));
 app.use(createRequestLogger());
 app.use(apiRateLimiter);
 
@@ -25,7 +25,7 @@ app.use('/api', musicRoutes);
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (err instanceof HttpError) {
     if (err.status >= 500) {
-      logger.error({ err }, 'Unhandled HTTP error');
+      logger.error({ err: err instanceof Error ? err : new Error(String(err)) }, 'Unhandled HTTP error');
     }
     if (!res.headersSent) {
       res.status(err.status).json(toErrorResponse(err));
@@ -46,7 +46,7 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
     return;
   }
 
-  logger.error({ err }, 'Unhandled server error');
+  logger.error({ err: err instanceof Error ? err : new Error(String(err)) }, 'Unhandled server error');
   if (!res.headersSent) {
     res.status(500).json({ error: { code: 'server_error', message: 'Unexpected error' } });
   }

@@ -1,7 +1,6 @@
 import type { Request } from 'express';
 import type { Logger } from 'pino';
-import { createProvider } from '@musicdiscovery/providers';
-import type { MusicProvider } from '@musicdiscovery/providers';
+import { createProvider, MusicProvider } from '@musicdiscovery/providers';
 import { DEFAULT_PROVIDER_MODE, PROVIDERS, type ProviderId, isProviderId } from '@musicdiscovery/shared';
 import { env } from './env.js';
 import { HttpError } from './errors.js';
@@ -34,7 +33,7 @@ const DEFAULT_MODE: ProviderId =
   parseMode(env.DATA_MODE) ?? (ENABLED_PROVIDER_SET.has(DEFAULT_PROVIDER_MODE) ? DEFAULT_PROVIDER_MODE : ENABLED_PROVIDER_IDS[0]);
 
 interface RequestWithLogger extends Request {
-  log?: Logger;
+  log: Logger;
   __providerLogEnhanced?: boolean;
 }
 
