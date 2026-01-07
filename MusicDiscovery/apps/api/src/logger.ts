@@ -2,12 +2,13 @@
 export { logger, createChildLogger } from './config/logger.js';
 
 import { randomUUID } from 'node:crypto';
-import pinoHttpLib from 'pino-http';
+import pinoHttp from 'pino-http';
 import type { Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'http';
 import { logger } from './config/logger.js';
 
 export function createRequestLogger() {
-  return pinoHttpLib({
+  return pinoHttp({
     logger,
     genReqId(req: Request, res: Response) {
       const existing = req.headers['x-request-id'];
@@ -19,7 +20,7 @@ export function createRequestLogger() {
       res.setHeader('x-request-id', id);
       return id;
     },
-    customLogLevel: (_req, res, err) => {
+    customLogLevel: (_req: IncomingMessage, res: ServerResponse, err?: Error) => {
       if (res.statusCode >= 500 || err) return 'error';
       if (res.statusCode >= 400) return 'warn';
       return 'info';

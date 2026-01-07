@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { AppError, isAppError, toErrorResponse } from '../errors/AppError.js';
+import { isAppError, toErrorResponse } from '../errors/AppError.js';
 import { ProviderNotImplementedError } from '@musicdiscovery/providers';
 import { logger } from '../config/logger.js';
 import { env } from '../env.js';

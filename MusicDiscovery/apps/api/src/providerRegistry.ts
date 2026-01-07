@@ -29,8 +29,11 @@ function parseMode(value: unknown): ProviderId | null {
   return null;
 }
 
-const DEFAULT_MODE: ProviderId =
-  parseMode(env.DATA_MODE) ?? (ENABLED_PROVIDER_SET.has(DEFAULT_PROVIDER_MODE) ? DEFAULT_PROVIDER_MODE : ENABLED_PROVIDER_IDS[0]);
+const DEFAULT_MODE: ProviderId = (() => {
+  const parsed = parseMode(env.DATA_MODE);
+  if (parsed) return parsed;
+  return ENABLED_PROVIDER_SET.has(DEFAULT_PROVIDER_MODE) ? DEFAULT_PROVIDER_MODE : ENABLED_PROVIDER_IDS[0]!;
+})();
 
 interface RequestWithLogger extends Request {
   log: Logger;
