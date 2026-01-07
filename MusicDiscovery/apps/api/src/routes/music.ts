@@ -22,7 +22,7 @@ const router = Router();
 const MAX_PREVIEW_BYTES = 10 * 1024 * 1024;
 
 interface RequestWithLogger extends Request {
-  log?: Logger;
+  log: Logger;
 }
 
 function getRequestLogger(req: Request, bindings?: Record<string, unknown>) {
@@ -38,8 +38,8 @@ function parseLimit(value: unknown, fallback = 10, max = 25) {
   return fallback;
 }
 
-function attachPreviewProxy(track: Track | null): Track | null {
-  if (!track || !track.previewUrl) {
+function attachPreviewProxy(track: Track): Track {
+  if (!track.previewUrl) {
     return track;
   }
   return {
@@ -166,7 +166,7 @@ async function proxyTrackPreview(req: Request, res: Response, next: NextFunction
     res.end();
   } catch (error) {
     const log = getRequestLogger(req, { route: 'preview', trackId: req.params.id });
-    log.error({ err: error }, 'Failed to proxy preview');
+    log.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Failed to proxy preview');
     if (!res.headersSent) {
       res.status(502).json({ error: { code: 'preview_proxy_failed', message: 'Failed to load preview audio' } });
     } else {
@@ -247,7 +247,7 @@ router.get('/music/artists/:id/top-tracks', async (req, res, next) => {
       1000 * 60 * 5,
       () => provider.getTopTracks(req.params.id, market, limit)
     );
-    const decorated = items.map((track) => attachPreviewProxy(track) ?? track);
+    const decorated = items.map((track) => attachPreviewProxy(track));
     const parsed = TopTracksResponseSchema.parse({ items: decorated });
     res.json(parsed);
   } catch (error) {
@@ -267,7 +267,7 @@ router.get('/music/tracks/:id', async (req, res, next) => {
       res.status(404).json({ error: { code: 'not_found', message: 'Track not found' } });
       return;
     }
-    const decorated = attachPreviewProxy(track) ?? track;
+    const decorated = attachPreviewProxy(track);
     res.json(TrackSchema.parse(decorated));
   } catch (error) {
     next(error);
