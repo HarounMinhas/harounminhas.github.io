@@ -1,57 +1,68 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { ProviderNotImplementedError } from '@musicdiscovery/providers';
 import musicRoutes from './routes/music.js';
 import { apiRateLimiter } from './middleware/rateLimit.js';
 import { env } from './env.js';
-import { HttpError, toErrorResponse } from './errors.js';
 import { createRequestLogger, logger } from './logger.js';
+import { errorHandler } from './utils/errorHandler.js';
 
 const app = express();
 
+// Security and parsing middleware
 app.use(helmet());
 app.use(express.json());
 app.use(cors({ origin: env.CORS_ORIGIN as string, credentials: true }));
+
+// Logging middleware
 app.use(createRequestLogger());
+
+// Rate limiting
 app.use(apiRateLimiter);
 
+// Health check endpoint
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', mode: env.DATA_MODE });
+  res.json({ 
+    status: 'ok', 
+    mode: env.DATA_MODE,
+    timestamp: new Date().toISOString(),
+    environment: env.NODE_ENV
+  });
 });
 
+// API routes
 app.use('/api', musicRoutes);
 
-app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  if (err instanceof HttpError) {
-    if (err.status >= 500) {
-      logger.error({ err: err instanceof Error ? err : new Error(String(err)) }, 'Unhandled HTTP error');
-    }
-    if (!res.headersSent) {
-      res.status(err.status).json(toErrorResponse(err));
-    }
-    return;
-  }
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
-  if (err instanceof ProviderNotImplementedError) {
-    if (!res.headersSent) {
-      res.status(501).json({
-        error: {
-          code: 'provider_not_implemented',
-          message: err.message,
-          details: { providerId: err.providerId }
-        }
-      });
-    }
-    return;
-  }
-
-  logger.error({ err: err instanceof Error ? err : new Error(String(err)) }, 'Unhandled server error');
-  if (!res.headersSent) {
-    res.status(500).json({ error: { code: 'server_error', message: 'Unexpected error' } });
-  }
+// Start server
+const server = app.listen(env.PORT, () => {
+  logger.info(
+    { 
+      port: env.PORT, 
+      mode: env.DATA_MODE,
+      environment: env.NODE_ENV
+    }, 
+    'MusicDiscovery API server started'
+  );
 });
 
-app.listen(env.PORT, () => {
-  logger.info({ port: env.PORT, mode: env.DATA_MODE }, 'API listening');
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
 });
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
+});
+
+export { app };

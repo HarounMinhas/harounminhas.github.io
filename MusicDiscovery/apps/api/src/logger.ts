@@ -1,11 +1,10 @@
+// Re-export from config for backward compatibility
+export { logger, createChildLogger } from './config/logger.js';
+
 import { randomUUID } from 'node:crypto';
-import pino from 'pino';
 import pinoHttpLib from 'pino-http';
 import type { Request, Response } from 'express';
-
-import { env } from './env.js';
-
-export const logger = pino({ level: env.LOG_LEVEL as string });
+import { logger } from './config/logger.js';
 
 export function createRequestLogger() {
   return pinoHttpLib({
@@ -19,6 +18,11 @@ export function createRequestLogger() {
       const id = randomUUID();
       res.setHeader('x-request-id', id);
       return id;
+    },
+    customLogLevel: (_req, res, err) => {
+      if (res.statusCode >= 500 || err) return 'error';
+      if (res.statusCode >= 400) return 'warn';
+      return 'info';
     }
   });
 }

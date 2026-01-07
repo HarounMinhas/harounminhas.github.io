@@ -1,4 +1,5 @@
 import { LRUCache } from 'lru-cache';
+import { getCacheProfile, type CacheProfileName, type CacheOptions } from './config/cache.js';
 
 interface CacheEntry<T> {
   value: T;
@@ -14,13 +15,23 @@ const defaultCache = new LRUCache<string, CacheEntry<unknown>>({
 });
 
 export type CacheStore<T> = LRUCache<string, CacheEntry<T>, unknown>;
+export type { CacheEntry };
 
-export function createCache<T>(options: LRUCache.Options<string, CacheEntry<T>, unknown> = {}): CacheStore<T> {
+export function createCache<T>(options: CacheOptions<T> = {}): CacheStore<T> {
   return new LRUCache<string, CacheEntry<T>, unknown>({
     max: DEFAULT_MAX_ITEMS,
     ttl: DEFAULT_TTL_MS,
     ttlAutopurge: true,
     ...options
+  });
+}
+
+export function createCacheWithProfile<T>(profile: CacheProfileName): CacheStore<T> {
+  const config = getCacheProfile(profile);
+  return createCache<T>({
+    max: config.max,
+    ttl: config.ttl,
+    ttlAutopurge: true
   });
 }
 
@@ -41,4 +52,12 @@ export async function withCache<T>(
 
 export function clearCache(store: CacheStore<unknown> = defaultCache): void {
   store.clear();
+}
+
+export function getCacheStats(store: CacheStore<unknown> = defaultCache) {
+  return {
+    size: store.size,
+    max: store.max,
+    calculatedSize: store.calculatedSize
+  };
 }
