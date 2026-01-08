@@ -5,7 +5,14 @@ export const EnvSchema = z.object({
   MARKET: z.string().default('BE'),
   PORT: z.coerce.number().default(8080),
   NODE_ENV: z.string().default('development'),
-  CORS_ORIGIN: z.string().default('*'),
+  CORS_ORIGIN: z
+    .string()
+    .default('http://localhost:5173,http://localhost:4173,https://harounminhas.github.io')
+    .transform((val) => {
+      // Support comma-separated list of origins
+      if (val === '*') return '*';
+      return val.split(',').map((origin) => origin.trim());
+    }),
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
     .default('info'),
