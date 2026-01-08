@@ -284,18 +284,31 @@ html[data-theme="light"] .settings-overlay__panel {
   gap: 2rem;
 }
 
+.app__header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.app__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.app__header-top .label {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
 .app__header-controls {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 1rem;
-}
-
-.app__header-controls-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 0.85rem;
+  flex-shrink: 0;
 }
 
 .settings-button {
@@ -311,6 +324,7 @@ html[data-theme="light"] .settings-overlay__panel {
   color: rgba(244, 245, 247, 0.65);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .settings-button:hover,
@@ -343,17 +357,18 @@ html[data-theme="light"] .settings-button:focus-visible {
     gap: 1.5rem;
   }
 
-  .app__header > * {
+  .app__header-content {
     width: 100%;
+  }
+
+  .app__header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .app__header-controls {
     align-items: stretch;
-  }
-
-  .app__header-controls-row {
-    justify-content: space-between;
-    align-items: center;
   }
 
   .settings-overlay__panel {
