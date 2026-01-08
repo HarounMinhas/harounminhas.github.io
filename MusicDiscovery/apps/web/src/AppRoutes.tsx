@@ -4,7 +4,7 @@ import type { Artist, ProviderId, ProviderMetadata, Track } from '@musicdiscover
 
 import ArtistDetails from './components/ArtistDetails';
 import ArtistTabsBar, { type ArtistTabItem } from './components/ArtistTabsBar';
-import BackgroundToggle, { type BackgroundMode } from './components/BackgroundToggle';
+import type { BackgroundMode } from './components/BackgroundToggle';
 import LoadingIndicator from './components/LoadingIndicator';
 import ProviderSwitcher from './components/ProviderSwitcher';
 import SearchResultsList from './components/SearchResultsList';
@@ -79,12 +79,9 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
         <div>
           <p className="label">MusicDiscovery</p>
           <h1>Ontdek nieuwe artiesten</h1>
-          <p className="muted">
-            Zoek cross-provider en bekijk meteen de populairste nummers en gerelateerde artiesten.
-          </p>
+          <p className="muted">Zoek cross-provider en bekijk meteen de populairste nummers en gerelateerde artiesten.</p>
         </div>
         <div className="app__header-controls">
-          <BackgroundToggle value={header.backgroundMode} onChange={header.onBackgroundModeChange} />
           <ProviderSwitcher
             value={header.provider}
             status={header.providerStatus}
@@ -131,9 +128,7 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
             </div>
           </div>
 
-          {search.status === 'idle' && search.results.length === 0 ? (
-            <p className="muted">Begin met typen om artiesten te zoeken.</p>
-          ) : null}
+          {search.status === 'idle' && search.results.length === 0 ? <p className="muted">Begin met typen om artiesten te zoeken.</p> : null}
 
           {search.status === 'loading' ? <LoadingIndicator label="Resultaten laden…" /> : null}
           {search.status === 'error' && search.error ? (

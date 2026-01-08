@@ -3,7 +3,7 @@ import type { ProviderId } from '@musicdiscovery/shared';
 
 import AppRoutes from './AppRoutes';
 import BackgroundSurface from './components/BackgroundSurface';
-import type { BackgroundMode } from './components/BackgroundToggle';
+import BackgroundToggle, { type BackgroundMode } from './components/BackgroundToggle';
 import './styles.css';
 import { useArtistDetails } from './hooks/useArtistDetails';
 import { useArtistSearch } from './hooks/useArtistSearch';
@@ -11,6 +11,8 @@ import { useProviderSelection } from './hooks/useProviderSelection';
 import { useTabState } from './hooks/useTabState';
 import { useToastQueue } from './hooks/useToastQueue';
 import { useScrollPreserver } from './hooks/useScrollPreserver';
+
+const INTRO_ACK_KEY = 'musicdiscovery-intro-acknowledged';
 
 export default function App(): JSX.Element {
   const preserveScroll = useScrollPreserver();
@@ -62,7 +64,7 @@ export default function App(): JSX.Element {
         return stored;
       }
     }
-    return 'static';
+    return 'animated';
   });
 
   useEffect(() => {
@@ -70,6 +72,21 @@ export default function App(): JSX.Element {
       window.localStorage.setItem('background-mode', backgroundMode);
     }
   }, [backgroundMode]);
+
+  const [isIntroOpen, setIsIntroOpen] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return window.localStorage.getItem(INTRO_ACK_KEY) !== 'true';
+  });
+
+  const acknowledgeIntro = useCallback(() => {
+    setIsIntroOpen(false);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(INTRO_ACK_KEY, 'true');
+    }
+  }, []);
 
   const handledConfirmedArtistRef = useRef<string | null>(null);
 
@@ -208,7 +225,45 @@ export default function App(): JSX.Element {
 
   return (
     <BackgroundSurface mode={backgroundMode}>
+      {isIntroOpen ? (
+        <div
+          className="intro-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Info"
+          onClick={acknowledgeIntro}
+        >
+          <div className="intro-overlay__backdrop" />
+          <div
+            className="intro-overlay__panel"
+            role="document"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <p className="label">Kleine opmerking</p>
+            <p className="muted">
+              Zoeken kan in het begin wat traag zijn. Dit komt omdat de app nog in testfase zit en op gratis services
+              draait.
+            </p>
+            <p className="muted">
+              Krijg je niet meteen resultaten? Refresh even of wacht een minuutje — dan is de service waarschijnlijk aan
+              het opstarten.
+            </p>
+            <div className="intro-overlay__actions">
+              <button type="button" className="intro-overlay__button" onClick={acknowledgeIntro}>
+                Oké, begrepen
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <AppRoutes header={headerProps} search={searchProps} tabs={tabsProps} detail={detailProps} toasts={toasts} />
+
+      <footer className="app__footer-controls">
+        <BackgroundToggle value={backgroundMode} onChange={setBackgroundMode} />
+      </footer>
     </BackgroundSurface>
   );
 }

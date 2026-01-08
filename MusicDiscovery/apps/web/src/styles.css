@@ -3,7 +3,7 @@
   font-family: 'Inter', system-ui, sans-serif;
   background: radial-gradient(circle at top left, #1a2238, #090c14 55%);
   color: #f4f5f7;
-  --background-pulse-duration: 20000;
+  --background-pulse-duration: 14000;
   --background-pulse-move-padding: 18;
 }
 
@@ -40,7 +40,7 @@ body::before {
   left: 50%;
   top: 50%;
   transform: translate3d(calc(-50% + var(--pulse-offset-x, 0px)), calc(-50% + var(--pulse-offset-y, 0px)), 0);
-  transition: transform 6s ease-in-out;
+  transition: transform 4.5s ease-in-out;
   pointer-events: none;
 }
 
@@ -138,6 +138,57 @@ a {
   }
 }
 
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.intro-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.intro-overlay__panel {
+  position: relative;
+  width: min(540px, 100%);
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  background: rgba(10, 15, 25, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 48px rgba(4, 8, 20, 0.65);
+  backdrop-filter: blur(18px);
+}
+
+.intro-overlay__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.intro-overlay__button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: rgba(119, 153, 255, 0.22);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.intro-overlay__button:hover,
+.intro-overlay__button:focus-visible {
+  outline: none;
+  background: rgba(119, 153, 255, 0.3);
+  border-color: rgba(119, 153, 255, 0.55);
+  transform: translateY(-1px);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -196,37 +247,69 @@ a {
   gap: 0.45rem;
 }
 
-.background-toggle__buttons {
+.background-toggle__switch {
   display: inline-flex;
-  gap: 0.35rem;
-  padding: 0.35rem;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.8rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(10, 15, 25, 0.55);
   box-shadow: 0 16px 30px rgba(4, 8, 20, 0.5);
   backdrop-filter: blur(12px);
-}
-
-.background-toggle__button {
-  background: transparent;
-  border: none;
-  color: rgba(244, 245, 247, 0.72);
-  padding: 0.45rem 1rem;
-  border-radius: 999px;
-  font-size: 0.95rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
 }
 
-.background-toggle__button:hover {
-  color: #f4f5f7;
-  background: rgba(119, 153, 255, 0.18);
+.background-toggle__switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
 }
 
-.background-toggle__button.is-active {
-  color: #f4f5f7;
-  background: rgba(119, 153, 255, 0.28);
-  box-shadow: 0 14px 32px rgba(5, 9, 18, 0.45);
+.background-toggle__switch-track {
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.background-toggle__switch-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(244, 245, 247, 0.9);
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translate3d(0, -50%, 0);
+  transition: transform 0.22s ease, background-color 0.2s ease;
+}
+
+.background-toggle__switch-input:checked + .background-toggle__switch-track {
+  background: rgba(119, 153, 255, 0.38);
+  border-color: rgba(119, 153, 255, 0.55);
+}
+
+.background-toggle__switch-input:checked + .background-toggle__switch-track .background-toggle__switch-thumb {
+  transform: translate3d(20px, -50%, 0);
+  background: rgba(244, 245, 247, 0.98);
+}
+
+.background-toggle__switch-input:focus-visible + .background-toggle__switch-track {
+  box-shadow: 0 0 0 3px rgba(119, 153, 255, 0.22);
+}
+
+.background-toggle__switch-text {
+  color: rgba(244, 245, 247, 0.75);
+  font-size: 0.95rem;
+  min-width: 2.5rem;
+  text-align: right;
 }
 
 .background-toggle__label {
@@ -236,6 +319,22 @@ a {
 @media (max-width: 860px) {
   .background-toggle {
     align-items: flex-start;
+  }
+
+  .background-toggle__switch-text {
+    text-align: left;
+  }
+}
+
+.app__footer-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 0.25rem;
+}
+
+@media (max-width: 860px) {
+  .app__footer-controls {
+    justify-content: flex-start;
   }
 }
 
