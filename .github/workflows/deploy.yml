@@ -44,16 +44,27 @@ jobs:
         working-directory: ./phase10
         run: npm run build
 
-      # Build MusicDiscovery (Option C: source lives INSIDE this repo under ./MusicDiscovery)
+      # Build MusicDiscovery monorepo
       - name: Build MusicDiscovery (if present)
         run: |
           if [ -d "MusicDiscovery" ]; then
             echo "MusicDiscovery folder found - building..."
             cd MusicDiscovery
+            
+            # Enable pnpm
             corepack enable
+            
+            # Install all workspace dependencies
             pnpm install --frozen-lockfile
-            pnpm --filter @musicdiscovery/web exec tsc -p tsconfig.json
-            pnpm --filter @musicdiscovery/web exec vite build --base=/MusicDiscovery/
+            
+            # Build shared package first (dependency)
+            echo "Building @musicdiscovery/shared..."
+            pnpm --filter @musicdiscovery/shared run build
+            
+            # Build web app (depends on shared)
+            echo "Building @musicdiscovery/web..."
+            pnpm --filter @musicdiscovery/web run build --base=/MusicDiscovery/
+            
             cd ..
           else
             echo "MusicDiscovery folder not found - skipping build."
