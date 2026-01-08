@@ -15,27 +15,27 @@ const ContactPage = () => {
                 </p>
                 <div className="mb-4">
                   <h2 className="h5">Adres praktijk</h2>
-                  <p className="mb-1">P. de Smet de Naeyerstraat 17</p>
-                  <p className="mb-1">8430 Middelkerke</p>
+                  <p className="mb-1">Voorbeeldstraat 123</p>
+                  <p className="mb-1">1000 Brussel</p>
                   <p className="mb-0">Enkel op afspraak.</p>
                 </div>
                 <div>
                   <h2 className="h5">Praktijkuren</h2>
                   <ul className="list-unstyled schedule-list text-start text-lg-start mx-auto" style={{ maxWidth: '480px' }}>
                     <li>
-                      <strong>Maandag:</strong> 13u – 18u (praktijk Middelkerke + huisbezoeken Koksijde, Oostduinkerke, Veurne, De Panne)
+                      <strong>Maandag:</strong> 13u – 18u (praktijk + huisbezoeken)
                     </li>
                     <li>
-                      <strong>Dinsdag:</strong> 13u – 18u30 (praktijk Middelkerke)
+                      <strong>Dinsdag:</strong> 13u – 18u30 (praktijk)
                     </li>
                     <li>
-                      <strong>Woensdag:</strong> 13u – 18u (praktijk Middelkerke + huisbezoeken)
+                      <strong>Woensdag:</strong> 13u – 18u (praktijk + huisbezoeken)
                     </li>
                     <li>
-                      <strong>Donderdag:</strong> 13u – 18u30 (praktijk Middelkerke)
+                      <strong>Donderdag:</strong> 13u – 18u30 (praktijk)
                     </li>
                     <li>
-                      <strong>Vrijdag:</strong> 13u – 18u (praktijk Middelkerke)
+                      <strong>Vrijdag:</strong> 13u – 18u (praktijk)
                     </li>
                   </ul>
                 </div>
@@ -50,10 +50,10 @@ const ContactPage = () => {
                   Laat het contactformulier achterwege en bel of mail me meteen. We plannen samen een geschikt moment voor een kennismaking.
                 </p>
                 <div className="cta-buttons">
-                  <Button as="a" href="tel:+32476476321" variant="primary" size="lg" className="btn-responsive">
-                    Bel 0476 47 63 21
+                  <Button as="a" href="tel:+32123456789" variant="primary" size="lg" className="btn-responsive">
+                    Bel 0123 45 67 89
                   </Button>
-                  <Button as="a" href="mailto:logopediemarieke@gmail.com" variant="outline-primary" size="lg" className="btn-responsive">
+                  <Button as="a" href="mailto:info@example-logopedie.be" variant="outline-primary" size="lg" className="btn-responsive">
                     Stuur een e-mail
                   </Button>
                 </div>

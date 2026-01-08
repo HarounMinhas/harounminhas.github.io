@@ -9,7 +9,7 @@ const HomePage = () => {
         <Container>
           <Row className="align-items-center g-4">
             <Col lg={7} className="text-center text-lg-start">
-              <h1 className="display-5 fw-bold text-uppercase text-wrap">Logopedie voor volwassenen en kinderen in Middelkerke</h1>
+              <h1 className="display-5 fw-bold text-uppercase text-wrap">Logopedie voor volwassenen en kinderen in Brussel</h1>
               {/* Subtitel makkelijk aanpasbaar */}
               <p className="lead mt-3 text-muted">
                 Professionele logopedische begeleiding met bijzondere expertise in slikproblemen en neurologische aandoeningen, met zorg voor zowel volwassenen als kinderen.
@@ -39,10 +39,10 @@ const HomePage = () => {
               </Col>
               <Col lg={5}>
                 <div className="contact-cta-actions">
-                  <Button as="a" href="tel:+32476476321" variant="primary" size="lg" className="btn-responsive btn-cta-highlight">
-                    Bel 0476 47 63 21
+                  <Button as="a" href="tel:+32123456789" variant="primary" size="lg" className="btn-responsive btn-cta-highlight">
+                    Bel 0123 45 67 89
                   </Button>
-                  <Button as="a" href="mailto:logopediemarieke@gmail.com" variant="outline-primary" size="lg" className="btn-responsive">
+                  <Button as="a" href="mailto:info@example-logopedie.be" variant="outline-primary" size="lg" className="btn-responsive">
                     Mail naar Marieke
                   </Button>
                 </div>
