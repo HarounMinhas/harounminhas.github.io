@@ -1,4 +1,3 @@
-import type pLimit from 'p-limit';
 import pLimitLib from 'p-limit';
 
 import type { Artist, MusicProvider, Track } from '../types.js';
@@ -287,7 +286,7 @@ export class TokenlessProvider implements MusicProvider {
             `${ITUNES_SEARCH_URL}?term=${encodeURIComponent(genre)}&entity=musicArtist&limit=${Math.max(limit * 3, 25)}`
           );
           return data.results;
-        } catch (error) {
+        } catch {
           return [];
         }
       })
