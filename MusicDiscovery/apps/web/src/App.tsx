@@ -4,6 +4,7 @@ import type { ProviderId } from '@musicdiscovery/shared';
 import AppRoutes from './AppRoutes';
 import BackgroundSurface from './components/BackgroundSurface';
 import BackgroundToggle, { type BackgroundMode } from './components/BackgroundToggle';
+import ThemeToggle, { type ThemeMode } from './components/ThemeToggle';
 import './styles.css';
 import { useArtistDetails } from './hooks/useArtistDetails';
 import { useArtistSearch } from './hooks/useArtistSearch';
@@ -13,6 +14,7 @@ import { useToastQueue } from './hooks/useToastQueue';
 import { useScrollPreserver } from './hooks/useScrollPreserver';
 
 const INTRO_ACK_KEY = 'musicdiscovery-intro-acknowledged';
+const THEME_KEY = 'musicdiscovery-theme';
 
 export default function App(): JSX.Element {
   const preserveScroll = useScrollPreserver();
@@ -57,6 +59,31 @@ export default function App(): JSX.Element {
     relatedArtists
   } = useArtistDetails(activeTabId, provider);
 
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem(THEME_KEY);
+      if (stored === 'light' || stored === 'dark') {
+        return stored;
+      }
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.dataset.theme = theme;
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_KEY, theme);
+    }
+
+    return () => {
+      delete document.documentElement.dataset.theme;
+    };
+  }, [theme]);
+
   const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>(() => {
     if (typeof window !== 'undefined') {
       const stored = window.localStorage.getItem('background-mode');
@@ -87,6 +114,33 @@ export default function App(): JSX.Element {
       window.localStorage.setItem(INTRO_ACK_KEY, 'true');
     }
   }, []);
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const openSettings = useCallback(() => {
+    setIsSettingsOpen(true);
+  }, []);
+
+  const closeSettings = useCallback(() => {
+    setIsSettingsOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isSettingsOpen) {
+      return;
+    }
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeSettings();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  }, [isSettingsOpen, closeSettings]);
 
   const handledConfirmedArtistRef = useRef<string | null>(null);
 
@@ -152,10 +206,9 @@ export default function App(): JSX.Element {
       providerStatus,
       providerError,
       onProviderChange: handleProviderChange,
-      backgroundMode,
-      onBackgroundModeChange: setBackgroundMode
+      onOpenSettings: openSettings
     }),
-    [provider, providers, providerStatus, providerError, handleProviderChange, backgroundMode]
+    [provider, providers, providerStatus, providerError, handleProviderChange, openSettings]
   );
 
   const searchProps = useMemo(
@@ -226,13 +279,7 @@ export default function App(): JSX.Element {
   return (
     <BackgroundSurface mode={backgroundMode}>
       {isIntroOpen ? (
-        <div
-          className="intro-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Info"
-          onClick={acknowledgeIntro}
-        >
+        <div className="intro-overlay" role="dialog" aria-modal="true" aria-label="Info" onClick={acknowledgeIntro}>
           <div className="intro-overlay__backdrop" />
           <div
             className="intro-overlay__panel"
@@ -259,11 +306,34 @@ export default function App(): JSX.Element {
         </div>
       ) : null}
 
+      {isSettingsOpen ? (
+        <div
+          className="settings-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Instellingen"
+          onClick={closeSettings}
+        >
+          <div className="settings-overlay__backdrop" />
+          <div
+            className="settings-overlay__panel"
+            role="document"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <p className="label">Instellingen</p>
+            <div className="settings-overlay__content">
+              <ThemeToggle value={theme} onChange={setTheme} />
+              <BackgroundToggle value={backgroundMode} onChange={setBackgroundMode} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <AppRoutes header={headerProps} search={searchProps} tabs={tabsProps} detail={detailProps} toasts={toasts} />
 
-      <footer className="app__footer-controls">
-        <BackgroundToggle value={backgroundMode} onChange={setBackgroundMode} />
-      </footer>
+      {hasTabs ? null : null}
     </BackgroundSurface>
   );
 }
