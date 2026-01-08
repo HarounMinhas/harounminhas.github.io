@@ -9,6 +9,11 @@ import { errorHandler } from './utils/errorHandler.js';
 
 const app = express();
 
+// Trust proxy when behind a reverse proxy (e.g. Render sets X-Forwarded-For)
+if (env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Security and parsing middleware
 app.use(helmet());
 app.use(express.json());
