@@ -1,7 +1,7 @@
 export const heroContent = {
-  title: 'Logopedie op maat in Middelkerke',
+  title: 'Logopedie op maat in Brussel',
   subtitle:
-    'Eén plek voor gespecialiseerde logopedische hulp bij slik- en spraakproblemen, voor zowel volwassenen als kinderen.',
+    'Één plek voor gespecialiseerde logopedische hulp bij slik- en spraakproblemen, voor zowel volwassenen als kinderen.',
   cta: 'Plan een gesprek'
 };
 
@@ -61,10 +61,10 @@ export const specialties = [
 ];
 
 export const contactDetails = {
-  phone: '+32476476321',
-  phoneLabel: '0476 47 63 21',
-  email: 'logopediemarieke@gmail.com',
-  address: `Westendelaan 366/2
-8434 Westende (Middelkerke)`,
+  phone: '+32123456789',
+  phoneLabel: '0123 45 67 89',
+  email: 'info@example-logopedie.be',
+  address: `Voorbeeldstraat 123
+1000 Brussel`,
   schedule: ['Maandag - vrijdag', 'Enkel op afspraak', 'Gratis parking beschikbaar']
 };

@@ -131,7 +131,7 @@ const DienstenPage = () => {
                     <h3 className="h6">Contact opnemen</h3>
                     {/* Contactgegevens makkelijk aanpasbaar */}
                     <p className="mb-0">
-                      Neem contact op via <a href="tel:+32476476321">0476/476321</a>, via e-mail naar <a href="mailto:logopediemarieke@gmail.com">logopediemarieke@gmail.com</a> of via het contactformulier. Formuleer kort je hulpvraag en we plannen de eerste afspraak in.
+                      Neem contact op via <a href="tel:+32123456789">0123/456789</a>, via e-mail naar <a href="mailto:info@example-logopedie.be">info@example-logopedie.be</a> of via het contactformulier. Formuleer kort je hulpvraag en we plannen de eerste afspraak in.
                     </p>
                   </div>
                 </div>
