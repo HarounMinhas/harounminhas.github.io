@@ -12,7 +12,12 @@ const app = express();
 // Security and parsing middleware
 app.use(helmet());
 app.use(express.json());
-app.use(cors({ origin: env.CORS_ORIGIN as string, credentials: true }));
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN,
+    credentials: true
+  })
+);
 
 // Logging middleware
 app.use(createRequestLogger());
@@ -22,8 +27,8 @@ app.use(apiRateLimiter);
 
 // Health check endpoint
 app.get('/api/health', (_req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     mode: env.DATA_MODE,
     timestamp: new Date().toISOString(),
     environment: env.NODE_ENV
@@ -39,11 +44,12 @@ app.use(errorHandler);
 // Start server
 const server = app.listen(env.PORT, () => {
   logger.info(
-    { 
-      port: env.PORT, 
+    {
+      port: env.PORT,
       mode: env.DATA_MODE,
-      environment: env.NODE_ENV
-    }, 
+      environment: env.NODE_ENV,
+      corsOrigins: env.CORS_ORIGIN
+    },
     'MusicDiscovery API server started'
   );
 });
