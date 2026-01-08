@@ -79,7 +79,7 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
         <div>
           <p className="label">MusicDiscovery</p>
           <h1>Ontdek nieuwe artiesten</h1>
-          <p className="muted">Zoek cross-provider en bekijk meteen de populairste nummers en gerelateerde artiesten.</p>
+          <p className="muted">Typ een artiest die je leuk vindt en ontdek meteen nieuwe muziek om te beluisteren.</p>
         </div>
         <div className="app__header-controls">
           <ProviderSwitcher
@@ -128,7 +128,9 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
             </div>
           </div>
 
-          {search.status === 'idle' && search.results.length === 0 ? <p className="muted">Begin met typen om artiesten te zoeken.</p> : null}
+          {search.status === 'idle' && search.results.length === 0 ? (
+            <p className="muted">Begin met typen om artiesten te zoeken.</p>
+          ) : null}
 
           {search.status === 'loading' ? <LoadingIndicator label="Resultaten laden…" /> : null}
           {search.status === 'error' && search.error ? (
