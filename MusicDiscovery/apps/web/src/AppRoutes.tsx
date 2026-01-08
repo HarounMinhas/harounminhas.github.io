@@ -85,24 +85,24 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
       </div>
 
       <header className="app__header">
-        <div>
-          <p className="label">MusicDiscovery</p>
+        <div className="app__header-content">
+          <div className="app__header-top">
+            <p className="label">MusicDiscovery</p>
+            <button type="button" className="settings-button" aria-label="Instellingen" onClick={header.onOpenSettings}>
+              <GearIcon />
+            </button>
+          </div>
           <h1>Ontdek nieuwe artiesten</h1>
           <p className="muted">Typ een artiest die je leuk vindt en ontdek meteen nieuwe muziek om te beluisteren.</p>
         </div>
         <div className="app__header-controls">
-          <div className="app__header-controls-row">
-            <button type="button" className="settings-button" aria-label="Instellingen" onClick={header.onOpenSettings}>
-              <GearIcon />
-            </button>
-            <ProviderSwitcher
-              value={header.provider}
-              status={header.providerStatus}
-              error={header.providerError}
-              options={header.providerOptions}
-              onChange={header.onProviderChange}
-            />
-          </div>
+          <ProviderSwitcher
+            value={header.provider}
+            status={header.providerStatus}
+            error={header.providerError}
+            options={header.providerOptions}
+            onChange={header.onProviderChange}
+          />
         </div>
       </header>
 
