@@ -1,21 +1,67 @@
-# MusicDiscovery (WIP)
+# MusicDiscovery
 
-This folder is reserved for the **MusicDiscovery** webapp that will be published under:
-
-- /MusicDiscovery/
+Music discovery web application for exploring related artists and top tracks using public music APIs.
 
 ## Status
 
-- Work in progress: the portfolio tile already links to the app path.
-- The GitHub Pages deploy workflow is prepared to build and publish this app once the source is placed here.
+Work in progress. The portfolio landing page includes a link to this application, and the GitHub Pages deployment workflow is configured to build and publish the app once development is complete.
 
-## Data sources
+## Project Structure
 
-This project intentionally uses only public endpoints:
+Monorepo managed with pnpm workspaces and Turborepo:
 
-- Deezer (primary) for related artists and top tracks.
-- iTunes Search API for discovery links and previews.
+```
+MusicDiscovery/
+├── apps/          # Application packages
+├── packages/      # Shared libraries and utilities
+├── infra/         # Infrastructure configuration
+└── pnpm-workspace.yaml
+```
+
+## Technology Stack
+
+- **Package Manager**: pnpm with workspaces
+- **Build System**: Turborepo for monorepo orchestration
+- **TypeScript**: Shared configuration via tsconfig.base.json
+- **Deployment**: Render.com (render.yaml configuration)
+
+## Data Sources
+
+This project uses only public API endpoints to avoid authentication complexity:
+
+- **Deezer API** - Primary source for related artists and top tracks
+- **iTunes Search API** - Discovery links and audio previews
+
+No API keys or authentication required.
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm 8+
+
+### Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run development server
+pnpm dev
+
+# Build for production
+pnpm build
+```
 
 ## Security
 
-Do **not** commit any `.env` files or secrets in this repository.
+No environment variables or API keys are required. Do not commit `.env` files or secrets to this repository.
+
+## Deployment
+
+The GitHub Pages workflow automatically builds and deploys this application to `/MusicDiscovery/` when changes are pushed to the main branch.
+
+---
+
+*Note: This documentation has been formatted and reviewed with assistance from large language models (LLMs) to ensure clarity and professional presentation.*
