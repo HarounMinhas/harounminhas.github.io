@@ -1,48 +1,48 @@
-# 🔍 Regex Playground
+# Regex Playground
 
-> **Write, test, and master regex — with live highlights, test suites, and visual explanations**
+Interactive web application for writing, testing, and mastering regular expressions with live highlights, test suites, and visual explanations.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://harounminhas.github.io/regex-playground/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## ✨ Features
+## Features
 
-### 🎯 Core Functionality
+### Core Functionality
 - **Live Regex Editor** with syntax highlighting and error detection
 - **Real-time Matching** with highlighted results in test input
 - **Replace Mode** with live preview and diff view
-- **Test Suite Runner** with pass/fail indicators (like unit tests!)
-- **Local Storage** - all data saved in IndexedDB, no backend needed
+- **Test Suite Runner** with pass/fail indicators
+- **Local Storage** using IndexedDB, no backend required
 
-### 🎨 Three Layout Modes
+### Layout Modes
 1. **3-Panel IDE** - Classic developer tool layout
 2. **Split View** - Fast workflow for quick testing
 3. **Notebook Mode** - Document-style for tutorials and lessons
 
-### 🚀 Advanced Features
-- **Share via URL** - Encode regex + input in shareable link
+### Advanced Features
+- **Share via URL** - Encode regex and input in shareable links
 - **Snippet Library** - Save and organize regex patterns
 - **Groups Table** - View captured groups with named group support
 - **Export/Import** - Backup and share projects as JSON
-- **Performance Guard** - Warns about slow regex patterns
-- **Dark/Light Theme** - Easy on the eyes
+- **Performance Guard** - Warnings for potentially slow regex patterns
+- **Dark/Light Theme** - Theme switching support
 
-### 🔬 Experimental Features (Coming Soon)
+### Experimental Features (Coming Soon)
 - **Explain Panel** - Human-readable regex breakdown
 - **Catastrophic Backtracking Detector**
 - **Regex Linting** - Best practice suggestions
-- **Railroad Diagram** - Visual regex flow
-- **Fuzz Generator** - Generate test strings
+- **Railroad Diagram** - Visual regex flow representation
+- **Fuzz Generator** - Automatic test string generation
 
-## 🛠 Tech Stack
+## Technology Stack
 
 - **100% Client-Side** - Pure vanilla JavaScript ES6+
-- **No Dependencies** - No frameworks, just modern web APIs
-- **IndexedDB** - For persistent local storage
+- **No Dependencies** - No frameworks, modern web APIs only
+- **IndexedDB** - Persistent local storage
 - **CSS Grid/Flexbox** - Responsive layouts
 - **GitHub Pages Ready** - Deploy anywhere
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 regex-playground/
@@ -70,7 +70,7 @@ regex-playground/
     └── themes.css         # Dark/light themes
 ```
 
-## 🎓 Data Model
+## Data Model
 
 ```javascript
 // Snippet
@@ -108,7 +108,7 @@ regex-playground/
 }
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Clone the repository**
    ```bash
@@ -130,7 +130,7 @@ regex-playground/
    http://localhost:8000
    ```
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### Email Validation
 ```regex
@@ -147,7 +147,7 @@ regex-playground/
 /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/
 ```
 
-## 🎯 Roadmap
+## Roadmap
 
 - [x] MVP: Layout chooser + core matching
 - [x] Replace mode + diff preview
@@ -161,21 +161,21 @@ regex-playground/
 - [ ] Fuzz generator
 - [ ] Multi-language support (PCRE, Python)
 
-## 🤝 Contributing
+## Contributing
 
-Contributions are welcome! Feel free to:
+Contributions are welcome. Feel free to:
 - Report bugs
 - Suggest features
 - Submit pull requests
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Inspired by regex101.com and regexr.com
-- Built as a portfolio project to demonstrate:
+- Built as a portfolio project demonstrating:
   - Clean architecture (modules, components)
   - Modern web APIs (IndexedDB, URL API)
   - Client-side data persistence
@@ -183,4 +183,6 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ---
 
-**Made with ❤️ by [Haroun Minhas](https://github.com/HarounMinhas)**
+**Created by [Haroun Minhas](https://github.com/HarounMinhas)**
+
+*Note: This documentation has been formatted and reviewed with assistance from large language models (LLMs) to ensure clarity and professional presentation.*
