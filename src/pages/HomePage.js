@@ -2,6 +2,10 @@ import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+/**
+ * Renders the main landing page for the speech therapy practice.
+ * Displays hero section, service overview, specializations, and call-to-action blocks.
+ */
 const HomePage = () => {
   return (
     <div>
@@ -10,7 +14,6 @@ const HomePage = () => {
           <Row className="align-items-center g-4">
             <Col lg={7} className="text-center text-lg-start">
               <h1 className="display-5 fw-bold text-uppercase text-wrap">Logopedie voor volwassenen en kinderen in Brussel</h1>
-              {/* Subtitel makkelijk aanpasbaar */}
               <p className="lead mt-3 text-muted">
                 Professionele logopedische begeleiding met bijzondere expertise in slikproblemen en neurologische aandoeningen, met zorg voor zowel volwassenen als kinderen.
               </p>
@@ -57,7 +60,6 @@ const HomePage = () => {
           <Row className="align-items-center g-4">
             <Col lg={6} className="text-center text-lg-start">
               <h2 className="h3">Over de praktijk</h2>
-              {/* Naam en achtergrond makkelijk aanpasbaar */}
               <p>
                 Ik ben Remmery Marieke, master in de logopedische en audiologische wetenschappen (KU Leuven, 2014). Met ervaring in zowel zelfstandige praktijk als ziekenhuissetting begeleid ik cliënten met aandacht voor hun unieke noden.
               </p>
