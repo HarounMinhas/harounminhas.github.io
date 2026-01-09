@@ -1,64 +1,64 @@
 # Haroun Minhas Portfolio
 
-Dit is mijn persoonlijke portfolio website gehost op GitHub Pages.
+Personal portfolio website hosted on GitHub Pages.
 
-## 🌐 Live Website
+## Live Website
 
 - **Portfolio Homepage**: [https://harounminhas.github.io/](https://harounminhas.github.io/)
 - **Marieke Logopedie Project**: [https://harounminhas.github.io/marieke/](https://harounminhas.github.io/marieke/)
 
-## 📁 Projectstructuur
+## Project Structure
 
-De repository bevat:
+The repository contains:
 
-- **Portfolio Landing Page**: Een moderne Bootstrap-gebaseerde homepage die al mijn projecten showcaset
-- **Marieke Logopedie**: Een React + TypeScript webapp voor een logopediepraktijk
+- **Portfolio Landing Page**: Modern Bootstrap-based homepage showcasing all projects
+- **Marieke Logopedie**: React + TypeScript web application for a speech therapy practice
 
-### Ontwikkeling
+### Development
 
-De Marieke frontend staat in `src/` en draait op React (Create React App). TypeScript-ondersteuning is toegevoegd zodat nieuwe componenten ook in `.ts`/`.tsx` kunnen worden geschreven. De bestaande JavaScript-bestanden blijven bruikbaar omdat `allowJs` aan staat in `tsconfig.json`.
+The Marieke frontend is located in `src/` and runs on React (Create React App). TypeScript support has been added, allowing new components to be written in `.ts`/`.tsx` files. Existing JavaScript files remain functional due to the `allowJs` setting in `tsconfig.json`.
 
-#### Handige commando's:
+#### Available Commands
 
-- `npm install` – installeert alle dependencies
-- `npm start` – draait de devserver lokaal op http://localhost:3000
-- `npm run type-check` – voert een TypeScript-check uit zonder output te schrijven
-- `npm run build` – bouwt een geoptimaliseerde versie in `build/`
+- `npm install` - Install all dependencies
+- `npm start` - Run development server locally at http://localhost:3000
+- `npm run type-check` - Execute TypeScript type checking without emitting output
+- `npm run build` - Build optimized production version to `build/` directory
 
-## 🚀 Deployment
+## Deployment
 
-GitHub Pages wordt automatisch bijgewerkt via GitHub Actions zodra je naar `main` pusht.
+GitHub Pages is automatically updated via GitHub Actions when pushing to the `main` branch.
 
-### Deployment Flow:
+### Deployment Flow
 
-1. De workflow installeert Node 20 en npm-dependencies (`npm ci`)
-2. Voert type-checking uit (`npm run type-check`)
-3. Bouwt de React app (`npm run build`)
-4. Organiseert de files:
-   - React build → `/marieke/`
-   - Portfolio landing page → `/` (root)
-5. Deploy alles naar GitHub Pages
+1. Workflow installs Node 20 and npm dependencies (`npm ci`)
+2. Executes type checking (`npm run type-check`)
+3. Builds React application (`npm run build`)
+4. Organizes files:
+   - React build output to `/marieke/`
+   - Portfolio landing page to `/` (root)
+5. Deploys all content to GitHub Pages
 
-De workflow vind je in `.github/workflows/deploy.yml`.
+The workflow configuration is located at `.github/workflows/deploy.yml`.
 
-### Lokale Preview
+### Local Preview
 
-Om het Marieke project lokaal te bekijken:
+To preview the Marieke project locally:
 
 ```bash
 npm install
 npm start
 ```
 
-De portfolio landing page is een statische HTML pagina en kan direct geopend worden vanuit `portfolio-index.html`.
+The portfolio landing page is a static HTML file and can be opened directly from `portfolio-index.html`.
 
-## 🎨 Technologie Stack
+## Technology Stack
 
 ### Portfolio Landing Page
 - **Bootstrap 5** - Modern responsive framework
-- **Bootstrap Icons** - Iconografie
-- **Google Fonts (Poppins)** - Typografie
-- **Vanilla HTML/CSS/JS** - Geen build process nodig
+- **Bootstrap Icons** - Iconography
+- **Google Fonts (Poppins)** - Typography
+- **Vanilla HTML/CSS/JS** - No build process required
 
 ### Marieke Logopedie Project
 - **React** - Frontend framework
@@ -67,11 +67,15 @@ De portfolio landing page is een statische HTML pagina en kan direct geopend wor
 - **Bootstrap 5** - UI components
 - **Create React App** - Build tooling
 
-## 📝 Toekomstige Projecten
+## Future Projects
 
-Meer projecten komen binnenkort! De portfolio pagina is ontworpen om eenvoudig uit te breiden met nieuwe project cards.
+Additional projects will be added over time. The portfolio page is designed to scale easily with new project cards.
 
-## 👤 Contact
+## Contact
 
 - **GitHub**: [@HarounMinhas](https://github.com/HarounMinhas)
 - **Website**: [harounminhas.github.io](https://harounminhas.github.io/)
+
+---
+
+*Note: This documentation has been formatted and reviewed with assistance from large language models (LLMs) to ensure clarity, consistency, and professional presentation.*
