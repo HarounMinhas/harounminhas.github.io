@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dropdown, Button } from 'react-bootstrap';
 
+// Predefined color palettes with CSS custom property values
 const colorPalettes = [
   {
     id: 'default',
@@ -74,16 +75,23 @@ const colorPalettes = [
   },
 ];
 
+/**
+ * Provides theme/color palette selection with localStorage persistence.
+ * Renders as Bootstrap dropdown on desktop and custom modal on mobile.
+ * Applies color values to CSS custom properties on document root.
+ */
 const ThemeSwitcher = () => {
   const [selectedId, setSelectedId] = useState('default');
   const [open, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Create lookup map for O(1) palette access by ID
   const paletteMap = useMemo(
     () => Object.fromEntries(colorPalettes.map((palette) => [palette.id, palette])),
     []
   );
 
+  // Detect mobile viewport for conditional rendering
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -95,6 +103,7 @@ const ThemeSwitcher = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Load saved palette from localStorage on mount
   useEffect(() => {
     const storedTheme = localStorage.getItem('preferredPalette');
     if (storedTheme && paletteMap[storedTheme]) {
@@ -105,6 +114,7 @@ const ThemeSwitcher = () => {
     }
   }, [paletteMap]);
 
+  // Prevent body scroll when mobile modal is open
   useEffect(() => {
     if (isMobile && open) {
       document.body.style.overflow = 'hidden';
@@ -117,6 +127,12 @@ const ThemeSwitcher = () => {
     };
   }, [isMobile, open]);
 
+  /**
+   * Applies color values to CSS custom properties on document root.
+   * These properties are referenced throughout the application's CSS.
+   * 
+   * @param {Object} colors - Object mapping property names to hex color values
+   */
   const applyPalette = (colors) => {
     const root = document.documentElement.style;
     Object.entries(colors).forEach(([key, value]) => {
@@ -124,6 +140,11 @@ const ThemeSwitcher = () => {
     });
   };
 
+  /**
+   * Handles palette selection, persists to localStorage, and closes mobile modal.
+   * 
+   * @param {string} id - Palette identifier
+   */
   const handlePaletteSelect = (id) => {
     const palette = paletteMap[id];
     if (!palette) return;
@@ -135,6 +156,7 @@ const ThemeSwitcher = () => {
     }
   };
 
+  // Close modal when clicking backdrop overlay
   const handleBackdropClick = (e) => {
     if (e.target.classList.contains('theme-backdrop')) {
       setOpen(false);
@@ -143,6 +165,7 @@ const ThemeSwitcher = () => {
 
   const selectedPalette = paletteMap[selectedId];
 
+  // Mobile-specific rendering with custom modal
   if (isMobile) {
     return (
       <div className="theme-switcher-mobile">
@@ -158,7 +181,7 @@ const ThemeSwitcher = () => {
           </span>
         </Button>
         
-        {/* Only render modal and backdrop when open */}
+        {/* Modal and backdrop only render when open */}
         {open && (
           <>
             <div 
@@ -208,6 +231,7 @@ const ThemeSwitcher = () => {
     );
   }
 
+  // Desktop rendering with Bootstrap dropdown
   return (
     <Dropdown show={open} onToggle={setOpen} align="start">
       <Dropdown.Toggle
