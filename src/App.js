@@ -18,16 +18,25 @@ import ContrastOpmaakPage from './pages/alternatives/ContrastOpmaakPage';
 import GridOpmaakPage from './pages/alternatives/GridOpmaakPage';
 import SereneOpmaakPage from './pages/alternatives/SereneOpmaakPage';
 
+/**
+ * Root application component that defines routing structure.
+ * Implements fixed navbar and footer with flexible content area.
+ * Uses React Router v6 for client-side navigation.
+ */
 function App() {
   return (
     <div className="d-flex flex-column min-vh-100">
       <MainNavbar />
+      {/* Main content area with padding to account for fixed navbar */}
       <main className="flex-fill" style={{ paddingTop: '4.5rem' }}>
         <Routes>
+          {/* Primary pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/over-mij" element={<OverMijPage />} />
           <Route path="/diensten" element={<DienstenPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          
+          {/* Alternative layout demonstrations */}
           <Route path="/alternatieve-opmaak" element={<AlternatieveOpmaakPage />} />
           <Route path="/alternatieve-opmaak/singlepage" element={<SinglePageOpmaakPage />} />
           <Route path="/alternatieve-opmaak/tegels" element={<TegelOpmaakPage />} />
