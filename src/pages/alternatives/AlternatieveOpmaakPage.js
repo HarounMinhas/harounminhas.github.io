@@ -69,6 +69,11 @@ const reimaginedLayouts = [
   }
 ];
 
+/**
+ * Overview page displaying all available alternative layout variations.
+ * Organizes layouts into existing variations and complete redesigns.
+ * Each layout maintains consistent theming while demonstrating different UI approaches.
+ */
 const AlternatieveOpmaakPage = () => {
   return (
     <div className="section-padding">
