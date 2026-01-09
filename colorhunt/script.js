@@ -1,4 +1,7 @@
-// UUID Generator
+/**
+ * Generates RFC4122 version 4 compliant UUID.
+ * Used for unique palette identification.
+ */
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -7,11 +10,11 @@ function generateUUID() {
     });
 }
 
-// State
+// Application state
 let palettes = [];
-let highlightedId = null;
-let activePaletteId = null;
-let highlightTimer = null;
+let highlightedId = null; // Palette ID currently being highlighted (duplicate detection)
+let activePaletteId = null; // Currently applied palette ID
+let highlightTimer = null; // Debounce timer for highlight animation
 
 // DOM Elements
 const widgetToggle = document.getElementById('widgetToggle');
@@ -21,7 +24,7 @@ const paletteUrlInput = document.getElementById('paletteUrl');
 const paletteList = document.getElementById('paletteList');
 const emptyState = document.getElementById('emptyState');
 
-// Default palettes
+// Default palettes loaded on initialization
 const defaultPalettes = [
     {
         url: 'https://colorhunt.co/palette/5a9cb5face68faac68fa6868',
@@ -37,7 +40,7 @@ const defaultPalettes = [
     }
 ];
 
-// Toggle widget
+// Widget toggle handlers
 widgetToggle.addEventListener('click', (e) => {
     e.stopPropagation();
     widgetContent.classList.toggle('active');
@@ -46,7 +49,6 @@ widgetToggle.addEventListener('click', (e) => {
     }
 });
 
-// Close widget with close button
 widgetClose.addEventListener('click', () => {
     widgetContent.classList.remove('active');
 });
@@ -59,12 +61,17 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Prevent closing when clicking inside widget
 widgetContent.addEventListener('click', (e) => {
     e.stopPropagation();
 });
 
-// Extract colors from ColorHunt URL
+/**
+ * Extracts hex color codes from ColorHunt palette URL.
+ * ColorHunt URLs contain concatenated hex values in the path.
+ * 
+ * @param {string} url - ColorHunt palette URL
+ * @returns {string[]|null} Array of hex color codes or null if invalid
+ */
 function extractColors(url) {
     try {
         const match = url.match(/palette\/([a-fA-F0-9]+)/);
@@ -81,7 +88,13 @@ function extractColors(url) {
     }
 }
 
-// Apply color palette to page
+/**
+ * Applies color palette to page by setting CSS custom properties.
+ * Also converts hex to RGB format for alpha channel support.
+ * 
+ * @param {string[]} colors - Array of hex color codes
+ * @param {string} paletteId - UUID of palette being applied
+ */
 function applyColorPalette(colors, paletteId) {
     if (colors.length < 4) return;
     
@@ -92,7 +105,7 @@ function applyColorPalette(colors, paletteId) {
     root.style.setProperty('--color-accent', colors[2]);
     root.style.setProperty('--color-highlight', colors[3]);
     
-    // Convert hex to RGB
+    // Convert hex to RGB for rgba() usage in CSS
     const hexToRgb = (hex) => {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
@@ -114,12 +127,17 @@ function applyColorPalette(colors, paletteId) {
     
     widgetToggle.style.backgroundColor = colors[0];
     
-    // Update active palette
     activePaletteId = paletteId;
     renderPalettes();
 }
 
-// Create palette card HTML
+/**
+ * Creates DOM element for a single palette card.
+ * 
+ * @param {Object} palette - Palette object with id, colors, and metadata
+ * @param {number} index - Position in palettes array
+ * @returns {HTMLElement} Palette card element
+ */
 function createPaletteCard(palette, index) {
     const card = document.createElement('div');
     card.className = 'palette-card';
@@ -135,7 +153,7 @@ function createPaletteCard(palette, index) {
         card.classList.add('active');
     }
     
-    // Preview container
+    // Color preview blocks
     const previewContainer = document.createElement('div');
     previewContainer.className = 'palette-preview-container';
     palette.colors.forEach(color => {
@@ -146,13 +164,12 @@ function createPaletteCard(palette, index) {
         previewContainer.appendChild(colorBlock);
     });
     
-    // Info container
+    // Palette metadata
     const infoContainer = document.createElement('div');
     infoContainer.className = 'palette-info';
     
     const paletteId = document.createElement('span');
     paletteId.className = 'palette-id';
-    // Show first 8 characters of UUID for readability
     paletteId.textContent = `#${palette.id.substring(0, 8)}`;
     
     const colorCodes = document.createElement('span');
@@ -171,7 +188,7 @@ function createPaletteCard(palette, index) {
         removePalette(palette.id);
     };
     
-    // Click to apply
+    // Click to apply palette
     card.onclick = () => {
         applyColorPalette(palette.colors, palette.id);
     };
@@ -183,7 +200,10 @@ function createPaletteCard(palette, index) {
     return card;
 }
 
-// Render palette list
+/**
+ * Re-renders the entire palette list.
+ * Shows empty state when no palettes exist.
+ */
 function renderPalettes() {
     paletteList.innerHTML = '';
     
@@ -201,13 +221,20 @@ function renderPalettes() {
     }
 }
 
-// Add palette
+/**
+ * Adds a new palette or highlights existing duplicate.
+ * Duplicates are detected by comparing concatenated color values.
+ * 
+ * @param {string} url - Source ColorHunt URL
+ * @param {string[]} colors - Array of hex color codes
+ * @returns {boolean} True if palette was added, false if duplicate
+ */
 function addPalette(url, colors) {
     const uniqueColorKey = colors.join('-');
     const existingPalette = palettes.find(p => p.colorKey === uniqueColorKey);
     
     if (existingPalette) {
-        // DUPLICATE FOUND: Flash effect
+        // Duplicate found: flash highlight animation
         highlightedId = existingPalette.id;
         renderPalettes();
         
@@ -219,7 +246,7 @@ function addPalette(url, colors) {
         
         return false;
     } else {
-        // NEW PALETTE: Add to list with unique UUID
+        // New palette: prepend to list
         const newPalette = {
             id: generateUUID(),
             url: url,
@@ -234,11 +261,15 @@ function addPalette(url, colors) {
     }
 }
 
-// Remove palette
+/**
+ * Removes palette by ID.
+ * If removed palette was active, applies first available palette.
+ * 
+ * @param {string} id - UUID of palette to remove
+ */
 function removePalette(id) {
     palettes = palettes.filter(p => p.id !== id);
     
-    // If the removed palette was active, set the first one as active
     if (activePaletteId === id && palettes.length > 0) {
         applyColorPalette(palettes[0].colors, palettes[0].id);
     }
@@ -246,7 +277,7 @@ function removePalette(id) {
     renderPalettes();
 }
 
-// Handle input change with auto-detection
+// Auto-detect and add palette on input change
 paletteUrlInput.addEventListener('input', (e) => {
     const value = e.target.value;
     const extractedColors = extractColors(value);
@@ -257,24 +288,25 @@ paletteUrlInput.addEventListener('input', (e) => {
     }
 });
 
-// Initialize with default palettes
+/**
+ * Loads default palettes on page initialization.
+ * Applies first palette automatically.
+ */
 function initializeDefaultPalettes() {
     defaultPalettes.forEach(palette => {
         addPalette(palette.url, palette.colors);
     });
     
-    // Apply first palette
     if (palettes.length > 0) {
         applyColorPalette(palettes[0].colors, palettes[0].id);
     }
 }
 
-// Initialize on load
 window.addEventListener('DOMContentLoaded', () => {
     initializeDefaultPalettes();
 });
 
-// Smooth scroll for navigation links
+// Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
