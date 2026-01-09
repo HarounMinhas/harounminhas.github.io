@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
+// Default preferences for accessibility features
 const defaultPreferences = {
   dyslexicFont: false,
   grayscale: false,
@@ -14,7 +15,15 @@ const AccessibilityContext = createContext({
   resetPreferences: () => {}
 });
 
+/**
+ * Provides accessibility preferences to the application via React Context.
+ * Manages localStorage persistence and DOM class application for accessibility features.
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components that will have access to accessibility context
+ */
 export const AccessibilityProvider = ({ children }) => {
+  // Initialize state from localStorage if available, fallback to defaults
   const [preferences, setPreferences] = useState(() => {
     if (typeof window === 'undefined') {
       return defaultPreferences;
@@ -29,6 +38,7 @@ export const AccessibilityProvider = ({ children }) => {
     }
   });
 
+  // Persist preferences to localStorage whenever they change
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -41,6 +51,7 @@ export const AccessibilityProvider = ({ children }) => {
     }
   }, [preferences]);
 
+  // Apply or remove accessibility CSS classes on document root based on active preferences
   useEffect(() => {
     const root = document.documentElement;
     const classMap = {
@@ -57,7 +68,7 @@ export const AccessibilityProvider = ({ children }) => {
       }
     });
 
-    // Lazy load Lexend font when dyslexic mode is enabled
+    // Lazy load Lexend font only when dyslexic mode is activated
     if (preferences.dyslexicFont) {
       const linkId = 'lexend-font';
       if (!document.getElementById(linkId)) {
@@ -70,14 +81,17 @@ export const AccessibilityProvider = ({ children }) => {
     }
   }, [preferences]);
 
+  // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(
     () => ({
       preferences,
+      // Toggle a specific preference on/off
       togglePreference: (key) =>
         setPreferences((prev) => ({
           ...prev,
           [key]: !prev[key]
         })),
+      // Reset all preferences to default values
       resetPreferences: () => setPreferences(defaultPreferences)
     }),
     [preferences]
@@ -86,4 +100,10 @@ export const AccessibilityProvider = ({ children }) => {
   return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
 };
 
+/**
+ * Hook to access accessibility preferences and controls.
+ * Must be used within an AccessibilityProvider.
+ * 
+ * @returns {Object} Context value containing preferences and control functions
+ */
 export const useAccessibility = () => useContext(AccessibilityContext);
