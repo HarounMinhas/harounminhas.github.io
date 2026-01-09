@@ -1,6 +1,10 @@
 import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 
+/**
+ * Renders the contact page with practice information, hours, and direct contact options.
+ * Displays address, schedule, and call-to-action buttons for phone/email.
+ */
 const ContactPage = () => {
   return (
     <section className="section-padding">

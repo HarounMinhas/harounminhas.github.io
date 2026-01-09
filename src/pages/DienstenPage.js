@@ -1,7 +1,12 @@
 import React from 'react';
 import { Container, Row, Col, Card, Table } from 'react-bootstrap';
 
+/**
+ * Renders the services page with specializations, target groups, procedure, and pricing.
+ * Uses static data arrays for specializations and pricing tables.
+ */
 const DienstenPage = () => {
+  // Service specializations with unique IDs for anchor navigation
   const specialisaties = [
     {
       id: 'parkinsonzorg',
@@ -29,6 +34,7 @@ const DienstenPage = () => {
     }
   ];
 
+  // RIZIV pricing structure with standard and increased reimbursement rates
   const tarieven = [
     {
       prestatie: 'Sessie van 30 minuten',
@@ -129,7 +135,6 @@ const DienstenPage = () => {
                   <span className="step-number">1</span>
                   <div>
                     <h3 className="h6">Contact opnemen</h3>
-                    {/* Contactgegevens makkelijk aanpasbaar */}
                     <p className="mb-0">
                       Neem contact op via <a href="tel:+32123456789">0123/456789</a>, via e-mail naar <a href="mailto:info@example-logopedie.be">info@example-logopedie.be</a> of via het contactformulier. Formuleer kort je hulpvraag en we plannen de eerste afspraak in.
                     </p>
@@ -188,13 +193,10 @@ const DienstenPage = () => {
                   </Table>
                 </div>
                 <p className="mb-0">Voor huisbezoeken wordt een verplaatsingsvergoeding aangerekend.</p>
-                {/* Tarieven gemakkelijk aanpasbaar voor toekomstige wijzigingen */}
               </Card.Body>
             </Card>
           </Col>
         </Row>
-
-        {/* Toekomstige reviewsectie (anoniem) kan hier komen */}
       </Container>
     </section>
   );

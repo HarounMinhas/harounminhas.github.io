@@ -1,6 +1,10 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
+/**
+ * Renders the about page with therapist biography, specializations, and education.
+ * Displays professional background, focus areas, and completed training courses.
+ */
 const OverMijPage = () => {
   return (
     <section className="section-padding">
@@ -61,7 +65,7 @@ const OverMijPage = () => {
               <Card.Body className="p-4 p-lg-5">
                 <h2 className="h4">Bijscholingen & opleidingen (selectie)</h2>
                 <p className="text-muted">
-                  Onderstaande lijst is een selectie van gevolgde bijscholingen. {/* Klant kan hier eigen lijst invullen */}
+                  Onderstaande lijst is een selectie van gevolgde bijscholingen.
                 </p>
                 <ul className="ps-3 mb-0">
                   <li>Postgraduaat Slikproblemen – KU Leuven</li>
