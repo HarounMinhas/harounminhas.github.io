@@ -28,6 +28,42 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
+
+        /* Language menu */
+        .lang-switcher {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 2500;
+        }
+
+        .lang-switcher .btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px var(--shadow);
+            color: var(--text);
+            border-radius: 999px;
+            padding: 0.35rem 0.6rem;
+        }
+
+        .lang-switcher .dropdown-menu {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px var(--shadow);
+            border-radius: 14px;
+            overflow: hidden;
+            min-width: 10rem;
+        }
+
+        .lang-switcher .dropdown-item {
+            color: var(--text);
+        }
+
+        .lang-switcher .dropdown-item.active,
+        .lang-switcher .dropdown-item:active {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+        }
         
         /* Theme Root with Background Layers */
         .theme-root {
@@ -764,17 +800,48 @@
             .scroll-indicator-icon {
                 font-size: 1.2rem;
             }
+
+            .lang-switcher {
+                top: 1rem;
+                right: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="theme-root" id="themeRoot">
+        <!-- Language Switcher (only on portfolio page) -->
+        <div class="lang-switcher dropdown">
+            <button
+                class="btn btn-sm dropdown-toggle"
+                type="button"
+                id="langDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Kies taal"
+            >
+                <span id="langCurrentFlag" aria-hidden="true">🇧🇪</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                <li>
+                    <button class="dropdown-item" type="button" data-lang="nl">
+                        🇧🇪 NL <span class="lang-check d-none" aria-hidden="true">✓</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" type="button" data-lang="en">
+                        🇬🇧 EN <span class="lang-check d-none" aria-hidden="true">✓</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
         <!-- Hero Section -->
         <section class="hero-section">
             <div class="container">
                 <div class="hero-content">
                     <h1 class="hero-title">Haroun Minhas</h1>
-                    <p class="hero-subtitle">Full Stack Developer & Creatieve Probleemoplosser</p>
+                    <p class="hero-subtitle" data-i18n="hero.subtitle">Full Stack Developer & Creatieve Probleemoplosser</p>
                     
                     <div class="social-links">
                         <a href="https://github.com/HarounMinhas" class="social-link" target="_blank" rel="noopener" title="GitHub">
@@ -804,8 +871,8 @@
         <!-- Projects Section -->
         <section class="projects-section" id="projectsSection">
             <div class="container">
-                <h2 class="section-title">Projecten</h2>
-                <p class="section-intro">
+                <h2 class="section-title" data-i18n="projects.title">Projecten</h2>
+                <p class="section-intro" data-i18n="projects.intro">
                     In mijn vrije tijd werk ik aan deze projecten. Het houdt mijn skills scherp, 
                     ik leer nieuwe dingen en het is gewoon leuk om te doen.
                 </p>
@@ -821,7 +888,7 @@
                                         <i class="bi bi-chat-heart-fill"></i>
                                     </div>
                                     <h3 class="project-title">Marieke Logopedie</h3>
-                                    <p class="project-description">
+                                    <p class="project-description" data-i18n="project.marieke.desc">
                                         Moderne website voor logopediepraktijk. 
                                         Responsive design, contact formulier en duidelijke info over behandelingen.
                                     </p>
@@ -833,7 +900,7 @@
                                 </div>
                                 <div class="project-footer">
                                     <span class="btn-project">
-                                        Bekijk <i class="bi bi-arrow-right"></i>
+                                        <span data-i18n="project.marieke.cta">Bekijk</span> <i class="bi bi-arrow-right"></i>
                                     </span>
                                 </div>
                             </a>
@@ -850,7 +917,7 @@
                                         <i class="bi bi-music-note-beamed"></i>
                                     </div>
                                     <h3 class="project-title">MusicDiscovery</h3>
-                                    <p class="project-description">
+                                    <p class="project-description" data-i18n="project.music.desc">
                                         Interactieve muziekontdekkingsapp met een sleepbare graaf van artiesten en previews.
                                     </p>
                                     <div class="mb-3">
@@ -862,7 +929,7 @@
                                 </div>
                                 <div class="project-footer">
                                     <span class="btn-project">
-                                        Open <i class="bi bi-arrow-right"></i>
+                                        <span data-i18n="project.music.cta">Open</span> <i class="bi bi-arrow-right"></i>
                                     </span>
                                 </div>
                             </a>
@@ -879,7 +946,7 @@
                                         <i class="bi bi-pencil-square"></i>
                                     </div>
                                     <h3 class="project-title">Zen Writer</h3>
-                                    <p class="project-description">
+                                    <p class="project-description" data-i18n="project.zen.desc">
                                         Schrijf zonder afleiding. Focus mode verbergt alles behalve je tekst. 
                                         Gebruik Bold, Italic en Underline. Sla op als JSON of XML.
                                     </p>
@@ -891,7 +958,7 @@
                                 </div>
                                 <div class="project-footer">
                                     <span class="btn-project">
-                                        Start <i class="bi bi-arrow-right"></i>
+                                        <span data-i18n="project.zen.cta">Start</span> <i class="bi bi-arrow-right"></i>
                                     </span>
                                 </div>
                             </a>
@@ -908,7 +975,7 @@
                                         <i class="bi bi-code-slash"></i>
                                     </div>
                                     <h3 class="project-title">Regex Playground</h3>
-                                    <p class="project-description">
+                                    <p class="project-description" data-i18n="project.regex.desc">
                                         Test regex patterns direct in je browser. 
                                         Zie matches live. Kies uit 3 layouts. Deel je pattern via URL.
                                     </p>
@@ -920,7 +987,7 @@
                                 </div>
                                 <div class="project-footer">
                                     <span class="btn-project">
-                                        Open <i class="bi bi-arrow-right"></i>
+                                        <span data-i18n="project.regex.cta">Open</span> <i class="bi bi-arrow-right"></i>
                                     </span>
                                 </div>
                             </a>
@@ -937,7 +1004,7 @@
                                         <i class="bi bi-dice-5-fill"></i>
                                     </div>
                                     <h3 class="project-title">Phase 10 Scorekeeper</h3>
-                                    <p class="project-description">
+                                    <p class="project-description" data-i18n="project.phase10.desc">
                                         Houd scores bij tijdens Phase 10. 
                                         Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.
                                     </p>
@@ -949,7 +1016,7 @@
                                 </div>
                                 <div class="project-footer">
                                     <span class="btn-project">
-                                        Start <i class="bi bi-arrow-right"></i>
+                                        <span data-i18n="project.phase10.cta">Start</span> <i class="bi bi-arrow-right"></i>
                                     </span>
                                 </div>
                             </a>
@@ -966,7 +1033,7 @@
                                         <i class="bi bi-palette-fill"></i>
                                     </div>
                                     <h3 class="project-title">ColorHunt Tester</h3>
-                                    <p class="project-description">
+                                    <p class="project-description" data-i18n="project.colorhunt.desc">
                                         Test ColorHunt palettes op Bootstrap componenten. 
                                         Zie direct hoe kleuren werken. Pas ze live toe.
                                     </p>
@@ -978,7 +1045,7 @@
                                 </div>
                                 <div class="project-footer">
                                     <span class="btn-project">
-                                        Test <i class="bi bi-arrow-right"></i>
+                                        <span data-i18n="project.colorhunt.cta">Test</span> <i class="bi bi-arrow-right"></i>
                                     </span>
                                 </div>
                             </a>
@@ -1004,8 +1071,151 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Theme Drift System -->
+    <!-- Theme Drift System + i18n -->
     <script>
+        const LANG_STORAGE_KEY = 'lang';
+
+        const TRANSLATIONS = {
+            nl: {
+                'hero.subtitle': 'Full Stack Developer & Creatieve Probleemoplosser',
+                'projects.title': 'Projecten',
+                'projects.intro': 'In mijn vrije tijd werk ik aan deze projecten. Het houdt mijn skills scherp, ik leer nieuwe dingen en het is gewoon leuk om te doen.',
+                'project.marieke.desc': 'Moderne website voor logopediepraktijk. Responsive design, contact formulier en duidelijke info over behandelingen.',
+                'project.marieke.cta': 'Bekijk',
+                'project.music.desc': 'Interactieve muziekontdekkingsapp met een sleepbare graaf van artiesten en previews.',
+                'project.music.cta': 'Open',
+                'project.zen.desc': 'Schrijf zonder afleiding. Focus mode verbergt alles behalve je tekst. Gebruik Bold, Italic en Underline. Sla op als JSON of XML.',
+                'project.zen.cta': 'Start',
+                'project.regex.desc': 'Test regex patterns direct in je browser. Zie matches live. Kies uit 3 layouts. Deel je pattern via URL.',
+                'project.regex.cta': 'Open',
+                'project.phase10.desc': 'Houd scores bij tijdens Phase 10. Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.',
+                'project.phase10.cta': 'Start',
+                'project.colorhunt.desc': 'Test ColorHunt palettes op Bootstrap componenten. Zie direct hoe kleuren werken. Pas ze live toe.',
+                'project.colorhunt.cta': 'Test',
+                'scroll.aria': 'Scroll naar beneden',
+                'scroll.title': 'Scroll naar projecten',
+                'theme.pauseTitle': 'Pauzeer thema',
+                'theme.playTitle': 'Start thema',
+                'theme.pauseAria': 'Pauze',
+                'theme.playAria': 'Afspelen',
+                'theme.nextTitle': 'Volgend thema',
+                'theme.nextAria': 'Volgende'
+            },
+            en: {
+                'hero.subtitle': 'Full-stack developer & creative problem solver',
+                'projects.title': 'Projects',
+                'projects.intro': 'In my free time I work on these projects. They keep my skills sharp, help me learn new things, and are simply fun to build.',
+                'project.marieke.desc': 'Modern website for a speech therapy practice. Responsive design, contact form, and clear information about treatments.',
+                'project.marieke.cta': 'View',
+                'project.music.desc': 'Interactive music discovery app with a draggable graph of artists and previews.',
+                'project.music.cta': 'Open',
+                'project.zen.desc': 'Write without distractions. Focus mode hides everything but your text. Use Bold, Italic and Underline. Save as JSON or XML.',
+                'project.zen.cta': 'Start',
+                'project.regex.desc': 'Test regex patterns directly in your browser. See matches live. Choose from 3 layouts. Share your pattern via URL.',
+                'project.regex.cta': 'Open',
+                'project.phase10.desc': 'Track scores during Phase 10. View history. Undo mistakes. Generate random phases.',
+                'project.phase10.cta': 'Start',
+                'project.colorhunt.desc': 'Test ColorHunt palettes on Bootstrap components. See how colors work instantly. Apply them live.',
+                'project.colorhunt.cta': 'Test',
+                'scroll.aria': 'Scroll down',
+                'scroll.title': 'Scroll to projects',
+                'theme.pauseTitle': 'Pause theme',
+                'theme.playTitle': 'Start theme',
+                'theme.pauseAria': 'Pause',
+                'theme.playAria': 'Play',
+                'theme.nextTitle': 'Next theme',
+                'theme.nextAria': 'Next'
+            }
+        };
+
+        function normalizeLang(value) {
+            return value === 'en' || value === 'nl' ? value : 'nl';
+        }
+
+        function getLang() {
+            try {
+                return normalizeLang(localStorage.getItem(LANG_STORAGE_KEY));
+            } catch {
+                return 'nl';
+            }
+        }
+
+        function setLang(lang) {
+            const normalized = normalizeLang(lang);
+            try {
+                localStorage.setItem(LANG_STORAGE_KEY, normalized);
+            } catch {
+                // ignore
+            }
+            applyLang(normalized);
+        }
+
+        function t(key) {
+            const lang = getLang();
+            return TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.nl?.[key] ?? key;
+        }
+
+        function applyLang(lang) {
+            document.documentElement.setAttribute('lang', lang);
+
+            // Text nodes
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                const value = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.nl?.[key];
+                if (typeof value === 'string') {
+                    el.textContent = value;
+                }
+            });
+
+            // Dropdown UI state
+            const flag = document.getElementById('langCurrentFlag');
+            if (flag) {
+                flag.textContent = lang === 'nl' ? '🇧🇪' : '🇬🇧';
+            }
+
+            document.querySelectorAll('[data-lang]').forEach((btn) => {
+                const btnLang = btn.getAttribute('data-lang');
+                const isActive = btnLang === lang;
+                btn.classList.toggle('active', isActive);
+                const check = btn.querySelector('.lang-check');
+                if (check) {
+                    check.classList.toggle('d-none', !isActive);
+                }
+            });
+
+            // Attributes
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            if (scrollIndicator) {
+                scrollIndicator.setAttribute('aria-label', t('scroll.aria'));
+                scrollIndicator.title = t('scroll.title');
+            }
+
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            if (playPauseBtn && window.__themeDriftManager) {
+                window.__themeDriftManager.updateI18n();
+            } else if (playPauseBtn) {
+                playPauseBtn.title = t('theme.pauseTitle');
+                playPauseBtn.setAttribute('aria-label', t('theme.pauseAria'));
+            }
+            if (nextBtn) {
+                nextBtn.title = t('theme.nextTitle');
+                nextBtn.setAttribute('aria-label', t('theme.nextAria'));
+            }
+        }
+
+        function initLanguageSwitcher() {
+            const lang = getLang();
+            applyLang(lang);
+
+            document.querySelectorAll('[data-lang]').forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setLang(btn.getAttribute('data-lang'));
+                });
+            });
+        }
+
         // Color Utilities
         const ColorUtils = {
             hexToRgb(hex) {
@@ -1171,6 +1381,21 @@
                 this.nextBtn.addEventListener('click', () => this.nextTheme());
                 
                 this.updatePlayPauseButton();
+                this.updateI18n();
+            }
+
+            updateI18n() {
+                const lang = getLang();
+                if (this.isPlaying) {
+                    this.playPauseBtn.title = TRANSLATIONS[lang]?.['theme.pauseTitle'] ?? TRANSLATIONS.nl['theme.pauseTitle'];
+                    this.playPauseBtn.setAttribute('aria-label', TRANSLATIONS[lang]?.['theme.pauseAria'] ?? TRANSLATIONS.nl['theme.pauseAria']);
+                } else {
+                    this.playPauseBtn.title = TRANSLATIONS[lang]?.['theme.playTitle'] ?? TRANSLATIONS.nl['theme.playTitle'];
+                    this.playPauseBtn.setAttribute('aria-label', TRANSLATIONS[lang]?.['theme.playAria'] ?? TRANSLATIONS.nl['theme.playAria']);
+                }
+
+                this.nextBtn.title = TRANSLATIONS[lang]?.['theme.nextTitle'] ?? TRANSLATIONS.nl['theme.nextTitle'];
+                this.nextBtn.setAttribute('aria-label', TRANSLATIONS[lang]?.['theme.nextAria'] ?? TRANSLATIONS.nl['theme.nextAria']);
             }
             
             applyTheme() {
@@ -1243,18 +1468,15 @@
                 }
                 
                 this.updatePlayPauseButton();
+                this.updateI18n();
             }
             
             updatePlayPauseButton() {
                 const icon = this.playPauseBtn.querySelector('i');
                 if (this.isPlaying) {
                     icon.className = 'bi bi-pause-fill';
-                    this.playPauseBtn.title = 'Pauzeer thema';
-                    this.playPauseBtn.setAttribute('aria-label', 'Pauze');
                 } else {
                     icon.className = 'bi bi-play-fill';
-                    this.playPauseBtn.title = 'Start thema';
-                    this.playPauseBtn.setAttribute('aria-label', 'Afspelen');
                 }
             }
         }
@@ -1262,12 +1484,14 @@
         // Initialize on DOMContentLoaded
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                new ThemeDriftManager();
+                window.__themeDriftManager = new ThemeDriftManager();
                 new ScrollIndicatorManager();
+                initLanguageSwitcher();
             });
         } else {
-            new ThemeDriftManager();
+            window.__themeDriftManager = new ThemeDriftManager();
             new ScrollIndicatorManager();
+            initLanguageSwitcher();
         }
     </script>
 </body>
