@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Player, RoundEntry } from '../types';
+import { useI18n } from '../i18n';
 
 interface EndRoundModalProps {
   players: Player[];
@@ -9,9 +10,11 @@ interface EndRoundModalProps {
 }
 
 export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRoundModalProps) {
+  const { t } = useI18n();
+
   const [entries, setEntries] = useState<Map<string, RoundEntry>>(
     new Map(
-      players.map(player => [
+      players.map((player) => [
         player.id,
         {
           playerId: player.id,
@@ -26,14 +29,14 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
   const updateEntry = (playerId: string, updates: Partial<RoundEntry>) => {
     const current = entries.get(playerId)!;
     const updated = { ...current, ...updates };
-    
+
     // Auto-increment phase if completed
     if (updates.phaseCompleted && updated.phaseAfterRound < 10) {
       updated.phaseAfterRound = Math.min(10, updated.phaseAfterRound + 1);
     } else if (updates.phaseCompleted === false) {
       updated.phaseAfterRound = currentPhases.get(playerId) || 1;
     }
-    
+
     setEntries(new Map(entries.set(playerId, updated)));
   };
 
@@ -45,7 +48,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">Einde Ronde</h2>
+          <h2 className="modal-title">{t('endRound.title')}</h2>
           <button className="modal-close" onClick={onClose}>
             ✖
           </button>
@@ -69,7 +72,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                 <div className="flex gap-2" style={{ marginBottom: '1rem', flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: '120px' }}>
                     <label className="form-label" style={{ fontSize: '0.9rem' }}>
-                      Punten
+                      {t('endRound.label.points')}
                     </label>
                     <input
                       type="number"
@@ -84,7 +87,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
 
                   <div style={{ flex: 1, minWidth: '120px' }}>
                     <label className="form-label" style={{ fontSize: '0.9rem' }}>
-                      Fase na ronde
+                      {t('endRound.label.phaseAfter')}
                     </label>
                     <select
                       className="form-select"
@@ -95,7 +98,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                     >
                       {Array.from({ length: 10 }, (_, i) => i + 1).map((phase) => (
                         <option key={phase} value={phase}>
-                          Fase {phase}
+                          {t('phase.label', { phase })}
                         </option>
                       ))}
                     </select>
@@ -113,12 +116,10 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                   <input
                     type="checkbox"
                     checked={entry.phaseCompleted}
-                    onChange={(e) =>
-                      updateEntry(player.id, { phaseCompleted: e.target.checked })
-                    }
+                    onChange={(e) => updateEntry(player.id, { phaseCompleted: e.target.checked })}
                     style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
                   />
-                  <span>Fase voltooid</span>
+                  <span>{t('endRound.label.phaseCompleted')}</span>
                 </label>
               </div>
             );
@@ -127,10 +128,10 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
 
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>
-            Annuleren
+            {t('endRound.btn.cancel')}
           </button>
           <button className="btn btn-primary" onClick={handleSave}>
-            💾 Opslaan
+            {t('endRound.btn.save')}
           </button>
         </div>
       </div>
