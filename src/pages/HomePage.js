@@ -1,7 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 
 /**
  * Renders the main landing page for the speech therapy practice.
@@ -12,10 +11,6 @@ const HomePage = () => {
     <div>
       <section className="hero-section">
         <Container>
-          <div className="d-flex justify-content-end pt-2">
-            <LanguageSwitcher />
-          </div>
-
           <Row className="align-items-center g-4">
             <Col lg={7} className="text-center text-lg-start">
               <h1 className="display-5 fw-bold text-uppercase text-wrap">Logopedie voor volwassenen en kinderen in Brussel</h1>
