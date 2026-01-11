@@ -17,18 +17,14 @@ export function Toast({ message, action, onClose, duration = 5000 }: ToastProps)
   }, [duration, onClose]);
 
   return (
-    <div className="toast">
+    <div className="p10-toast">
       <span>{message}</span>
       {action && (
         <button className="btn btn-small btn-secondary" onClick={action.onClick}>
           {action.label}
         </button>
       )}
-      <button
-        className="modal-close"
-        onClick={onClose}
-        style={{ marginLeft: 'auto' }}
-      >
+      <button className="modal-close" onClick={onClose} style={{ marginLeft: 'auto' }}>
         ✖
       </button>
     </div>

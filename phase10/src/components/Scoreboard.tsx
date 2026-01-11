@@ -16,8 +16,8 @@ export function Scoreboard({ scores }: ScoreboardProps) {
   });
 
   return (
-    <div className="table-responsive">
-      <table className="table table-striped align-middle">
+    <div className="table-container">
+      <table className="table">
         <thead>
           <tr>
             <th>{t('table.player')}</th>

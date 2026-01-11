@@ -154,7 +154,7 @@ function App() {
     <div className="app">
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
-          <span className="navbar-brand fw-semibold">ome</span>
+          <span className="navbar-brand fw-semibold">{t('app.title')}</span>
 
           <button
             className="navbar-toggler"
@@ -163,7 +163,7 @@ function App() {
             data-bs-target="#phase10Navbar"
             aria-controls="phase10Navbar"
             aria-expanded="false"
-            aria-label="Toggle navigation"
+            aria-label={t('nav.toggle')}
           >
             <span className="navbar-toggler-icon" />
           </button>
@@ -178,17 +178,17 @@ function App() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  Extra opties
+                  {t('nav.extraOptions')}
                 </a>
                 <ul className="dropdown-menu">
                   <li>
                     <button className="dropdown-item" onClick={() => setActiveModal('history')}>
-                      Rondegeschiedenis
+                      {t('nav.history')}
                     </button>
                   </li>
                   <li>
                     <button className="dropdown-item" onClick={() => setActiveModal('generator')}>
-                      Custom fases
+                      {t('nav.customPhases')}
                     </button>
                   </li>
                   <li>
@@ -196,7 +196,7 @@ function App() {
                   </li>
                   <li>
                     <button className="dropdown-item text-danger" onClick={newGame}>
-                      Nieuw spel
+                      {t('nav.newGame')}
                     </button>
                   </li>
                 </ul>
@@ -219,35 +219,37 @@ function App() {
         </div>
       </nav>
 
-      <div className="container my-3">
-        {gameState.gameStarted && (
-          <div className="text-muted mb-2" style={{ fontSize: '0.95rem' }}>
-            {t('scoreboard.round', { round: gameState.currentRound })}
-          </div>
-        )}
+      <div className="p10-content">
+        <div className="container">
+          {gameState.gameStarted && (
+            <div style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+              {t('scoreboard.round', { round: gameState.currentRound })}
+            </div>
+          )}
 
-        <div className="d-grid gap-2 mb-3">
-          {gameState.gameStarted ? (
-            <button className="btn btn-primary btn-lg" onClick={() => setActiveModal('endRound')}>
-              Einde ronde
-            </button>
-          ) : (
-            <button className="btn btn-primary btn-lg" onClick={resetToSetup}>
-              Nieuw spel
-            </button>
+          <div className="mb-3">
+            {gameState.gameStarted ? (
+              <button className="btn btn-primary" onClick={() => setActiveModal('endRound')} style={{ width: '100%' }}>
+                {t('action.endRound')}
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={resetToSetup} style={{ width: '100%' }}>
+                {t('action.newGame')}
+              </button>
+            )}
+          </div>
+
+          {gameState.gameStarted ? <Scoreboard scores={scores} /> : <PlayerSetup onStartGame={startGame} />}
+
+          {/* Fases: momenteel altijd via knop (later conditioneel op basis van saved phases) */}
+          {gameState.gameStarted && (
+            <div className="mt-3">
+              <button className="btn btn-secondary" onClick={() => setActiveModal('generator')} style={{ width: '100%' }}>
+                {t('action.generatePhases')}
+              </button>
+            </div>
           )}
         </div>
-
-        {gameState.gameStarted ? <Scoreboard scores={scores} /> : <PlayerSetup onStartGame={startGame} />}
-
-        {/* Fases: voorlopig altijd een duidelijke knop onderaan (extra feature kan later uitgebreid worden) */}
-        {gameState.gameStarted && (
-          <div className="d-grid gap-2 mt-3">
-            <button className="btn btn-outline-secondary" onClick={() => setActiveModal('generator')}>
-              Genereer fases
-            </button>
-          </div>
-        )}
       </div>
 
       {activeModal === 'endRound' && editingRound === null && (

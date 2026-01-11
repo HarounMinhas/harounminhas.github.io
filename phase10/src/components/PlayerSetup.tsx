@@ -68,11 +68,10 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
   };
 
   return (
-    <div className="container">
-      <div className="header">
-        <h1>{t('scoreboard.title')}</h1>
-        <p>{t('setup.subtitle')}</p>
-      </div>
+    <div>
+      <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+        {t('setup.subtitle')}
+      </p>
 
       <div className="card" style={{ maxWidth: '500px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit} className="mb-3">
@@ -88,9 +87,7 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
             />
           </div>
 
-          {errorKey && (
-            <div style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{t(errorKey)}</div>
-          )}
+          {errorKey && <div style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{t(errorKey)}</div>}
 
           <div className="flex gap-2">
             <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
@@ -124,10 +121,7 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
                     <span>
                       {index + 1}. {player.name}
                     </span>
-                    <button
-                      className="btn btn-danger btn-small"
-                      onClick={() => removePlayer(player.id)}
-                    >
+                    <button className="btn btn-danger btn-small" onClick={() => removePlayer(player.id)}>
                       {t('setup.btn.remove')}
                     </button>
                   </div>
@@ -135,11 +129,7 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
               </div>
             </div>
 
-            <button
-              className="btn btn-primary"
-              onClick={handleStartGame}
-              style={{ width: '100%', fontSize: '1.2rem' }}
-            >
+            <button className="btn btn-primary" onClick={handleStartGame} style={{ width: '100%', fontSize: '1.2rem' }}>
               {t('setup.btn.startGame')}
             </button>
           </>
