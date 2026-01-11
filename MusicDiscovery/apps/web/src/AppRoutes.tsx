@@ -10,6 +10,7 @@ import SearchResultsList from './components/SearchResultsList';
 import type { AsyncStatus } from './hooks/useArtistSearch';
 import type { ProviderStatus } from './hooks/useProviderSelection';
 import type { ToastMessage } from './hooks/useToastQueue';
+import { useI18n } from './i18n';
 
 interface HeaderProps {
   provider: ProviderId;
@@ -74,6 +75,8 @@ function GearIcon() {
 }
 
 function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
+  const { t } = useI18n();
+
   return (
     <>
       <div className="app__toasts" aria-live="polite" aria-atomic="true">
@@ -87,13 +90,18 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
       <header className="app__header">
         <div className="app__header-content">
           <div className="app__header-top">
-            <p className="label">MusicDiscovery</p>
-            <button type="button" className="settings-button" aria-label="Instellingen" onClick={header.onOpenSettings}>
+            <p className="label">{t('app.brand')}</p>
+            <button
+              type="button"
+              className="settings-button"
+              aria-label={t('app.openSettings')}
+              onClick={header.onOpenSettings}
+            >
               <GearIcon />
             </button>
           </div>
-          <h1>Ontdek nieuwe artiesten</h1>
-          <p className="muted">Typ een artiest die je leuk vindt en ontdek meteen nieuwe muziek om te beluisteren.</p>
+          <h1>{t('home.title')}</h1>
+          <p className="muted">{t('home.subtitle')}</p>
         </div>
         <div className="app__header-controls">
           <ProviderSwitcher
@@ -110,7 +118,7 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
         <section className="search-panel">
           <div className="search-panel__input">
             <label htmlFor="artist-search" className="label">
-              Zoek naar een artiest
+              {t('search.label')}
             </label>
             <div className="search-panel__input-wrapper">
               <input
@@ -127,7 +135,7 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
                     }
                   }
                 }}
-                placeholder="Bijvoorbeeld: Stromae"
+                placeholder={t('search.placeholder')}
                 autoComplete="off"
               />
               <SearchResultsList
@@ -142,11 +150,9 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
             </div>
           </div>
 
-          {search.status === 'idle' && search.results.length === 0 ? (
-            <p className="muted">Begin met typen om artiesten te zoeken.</p>
-          ) : null}
+          {search.status === 'idle' && search.results.length === 0 ? <p className="muted">{t('search.idle')}</p> : null}
 
-          {search.status === 'loading' ? <LoadingIndicator label="Resultaten laden…" /> : null}
+          {search.status === 'loading' ? <LoadingIndicator label={t('search.loading')} /> : null}
           {search.status === 'error' && search.error ? (
             <p className="sr-only" role="status">
               {search.error}
@@ -154,7 +160,7 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
           ) : null}
 
           {search.status === 'success' && search.results.length === 0 ? (
-            <p className="muted">Geen artiesten gevonden voor "{search.query}".</p>
+            <p className="muted">{t('search.noResults', { query: search.query })}</p>
           ) : null}
         </section>
 
@@ -175,15 +181,15 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
                 />
               ) : (
                 <div className="placeholder">
-                  <p className="label">Artiestdetails</p>
-                  <p className="muted">Selecteer een artiest om de details te bekijken.</p>
+                  <p className="label">{t('details.title')}</p>
+                  <p className="muted">{t('details.empty')}</p>
                 </div>
               )}
             </>
           ) : (
             <div className="placeholder">
-              <p className="label">Artiestdetails</p>
-              <p className="muted">Selecteer een artiest om de details te bekijken.</p>
+              <p className="label">{t('details.title')}</p>
+              <p className="muted">{t('details.empty')}</p>
             </div>
           )}
         </section>
