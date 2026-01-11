@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GameState, Player, RoundEntry, Round } from './types';
 import { PlayerSetup } from './components/PlayerSetup';
 import { Scoreboard } from './components/Scoreboard';
@@ -20,16 +20,18 @@ type ToastState = {
 } | null;
 
 function App() {
-  const { t } = useI18n();
+  const { lang, setLang, t } = useI18n();
 
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = loadGame();
-    return saved || {
-      players: [],
-      rounds: [],
-      currentRound: 1,
-      gameStarted: false,
-    };
+    return (
+      saved || {
+        players: [],
+        rounds: [],
+        currentRound: 1,
+        gameStarted: false,
+      }
+    );
   });
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -109,17 +111,23 @@ function App() {
     setToast({ messageKey: 'toast.roundUpdated' });
   };
 
+  const resetToSetup = () => {
+    clearGame();
+    setGameState({
+      players: [],
+      rounds: [],
+      currentRound: 1,
+      gameStarted: false,
+    });
+    setLastAction(null);
+    setToast(null);
+    setActiveModal(null);
+    setEditingRound(null);
+  };
+
   const newGame = () => {
     if (confirm(t('confirm.newGame'))) {
-      clearGame();
-      setGameState({
-        players: [],
-        rounds: [],
-        currentRound: 1,
-        gameStarted: false,
-      });
-      setLastAction(null);
-      setToast(null);
+      resetToSetup();
     }
   };
 
@@ -142,24 +150,105 @@ function App() {
 
   const scores = gameState.gameStarted ? calculatePlayerScores(gameState) : [];
 
-  if (!gameState.gameStarted) {
-    return (
-      <div className="app">
-        <PlayerSetup onStartGame={startGame} />
-      </div>
-    );
-  }
-
   return (
     <div className="app">
-      <Scoreboard
-        scores={scores}
-        currentRound={gameState.currentRound}
-        onEndRound={() => setActiveModal('endRound')}
-        onViewHistory={() => setActiveModal('history')}
-        onNewGame={newGame}
-        onGeneratePhase={() => setActiveModal('generator')}
-      />
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div className="container">
+          <span className="navbar-brand fw-semibold">ome</span>
+
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#phase10Navbar"
+            aria-controls="phase10Navbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon" />
+          </button>
+
+          <div className="collapse navbar-collapse" id="phase10Navbar">
+            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Extra opties
+                </a>
+                <ul className="dropdown-menu">
+                  <li>
+                    <button className="dropdown-item" onClick={() => setActiveModal('history')}>
+                      Rondegeschiedenis
+                    </button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item" onClick={() => setActiveModal('generator')}>
+                      Custom fases
+                    </button>
+                  </li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button className="dropdown-item text-danger" onClick={newGame}>
+                      Nieuw spel
+                    </button>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+
+            <div className="d-flex align-items-center gap-2">
+              <select
+                className="form-select form-select-sm"
+                value={lang}
+                onChange={(e) => setLang(e.target.value as any)}
+                aria-label={t('common.language')}
+                style={{ width: '110px' }}
+              >
+                <option value="nl">NL</option>
+                <option value="en">EN</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="container my-3">
+        {gameState.gameStarted && (
+          <div className="text-muted mb-2" style={{ fontSize: '0.95rem' }}>
+            {t('scoreboard.round', { round: gameState.currentRound })}
+          </div>
+        )}
+
+        <div className="d-grid gap-2 mb-3">
+          {gameState.gameStarted ? (
+            <button className="btn btn-primary btn-lg" onClick={() => setActiveModal('endRound')}>
+              Einde ronde
+            </button>
+          ) : (
+            <button className="btn btn-primary btn-lg" onClick={resetToSetup}>
+              Nieuw spel
+            </button>
+          )}
+        </div>
+
+        {gameState.gameStarted ? <Scoreboard scores={scores} /> : <PlayerSetup onStartGame={startGame} />}
+
+        {/* Fases: voorlopig altijd een duidelijke knop onderaan (extra feature kan later uitgebreid worden) */}
+        {gameState.gameStarted && (
+          <div className="d-grid gap-2 mt-3">
+            <button className="btn btn-outline-secondary" onClick={() => setActiveModal('generator')}>
+              Genereer fases
+            </button>
+          </div>
+        )}
+      </div>
 
       {activeModal === 'endRound' && editingRound === null && (
         <EndRoundModal
