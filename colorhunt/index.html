@@ -4,43 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ColorHunt Palette Tester - Haroun Minhas</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Color Palette Widget (Floating) -->
     <div id="colorWidget" class="color-widget">
-        <button id="widgetToggle" class="widget-toggle" aria-label="Toggle Color Palette">
+        <button id="widgetToggle" class="widget-toggle" data-i18n-aria="widget.toggleAria">
             🎨
         </button>
         <div id="widgetContent" class="widget-content">
             <div class="widget-header">
-                <h6 class="widget-title">ColorHunt Importer</h6>
-                <button id="widgetClose" class="widget-close-btn">✕</button>
+                <h6 class="widget-title" data-i18n="widget.title">ColorHunt Importer</h6>
+                <button id="widgetClose" class="widget-close-btn" data-i18n-aria="widget.closeAria" data-i18n-title="widget.closeTitle">✕</button>
             </div>
-            
+
             <!-- URL Input Section -->
             <div class="palette-input-section">
-                <input 
-                    type="text" 
-                    id="paletteUrl" 
-                    class="form-control form-control-sm" 
-                    placeholder="Paste ColorHunt link...">
-                <p class="input-hint">Paste a link to auto-add. Duplicates will flash.</p>
+                <input
+                    type="text"
+                    id="paletteUrl"
+                    class="form-control form-control-sm"
+                    data-i18n-placeholder="widget.placeholder"
+                >
+                <p class="input-hint" data-i18n="widget.hint">Plak een link om automatisch toe te voegen. Duplicaten lichten op.</p>
             </div>
-            
+
             <!-- Palette List -->
             <div id="paletteList" class="palette-list">
                 <!-- Default palettes will be added by JavaScript -->
             </div>
-            
-            <div id="emptyState" class="empty-state" style="display: none;">
-                No palettes yet.
+
+            <div id="emptyState" class="empty-state" style="display: none;" data-i18n="widget.empty">
+                Nog geen palettes.
             </div>
         </div>
     </div>
@@ -48,16 +49,36 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="../portfolio-index.html"><i class="bi bi-arrow-left"></i> Terug naar Portfolio</a>
+            <a class="navbar-brand" href="../portfolio-index.html">
+                <i class="bi bi-arrow-left"></i>
+                <span data-i18n="nav.back">Terug naar Portfolio</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#typography">Typography</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#components">Components</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#forms">Forms</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#utilities">Utilities</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#typography" data-i18n="nav.typography">Typografie</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#components" data-i18n="nav.components">Componenten</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#forms" data-i18n="nav.forms">Formulieren</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#utilities" data-i18n="nav.utilities">Utilities</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n-aria="lang.aria">
+                            <span id="langCurrent">🇧🇪 NL</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                            <li>
+                                <button class="dropdown-item" type="button" data-lang="nl">
+                                    🇧🇪 <span data-i18n="lang.nl">Nederlands</span> <span class="lang-check" data-check-lang="nl" aria-hidden="true">✓</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" type="button" data-lang="en">
+                                    🇬🇧 <span data-i18n="lang.en">Engels</span> <span class="lang-check" data-check-lang="en" aria-hidden="true">✓</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -67,15 +88,15 @@
     <div class="hero-section text-center text-white">
         <div class="container">
             <h1 class="display-3 fw-bold">ColorHunt Palette Tester</h1>
-            <p class="lead">Test Bootstrap components met ColorHunt color palettes</p>
-            <p class="mt-3">Klik op 🎨 rechtsboven om palettes te importeren en toe te passen</p>
+            <p class="lead" data-i18n="hero.lead">Test Bootstrap componenten met ColorHunt color palettes</p>
+            <p class="mt-3" data-i18n="hero.cta">Klik op 🎨 rechtsboven om palettes te importeren en toe te passen</p>
         </div>
     </div>
 
     <!-- Typography Section -->
     <section id="typography" class="py-5">
         <div class="container">
-            <h2 class="section-title">Typography</h2>
+            <h2 class="section-title" data-i18n="section.typography">Typografie</h2>
             <div class="row">
                 <div class="col-md-6">
                     <h1>Heading 1</h1>
@@ -86,11 +107,11 @@
                     <h6>Heading 6</h6>
                 </div>
                 <div class="col-md-6">
-                    <p class="lead">Dit is een lead paragraph die opvalt.</p>
-                    <p>Dit is een normale paragraph met <strong>bold text</strong>, <em>italic text</em>, en <mark>highlighted text</mark>.</p>
+                    <p class="lead" data-i18n="typography.lead">Dit is een lead paragraph die opvalt.</p>
+                    <p data-i18n="typography.paragraph">Dit is een normale paragraph met bold text, italic text, en highlighted text.</p>
                     <blockquote class="blockquote">
-                        <p>Een quote die inspirerend is.</p>
-                        <footer class="blockquote-footer">Auteur naam</footer>
+                        <p data-i18n="typography.quote">Een quote die inspirerend is.</p>
+                        <footer class="blockquote-footer" data-i18n="typography.author">Auteur naam</footer>
                     </blockquote>
                 </div>
             </div>
@@ -100,24 +121,24 @@
     <!-- Buttons & Components -->
     <section id="components" class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title">Buttons & Badges</h2>
+            <h2 class="section-title" data-i18n="section.buttons">Knoppen & Badges</h2>
             <div class="mb-4">
-                <button class="btn btn-primary m-1">Primary</button>
-                <button class="btn btn-secondary m-1">Secondary</button>
-                <button class="btn btn-success m-1">Success</button>
-                <button class="btn btn-danger m-1">Danger</button>
-                <button class="btn btn-warning m-1">Warning</button>
-                <button class="btn btn-info m-1">Info</button>
-                <button class="btn btn-light m-1">Light</button>
-                <button class="btn btn-dark m-1">Dark</button>
+                <button class="btn btn-primary m-1" data-i18n="button.primary">Primair</button>
+                <button class="btn btn-secondary m-1" data-i18n="button.secondary">Secundair</button>
+                <button class="btn btn-success m-1" data-i18n="button.success">Succes</button>
+                <button class="btn btn-danger m-1" data-i18n="button.danger">Gevaar</button>
+                <button class="btn btn-warning m-1" data-i18n="button.warning">Waarschuwing</button>
+                <button class="btn btn-info m-1" data-i18n="button.info">Info</button>
+                <button class="btn btn-light m-1" data-i18n="button.light">Licht</button>
+                <button class="btn btn-dark m-1" data-i18n="button.dark">Donker</button>
             </div>
             <div class="mb-4">
-                <span class="badge bg-primary m-1">Primary</span>
-                <span class="badge bg-secondary m-1">Secondary</span>
-                <span class="badge bg-success m-1">Success</span>
-                <span class="badge bg-danger m-1">Danger</span>
-                <span class="badge bg-warning text-dark m-1">Warning</span>
-                <span class="badge bg-info m-1">Info</span>
+                <span class="badge bg-primary m-1" data-i18n="badge.primary">Primair</span>
+                <span class="badge bg-secondary m-1" data-i18n="badge.secondary">Secundair</span>
+                <span class="badge bg-success m-1" data-i18n="badge.success">Succes</span>
+                <span class="badge bg-danger m-1" data-i18n="badge.danger">Gevaar</span>
+                <span class="badge bg-warning text-dark m-1" data-i18n="badge.warning">Waarschuwing</span>
+                <span class="badge bg-info m-1" data-i18n="badge.info">Info</span>
             </div>
         </div>
     </section>
@@ -125,35 +146,35 @@
     <!-- Cards -->
     <section class="py-5">
         <div class="container">
-            <h2 class="section-title">Cards</h2>
+            <h2 class="section-title" data-i18n="section.cards">Kaarten</h2>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card h-100">
                         <div class="card-body">
-                            <h5 class="card-title">Card Title 1</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Subtitle</h6>
-                            <p class="card-text">Dit is een voorbeeldkaart met wat tekst om de layout te demonstreren.</p>
-                            <a href="#" class="btn btn-primary">Meer info</a>
+                            <h5 class="card-title" data-i18n="cards.title1">Kaart titel 1</h5>
+                            <h6 class="card-subtitle mb-2 text-muted" data-i18n="cards.subtitle">Subtitel</h6>
+                            <p class="card-text" data-i18n="cards.text1">Dit is een voorbeeldkaart met wat tekst om de layout te demonstreren.</p>
+                            <a href="#" class="btn btn-primary" data-i18n="cards.moreInfo">Meer info</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 bg-primary text-white">
                         <div class="card-body">
-                            <h5 class="card-title">Card Title 2</h5>
-                            <h6 class="card-subtitle mb-2">Subtitle</h6>
-                            <p class="card-text">Een card met achtergrondkleur voor extra aandacht.</p>
-                            <a href="#" class="btn btn-light">Meer info</a>
+                            <h5 class="card-title" data-i18n="cards.title2">Kaart titel 2</h5>
+                            <h6 class="card-subtitle mb-2" data-i18n="cards.subtitle">Subtitel</h6>
+                            <p class="card-text" data-i18n="cards.text2">Een kaart met achtergrondkleur voor extra aandacht.</p>
+                            <a href="#" class="btn btn-light" data-i18n="cards.moreInfo">Meer info</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100">
-                        <div class="card-header">Featured</div>
+                        <div class="card-header" data-i18n="cards.featured">Uitgelicht</div>
                         <div class="card-body">
-                            <h5 class="card-title">Card Title 3</h5>
-                            <p class="card-text">Card met een header sectie.</p>
-                            <a href="#" class="btn btn-secondary">Meer info</a>
+                            <h5 class="card-title" data-i18n="cards.title3">Kaart titel 3</h5>
+                            <p class="card-text" data-i18n="cards.text3">Kaart met een header sectie.</p>
+                            <a href="#" class="btn btn-secondary" data-i18n="cards.moreInfo">Meer info</a>
                         </div>
                     </div>
                 </div>
@@ -164,57 +185,57 @@
     <!-- Alerts -->
     <section class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title">Alerts</h2>
-            <div class="alert alert-primary" role="alert">Dit is een primary alert</div>
-            <div class="alert alert-success" role="alert">Dit is een success alert</div>
-            <div class="alert alert-warning" role="alert">Dit is een warning alert</div>
-            <div class="alert alert-danger" role="alert">Dit is een danger alert</div>
+            <h2 class="section-title" data-i18n="section.alerts">Meldingen</h2>
+            <div class="alert alert-primary" role="alert" data-i18n="alerts.primary">Dit is een primair bericht</div>
+            <div class="alert alert-success" role="alert" data-i18n="alerts.success">Dit is een succes bericht</div>
+            <div class="alert alert-warning" role="alert" data-i18n="alerts.warning">Dit is een waarschuwing</div>
+            <div class="alert alert-danger" role="alert" data-i18n="alerts.danger">Dit is een foutmelding</div>
         </div>
     </section>
 
     <!-- Forms -->
     <section id="forms" class="py-5">
         <div class="container">
-            <h2 class="section-title">Forms</h2>
+            <h2 class="section-title" data-i18n="section.forms">Formulieren</h2>
             <div class="row">
                 <div class="col-md-6">
                     <form>
                         <div class="mb-3">
-                            <label for="exampleInput1" class="form-label">Email adres</label>
-                            <input type="email" class="form-control" id="exampleInput1" placeholder="naam@voorbeeld.com">
+                            <label for="exampleInput1" class="form-label" data-i18n="forms.email">E-mailadres</label>
+                            <input type="email" class="form-control" id="exampleInput1" data-i18n-placeholder="forms.emailPlaceholder">
                         </div>
                         <div class="mb-3">
-                            <label for="exampleInput2" class="form-label">Wachtwoord</label>
+                            <label for="exampleInput2" class="form-label" data-i18n="forms.password">Wachtwoord</label>
                             <input type="password" class="form-control" id="exampleInput2">
                         </div>
                         <div class="mb-3">
-                            <label for="exampleSelect" class="form-label">Selecteer optie</label>
+                            <label for="exampleSelect" class="form-label" data-i18n="forms.select">Selecteer optie</label>
                             <select class="form-select" id="exampleSelect">
-                                <option selected>Kies...</option>
-                                <option value="1">Optie 1</option>
-                                <option value="2">Optie 2</option>
-                                <option value="3">Optie 3</option>
+                                <option selected data-i18n="forms.choose">Kies...</option>
+                                <option value="1" data-i18n="forms.option1">Optie 1</option>
+                                <option value="2" data-i18n="forms.option2">Optie 2</option>
+                                <option value="3" data-i18n="forms.option3">Optie 3</option>
                             </select>
                         </div>
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="exampleCheck">
-                            <label class="form-check-label" for="exampleCheck">Onthoud mij</label>
+                            <label class="form-check-label" for="exampleCheck" data-i18n="forms.remember">Onthoud mij</label>
                         </div>
-                        <button type="submit" class="btn btn-primary">Verstuur</button>
+                        <button type="submit" class="btn btn-primary" data-i18n="forms.submit">Verstuur</button>
                     </form>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label for="exampleTextarea" class="form-label">Bericht</label>
+                        <label for="exampleTextarea" class="form-label" data-i18n="forms.message">Bericht</label>
                         <textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="customRange" class="form-label">Range slider</label>
+                        <label for="customRange" class="form-label" data-i18n="forms.range">Range slider</label>
                         <input type="range" class="form-range" id="customRange">
                     </div>
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheck" checked>
-                        <label class="form-check-label" for="flexSwitchCheck">Toggle switch</label>
+                        <label class="form-check-label" for="flexSwitchCheck" data-i18n="forms.switch">Toggle switch</label>
                     </div>
                 </div>
             </div>
@@ -224,7 +245,7 @@
     <!-- Progress Bars & Spinners -->
     <section id="utilities" class="py-5">
         <div class="container">
-            <h2 class="section-title">Progress & Spinners</h2>
+            <h2 class="section-title" data-i18n="section.utilities">Progress & Spinners</h2>
             <div class="mb-4">
                 <div class="progress mb-2" role="progressbar" style="height: 25px;">
                     <div class="progress-bar" style="width: 25%">25%</div>
@@ -238,16 +259,16 @@
             </div>
             <div>
                 <div class="spinner-border text-primary m-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden" data-i18n="utilities.loading">Laden...</span>
                 </div>
                 <div class="spinner-border text-success m-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden" data-i18n="utilities.loading">Laden...</span>
                 </div>
                 <div class="spinner-grow text-danger m-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden" data-i18n="utilities.loading">Laden...</span>
                 </div>
                 <div class="spinner-grow text-warning m-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden" data-i18n="utilities.loading">Laden...</span>
                 </div>
             </div>
         </div>
@@ -256,7 +277,7 @@
     <!-- Footer -->
     <footer class="footer-section py-4 text-white">
         <div class="container text-center">
-            <p class="mb-0">&copy; 2025 Haroun Minhas. ColorHunt Palette Tester.</p>
+            <p class="mb-0" data-i18n="footer.copyright">© 2025 Haroun Minhas. ColorHunt Palette Tester.</p>
         </div>
     </footer>
 

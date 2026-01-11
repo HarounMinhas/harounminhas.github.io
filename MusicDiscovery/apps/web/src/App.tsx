@@ -12,13 +12,16 @@ import { useProviderSelection } from './hooks/useProviderSelection';
 import { useTabState } from './hooks/useTabState';
 import { useToastQueue } from './hooks/useToastQueue';
 import { useScrollPreserver } from './hooks/useScrollPreserver';
+import { I18nProvider, useI18n, type Lang } from './i18n';
 
 const INTRO_ACK_KEY = 'musicdiscovery-intro-acknowledged';
 const THEME_KEY = 'musicdiscovery-theme';
 
-export default function App(): JSX.Element {
+function AppInner(): JSX.Element {
   const preserveScroll = useScrollPreserver();
   const { toasts, pushToast } = useToastQueue();
+  const { t, lang, setLang } = useI18n();
+
   const {
     provider,
     providers,
@@ -279,7 +282,13 @@ export default function App(): JSX.Element {
   return (
     <BackgroundSurface mode={backgroundMode}>
       {isIntroOpen ? (
-        <div className="intro-overlay" role="dialog" aria-modal="true" aria-label="Info" onClick={acknowledgeIntro}>
+        <div
+          className="intro-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('intro.aria')}
+          onClick={acknowledgeIntro}
+        >
           <div className="intro-overlay__backdrop" />
           <div
             className="intro-overlay__panel"
@@ -288,18 +297,12 @@ export default function App(): JSX.Element {
               event.stopPropagation();
             }}
           >
-            <p className="label">Kleine opmerking</p>
-            <p className="muted">
-              Zoeken kan in het begin wat traag zijn. Dit komt omdat de app nog in testfase zit en op gratis services
-              draait.
-            </p>
-            <p className="muted">
-              Krijg je niet meteen resultaten? Refresh even of wacht een minuutje — dan is de service waarschijnlijk aan
-              het opstarten.
-            </p>
+            <p className="label">{t('intro.title')}</p>
+            <p className="muted">{t('intro.line1')}</p>
+            <p className="muted">{t('intro.line2')}</p>
             <div className="intro-overlay__actions">
               <button type="button" className="intro-overlay__button" onClick={acknowledgeIntro}>
-                Oké, begrepen
+                {t('intro.ok')}
               </button>
             </div>
           </div>
@@ -311,7 +314,7 @@ export default function App(): JSX.Element {
           className="settings-overlay"
           role="dialog"
           aria-modal="true"
-          aria-label="Instellingen"
+          aria-label={t('settings.aria')}
           onClick={closeSettings}
         >
           <div className="settings-overlay__backdrop" />
@@ -322,8 +325,25 @@ export default function App(): JSX.Element {
               event.stopPropagation();
             }}
           >
-            <p className="label">Instellingen</p>
+            <p className="label">{t('settings.title')}</p>
             <div className="settings-overlay__content">
+              <div className="background-toggle">
+                <span className="label background-toggle__label">{t('settings.language.label')}</span>
+                <label className="background-toggle__switch">
+                  <select
+                    className="background-toggle__switch-input"
+                    value={lang}
+                    onChange={(event) => {
+                      setLang(event.target.value as Lang);
+                    }}
+                    aria-label={t('settings.language.label')}
+                  >
+                    <option value="nl">{t('settings.language.nl')}</option>
+                    <option value="en">{t('settings.language.en')}</option>
+                  </select>
+                </label>
+              </div>
+
               <ThemeToggle value={theme} onChange={setTheme} />
               <BackgroundToggle value={backgroundMode} onChange={setBackgroundMode} />
             </div>
@@ -335,5 +355,13 @@ export default function App(): JSX.Element {
 
       {hasTabs ? null : null}
     </BackgroundSurface>
+  );
+}
+
+export default function App(): JSX.Element {
+  return (
+    <I18nProvider>
+      <AppInner />
+    </I18nProvider>
   );
 }

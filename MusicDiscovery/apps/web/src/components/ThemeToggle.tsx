@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useI18n } from '../i18n';
+
 export type ThemeMode = 'light' | 'dark';
 
 type ThemeToggleProps = {
@@ -8,11 +10,12 @@ type ThemeToggleProps = {
 };
 
 export default function ThemeToggle({ value, onChange }: ThemeToggleProps) {
+  const { t } = useI18n();
   const isDark = value === 'dark';
 
   return (
     <div className="background-toggle">
-      <span className="label background-toggle__label">Thema</span>
+      <span className="label background-toggle__label">{t('theme.label')}</span>
       <label className="background-toggle__switch">
         <input
           className="background-toggle__switch-input"
@@ -25,7 +28,7 @@ export default function ThemeToggle({ value, onChange }: ThemeToggleProps) {
         <span className="background-toggle__switch-track" aria-hidden="true">
           <span className="background-toggle__switch-thumb" />
         </span>
-        <span className="background-toggle__switch-text">{isDark ? 'Donker' : 'Licht'}</span>
+        <span className="background-toggle__switch-text">{isDark ? t('theme.dark') : t('theme.light')}</span>
       </label>
     </div>
   );

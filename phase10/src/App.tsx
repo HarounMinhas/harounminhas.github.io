@@ -8,11 +8,20 @@ import { PhaseGenerator } from './components/PhaseGenerator';
 import { Toast } from './components/Toast';
 import { calculatePlayerScores, recalculateFromRound } from './utils/gameLogic';
 import { saveGame, loadGame, clearGame } from './utils/storage';
+import { useI18n } from './i18n';
 import './App.css';
 
 type ModalType = 'endRound' | 'history' | 'generator' | null;
 
+type ToastState = {
+  messageKey: string;
+  messageVars?: Record<string, string | number>;
+  action?: { labelKey: string; onClick: () => void };
+} | null;
+
 function App() {
+  const { t } = useI18n();
+
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = loadGame();
     return saved || {
@@ -25,7 +34,7 @@ function App() {
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [editingRound, setEditingRound] = useState<number | null>(null);
-  const [toast, setToast] = useState<{ message: string; action?: { label: string; onClick: () => void } } | null>(null);
+  const [toast, setToast] = useState<ToastState>(null);
   const [lastAction, setLastAction] = useState<{ type: 'round'; data: GameState } | null>(null);
 
   // Auto-save whenever game state changes
@@ -63,9 +72,9 @@ function App() {
     setLastAction({ type: 'round', data: previousState });
     setActiveModal(null);
     setToast({
-      message: 'Ronde opgeslagen!',
+      messageKey: 'toast.roundSaved',
       action: {
-        label: 'Ongedaan maken',
+        labelKey: 'action.undo',
         onClick: undoLastRound,
       },
     });
@@ -75,7 +84,7 @@ function App() {
     if (lastAction && lastAction.type === 'round') {
       setGameState(lastAction.data);
       setLastAction(null);
-      setToast({ message: 'Laatste ronde ongedaan gemaakt' });
+      setToast({ messageKey: 'toast.roundUndone' });
     }
   };
 
@@ -97,11 +106,11 @@ function App() {
     setGameState(newState);
     setEditingRound(null);
     setActiveModal(null);
-    setToast({ message: 'Ronde bijgewerkt!' });
+    setToast({ messageKey: 'toast.roundUpdated' });
   };
 
   const newGame = () => {
-    if (confirm('Weet je zeker dat je een nieuw spel wilt starten? Het huidige spel wordt gewist.')) {
+    if (confirm(t('confirm.newGame'))) {
       clearGame();
       setGameState({
         players: [],
@@ -116,18 +125,18 @@ function App() {
 
   const getCurrentPhases = (): Map<string, number> => {
     const phases = new Map<string, number>();
-    
-    gameState.players.forEach(player => {
+
+    gameState.players.forEach((player) => {
       let currentPhase = 1;
-      gameState.rounds.forEach(round => {
-        const entry = round.entries.find(e => e.playerId === player.id);
+      gameState.rounds.forEach((round) => {
+        const entry = round.entries.find((e) => e.playerId === player.id);
         if (entry) {
           currentPhase = entry.phaseAfterRound;
         }
       });
       phases.set(player.id, currentPhase);
     });
-    
+
     return phases;
   };
 
@@ -185,14 +194,19 @@ function App() {
         />
       )}
 
-      {activeModal === 'generator' && (
-        <PhaseGenerator onClose={() => setActiveModal(null)} />
-      )}
+      {activeModal === 'generator' && <PhaseGenerator onClose={() => setActiveModal(null)} />}
 
       {toast && (
         <Toast
-          message={toast.message}
-          action={toast.action}
+          message={t(toast.messageKey, toast.messageVars)}
+          action={
+            toast.action
+              ? {
+                  label: t(toast.action.labelKey),
+                  onClick: toast.action.onClick,
+                }
+              : undefined
+          }
           onClose={() => setToast(null)}
         />
       )}

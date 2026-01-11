@@ -1,41 +1,46 @@
 import { useState } from 'react'
 import { Player } from '../types'
 import './StartScreen.css'
+import { useI18n } from '../i18n'
 
 interface StartScreenProps {
   onStartGame: (players: Player[]) => void
 }
 
+type ErrorKey = 'error.enterName' | 'error.nameExists' | 'error.minPlayers' | null
+
 function StartScreen({ onStartGame }: StartScreenProps) {
+  const { t } = useI18n()
+
   const [players, setPlayers] = useState<Player[]>([])
   const [newPlayerName, setNewPlayerName] = useState('')
-  const [error, setError] = useState('')
+  const [errorKey, setErrorKey] = useState<ErrorKey>(null)
 
   const addPlayer = () => {
     const name = newPlayerName.trim()
-    
+
     if (!name) {
-      setError('Voer een naam in')
+      setErrorKey('error.enterName')
       return
     }
 
-    if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-      setError('Deze naam bestaat al')
+    if (players.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+      setErrorKey('error.nameExists')
       return
     }
 
     const newPlayer: Player = {
       id: Date.now().toString(),
-      name
+      name,
     }
 
     setPlayers([...players, newPlayer])
     setNewPlayerName('')
-    setError('')
+    setErrorKey(null)
   }
 
   const removePlayer = (id: string) => {
-    setPlayers(players.filter(p => p.id !== id))
+    setPlayers(players.filter((p) => p.id !== id))
   }
 
   const addDefaultPlayers = (count: number) => {
@@ -43,7 +48,7 @@ function StartScreen({ onStartGame }: StartScreenProps) {
     for (let i = 1; i <= count; i++) {
       newPlayers.push({
         id: Date.now().toString() + i,
-        name: `Speler ${i}`
+        name: t('table.player') === 'Speler' ? `Speler ${i}` : `Player ${i}`,
       })
     }
     setPlayers(newPlayers)
@@ -51,7 +56,7 @@ function StartScreen({ onStartGame }: StartScreenProps) {
 
   const handleStartGame = () => {
     if (players.length < 2) {
-      setError('Voeg minimaal 2 spelers toe')
+      setErrorKey('error.minPlayers')
       return
     }
     onStartGame(players)
@@ -60,49 +65,49 @@ function StartScreen({ onStartGame }: StartScreenProps) {
   return (
     <div className="start-screen">
       <div className="card start-card">
-        <h1 className="title">🎲 Phase 10 Scorekeeper</h1>
-        <p className="subtitle">Voeg spelers toe om te beginnen</p>
+        <h1 className="title">{t('scoreboard.title')}</h1>
+        <p className="subtitle">{t('start.subtitle')}</p>
 
         <div className="input-section">
           <div className="input-with-button">
             <input
               type="text"
-              placeholder="Spelernaam"
+              placeholder={t('start.placeholder.playerName')}
               value={newPlayerName}
               onChange={(e) => setNewPlayerName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addPlayer()}
               className="player-input"
             />
             <button onClick={addPlayer} className="btn btn-primary">
-              + Toevoegen
+              {t('start.btn.add')}
             </button>
           </div>
-          {error && <p className="error-message">{error}</p>}
+          {errorKey && <p className="error-message">{t(errorKey)}</p>}
         </div>
 
         <div className="quick-actions">
           <button onClick={() => addDefaultPlayers(2)} className="btn btn-secondary btn-sm">
-            2 spelers
+            {t('start.quick.2')}
           </button>
           <button onClick={() => addDefaultPlayers(4)} className="btn btn-secondary btn-sm">
-            4 spelers
+            {t('start.quick.4')}
           </button>
           <button onClick={() => addDefaultPlayers(6)} className="btn btn-secondary btn-sm">
-            6 spelers
+            {t('start.quick.6')}
           </button>
         </div>
 
         {players.length > 0 && (
           <div className="players-list">
-            <h3>Spelers ({players.length})</h3>
+            <h3>{t('start.section.players', { count: players.length })}</h3>
             <div className="players-grid">
-              {players.map(player => (
+              {players.map((player) => (
                 <div key={player.id} className="player-item">
                   <span>{player.name}</span>
-                  <button 
+                  <button
                     onClick={() => removePlayer(player.id)}
                     className="btn-icon btn-danger"
-                    title="Verwijder"
+                    title={t('start.tooltip.remove')}
                   >
                     ×
                   </button>
@@ -112,12 +117,12 @@ function StartScreen({ onStartGame }: StartScreenProps) {
           </div>
         )}
 
-        <button 
+        <button
           onClick={handleStartGame}
           disabled={players.length < 2}
           className="btn btn-primary btn-large"
         >
-          Start Spel →
+          {t('start.btn.start')}
         </button>
       </div>
     </div>

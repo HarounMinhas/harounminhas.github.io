@@ -42,6 +42,33 @@
             line-height: 1.6;
             min-height: 100vh;
         }
+
+        /* Language select */
+        .lang-select {
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .chooser-lang {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .chooser-lang .lang-select {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+        }
+
+        .chooser-lang .lang-select option {
+            color: var(--text);
+        }
         
         /* Layout Chooser */
         .layout-chooser {
@@ -55,6 +82,7 @@
         }
         
         .chooser-header {
+            position: relative;
             text-align: center;
             color: white;
             margin-bottom: 3rem;
@@ -375,6 +403,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
         }
         
         .panel-body {
@@ -457,6 +486,7 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.875rem;
+            flex-shrink: 0;
         }
         
         .match-item {
@@ -473,6 +503,7 @@
             margin-bottom: 0.75rem;
             font-size: 0.875rem;
             color: var(--text-muted);
+            gap: 1rem;
         }
         
         .match-text {
@@ -534,6 +565,180 @@
     <div id="app"></div>
     
     <script>
+        /**
+         * Shared language: localStorage.lang (shared with other subprojects)
+         */
+        const LANG_STORAGE_KEY = 'lang';
+
+        const TRANSLATIONS = {
+            nl: {
+                'lang.aria': 'Kies taal',
+                'lang.nl': 'Nederlands',
+                'lang.en': 'Engels',
+
+                'chooser.subtitle': 'Kies je layout om te starten',
+                'layout.select': 'Selecteer',
+
+                'layout.a.name': '3-Panel IDE',
+                'layout.a.desc': 'Klassieke IDE met sidebar, editor en resultaten. Perfect voor complexere workflows.',
+                'layout.b.name': 'Split View',
+                'layout.b.desc': 'Snelle focus op regex en input met resultaten rechts. Ideaal voor dagelijks gebruik.',
+                'layout.c.name': 'Notebook Mode',
+                'layout.c.desc': 'Document-achtige flow met blokken. Handig voor tutorials en documentatie.',
+
+                'wireframe.sidebar': 'Sidebar',
+                'wireframe.editor': 'Regex Editor',
+                'wireframe.input': 'Input Text',
+                'wireframe.results': 'Results',
+                'wireframe.regexBlock': 'Regex Block',
+                'wireframe.testInput': 'Test Input',
+                'wireframe.output': 'Output',
+
+                'sidebar.examples': '📚 Voorbeelden',
+                'sidebar.demoNote': '💡 Demo: Deze voorbeelden zijn ter demonstratie. Klik om te laden!',
+
+                'topbar.homeTitle': 'Terug naar layout keuze',
+                'topbar.tab.match': 'Match',
+                'topbar.share': '🔗 Delen',
+
+                'panel.regexPattern': 'Regex Pattern',
+                'panel.testInput': 'Test Input',
+                'panel.matches': 'Matches',
+
+                'flags.global': 'g (global)',
+                'flags.caseInsensitive': 'i (niet hoofdlettergevoelig)',
+                'flags.multiline': 'm (multiline)',
+
+                'btn.testPattern': '▶ Test Pattern',
+                'input.placeholder': 'Voer je test text hier in...',
+
+                'results.start': 'Klik op "Test Pattern" om te beginnen',
+                'results.noMatches': 'Geen matches gevonden',
+                'results.fixRegex': 'Fix de regex error om te testen',
+
+                'match.count.zero': '0 matches',
+                'match.count.one': '{count} match',
+                'match.count.other': '{count} matches',
+                'match.header': 'Match #{index}',
+                'match.position': 'Positie: {start}-{end}',
+                'match.captured': 'Captured groups:',
+
+                'share.copied': '🔗 Link gekopieerd naar clipboard!',
+                'share.prompt': 'Kopieer deze link:'
+            },
+            en: {
+                'lang.aria': 'Choose language',
+                'lang.nl': 'Dutch',
+                'lang.en': 'English',
+
+                'chooser.subtitle': 'Choose your preferred layout to get started',
+                'layout.select': 'Select',
+
+                'layout.a.name': '3-Panel IDE',
+                'layout.a.desc': 'Classic IDE with sidebar, editor and results. Great for more complex workflows.',
+                'layout.b.name': 'Split View',
+                'layout.b.desc': 'Fast focus on regex and input with results on the right. Ideal for daily use.',
+                'layout.c.name': 'Notebook Mode',
+                'layout.c.desc': 'Document-style flow with blocks. Great for tutorials and documentation.',
+
+                'wireframe.sidebar': 'Sidebar',
+                'wireframe.editor': 'Regex Editor',
+                'wireframe.input': 'Input Text',
+                'wireframe.results': 'Results',
+                'wireframe.regexBlock': 'Regex Block',
+                'wireframe.testInput': 'Test Input',
+                'wireframe.output': 'Output',
+
+                'sidebar.examples': '📚 Examples',
+                'sidebar.demoNote': '💡 Demo: These examples are for demonstration. Click to load!',
+
+                'topbar.homeTitle': 'Back to layout picker',
+                'topbar.tab.match': 'Match',
+                'topbar.share': '🔗 Share',
+
+                'panel.regexPattern': 'Regex Pattern',
+                'panel.testInput': 'Test Input',
+                'panel.matches': 'Matches',
+
+                'flags.global': 'g (global)',
+                'flags.caseInsensitive': 'i (case insensitive)',
+                'flags.multiline': 'm (multiline)',
+
+                'btn.testPattern': '▶ Test Pattern',
+                'input.placeholder': 'Enter your test text here...',
+
+                'results.start': 'Click "Test Pattern" to get started',
+                'results.noMatches': 'No matches found',
+                'results.fixRegex': 'Fix the regex error to test',
+
+                'match.count.zero': '0 matches',
+                'match.count.one': '{count} match',
+                'match.count.other': '{count} matches',
+                'match.header': 'Match #{index}',
+                'match.position': 'Position: {start}-{end}',
+                'match.captured': 'Captured groups:',
+
+                'share.copied': '🔗 Link copied to clipboard!',
+                'share.prompt': 'Copy this link:'
+            }
+        };
+
+        function normalizeLang(value) {
+            return value === 'en' ? 'en' : 'nl';
+        }
+
+        function detectBrowserLang() {
+            const raw = (navigator.languages?.[0] ?? navigator.language ?? '').toLowerCase();
+            return raw.startsWith('en') ? 'en' : 'nl';
+        }
+
+        function getLang() {
+            try {
+                const stored = localStorage.getItem(LANG_STORAGE_KEY);
+                if (stored) return normalizeLang(stored);
+            } catch {
+                // ignore
+            }
+            return detectBrowserLang();
+        }
+
+        function setLang(lang) {
+            const normalized = normalizeLang(lang);
+            try {
+                localStorage.setItem(LANG_STORAGE_KEY, normalized);
+            } catch {
+                // ignore
+            }
+            if (window.__regexPlaygroundApp) {
+                window.__regexPlaygroundApp.setLanguage(normalized);
+            }
+        }
+
+        function format(template, vars) {
+            if (!vars) return template;
+            return template.replace(/\{(\w+)\}/g, (match, key) => {
+                const value = vars[key];
+                if (value === null || value === undefined) return '';
+                return String(value);
+            });
+        }
+
+        function t(key, vars) {
+            const lang = getLang();
+            const value = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.nl?.[key] ?? key;
+            return format(value, vars);
+        }
+
+        function langSelectHtml(id, contextClass) {
+            const lang = getLang();
+            return `
+                <select id="${id}" class="lang-select ${contextClass}" aria-label="${t('lang.aria')}">
+                    <option value="nl">🇧🇪 ${t('lang.nl')}</option>
+                    <option value="en">🇬🇧 ${t('lang.en')}</option>
+                </select>
+            `;
+        }
+
         const EXAMPLES = [
             {
                 name: 'Email Validator',
@@ -571,6 +776,8 @@
             constructor() {
                 this.app = document.getElementById('app');
                 this.currentLayout = 'A';
+                this.view = 'chooser';
+                this.lang = getLang();
                 this.state = {
                     pattern: '\\w+@\\w+\\.\\w+',
                     flags: { g: true, i: false, m: false },
@@ -580,8 +787,20 @@
                 };
                 this.init();
             }
+
+            setLanguage(lang) {
+                this.lang = normalizeLang(lang);
+                document.documentElement.lang = this.lang;
+                if (this.view === 'chooser') {
+                    this.showLayoutChooser();
+                } else {
+                    this.showPlayground();
+                }
+            }
             
             init() {
+                document.documentElement.lang = this.lang;
+
                 const activeLayout = localStorage.getItem('activeLayout');
                 
                 if (!activeLayout) {
@@ -593,19 +812,30 @@
             }
             
             showLayoutChooser() {
+                this.view = 'chooser';
+
                 this.app.innerHTML = `
                     <div class="layout-chooser">
                         <div class="chooser-header">
+                            <div class="chooser-lang">
+                                ${langSelectHtml('lang-select-chooser', 'lang-select--chooser')}
+                            </div>
                             <h1>🔍 Regex Playground</h1>
-                            <p>Kies je preferred layout om te starten</p>
+                            <p>${t('chooser.subtitle')}</p>
                         </div>
                         <div class="layout-grid">
-                            ${this.createLayoutCard('A', '3-Panel IDE', 'Klassieke IDE met sidebar, editor en results. Perfect voor complexe workflows.')}
-                            ${this.createLayoutCard('B', 'Split View', 'Snelle focus op regex en input met resultaten rechts. Ideaal voor dagelijks gebruik.')}
-                            ${this.createLayoutCard('C', 'Notebook Mode', 'Document-achtige flow met blokken. Geweldig voor tutorials en documentatie.')}
+                            ${this.createLayoutCard('A', t('layout.a.name'), t('layout.a.desc'))}
+                            ${this.createLayoutCard('B', t('layout.b.name'), t('layout.b.desc'))}
+                            ${this.createLayoutCard('C', t('layout.c.name'), t('layout.c.desc'))}
                         </div>
                     </div>
                 `;
+
+                const chooserLangSelect = document.getElementById('lang-select-chooser');
+                if (chooserLangSelect) {
+                    chooserLangSelect.value = this.lang;
+                    chooserLangSelect.addEventListener('change', (e) => setLang(e.target.value));
+                }
                 
                 document.querySelectorAll('[data-layout]').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -627,7 +857,7 @@
                                 ${this.createWireframe(id)}
                             </div>
                         </div>
-                        <button class="btn btn-primary" data-layout="${id}">Selecteer</button>
+                        <button class="btn btn-primary" data-layout="${id}">${t('layout.select')}</button>
                     </div>
                 `;
             }
@@ -635,33 +865,35 @@
             createWireframe(id) {
                 if (id === 'A') {
                     return `
-                        <div class="wf-box"><span class="wf-label">Sidebar</span></div>
+                        <div class="wf-box"><span class="wf-label">${t('wireframe.sidebar')}</span></div>
                         <div class="wf-column">
-                            <div class="wf-box"><span class="wf-label">Regex Editor</span></div>
-                            <div class="wf-box"><span class="wf-label">Input Text</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.editor')}</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.input')}</span></div>
                         </div>
-                        <div class="wf-box"><span class="wf-label">Results</span></div>
+                        <div class="wf-box"><span class="wf-label">${t('wireframe.results')}</span></div>
                     `;
                 } else if (id === 'B') {
                     return `
                         <div class="wf-column">
-                            <div class="wf-box"><span class="wf-label">Regex Editor</span></div>
-                            <div class="wf-box"><span class="wf-label">Input Text</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.editor')}</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.input')}</span></div>
                         </div>
-                        <div class="wf-box"><span class="wf-label">Results</span></div>
+                        <div class="wf-box"><span class="wf-label">${t('wireframe.results')}</span></div>
                     `;
                 } else {
                     return `
                         <div class="wf-column" style="height: 100%;">
-                            <div class="wf-box"><span class="wf-label">Regex Block</span></div>
-                            <div class="wf-box"><span class="wf-label">Test Input</span></div>
-                            <div class="wf-box"><span class="wf-label">Output</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.regexBlock')}</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.testInput')}</span></div>
+                            <div class="wf-box"><span class="wf-label">${t('wireframe.output')}</span></div>
                         </div>
                     `;
                 }
             }
-            
+
             showPlayground() {
+                this.view = 'playground';
+
                 const layoutClass = `layout-${this.currentLayout.toLowerCase()}`;
                 
                 let mainContent = '';
@@ -670,7 +902,7 @@
                     // 3-Panel IDE: Sidebar | Middle | Results
                     mainContent = `
                         <div class="sidebar">
-                            <h3>📚 Voorbeelden</h3>
+                            <h3>${t('sidebar.examples')}</h3>
                             ${EXAMPLES.map(ex => `
                                 <div class="example-item" data-example='${JSON.stringify(ex)}'>
                                     <div class="example-name">${ex.name}</div>
@@ -678,7 +910,7 @@
                                 </div>
                             `).join('')}
                             <div class="demo-note">
-                                💡 <strong>Demo:</strong> Deze voorbeelden zijn ter demonstratie. Klik om te laden!
+                                ${t('sidebar.demoNote')}
                             </div>
                         </div>
                         <div class="middle-section">
@@ -708,21 +940,22 @@
                         ${this.createResultsPanel()}
                     `;
                 }
-                
+
                 this.app.innerHTML = `
                     <div class="playground ${layoutClass}">
                         <div class="topbar">
                             <div class="topbar-left">
-                                <button class="btn-icon" id="btn-home" title="Terug naar layout keuze">🏠</button>
+                                <button class="btn-icon" id="btn-home" title="${t('topbar.homeTitle')}">🏠</button>
                                 <span class="project-name">Regex Playground</span>
                             </div>
                             <div class="topbar-center">
                                 <div class="tab-group">
-                                    <button class="tab active">Match</button>
+                                    <button class="tab active">${t('topbar.tab.match')}</button>
                                 </div>
                             </div>
                             <div class="topbar-right">
-                                <button class="btn-secondary" id="btn-share">🔗 Share</button>
+                                ${langSelectHtml('lang-select-topbar', 'lang-select--topbar')}
+                                <button class="btn-secondary" id="btn-share">${t('topbar.share')}</button>
                             </div>
                         </div>
                         <div class="playground-main">
@@ -730,15 +963,21 @@
                         </div>
                     </div>
                 `;
+
+                const topbarLangSelect = document.getElementById('lang-select-topbar');
+                if (topbarLangSelect) {
+                    topbarLangSelect.value = this.lang;
+                    topbarLangSelect.addEventListener('change', (e) => setLang(e.target.value));
+                }
                 
                 this.attachEventListeners();
                 this.runRegex();
             }
-            
+
             createEditorPanel() {
                 return `
                     <div class="panel">
-                        <div class="panel-header">Regex Pattern</div>
+                        <div class="panel-header">${t('panel.regexPattern')}</div>
                         <div class="panel-body">
                             <div class="regex-input-wrapper">
                                 <span class="regex-delimiter">/</span>
@@ -748,15 +987,15 @@
                             <div class="flags">
                                 <label class="flag-label">
                                     <input type="checkbox" id="flag-g" ${this.state.flags.g ? 'checked' : ''}>
-                                    <span>g (global)</span>
+                                    <span>${t('flags.global')}</span>
                                 </label>
                                 <label class="flag-label">
                                     <input type="checkbox" id="flag-i" ${this.state.flags.i ? 'checked' : ''}>
-                                    <span>i (case insensitive)</span>
+                                    <span>${t('flags.caseInsensitive')}</span>
                                 </label>
                                 <label class="flag-label">
                                     <input type="checkbox" id="flag-m" ${this.state.flags.m ? 'checked' : ''}>
-                                    <span>m (multiline)</span>
+                                    <span>${t('flags.multiline')}</span>
                                 </label>
                             </div>
                             <div id="error-display"></div>
@@ -764,35 +1003,35 @@
                     </div>
                 `;
             }
-            
+
             createInputPanel() {
                 return `
                     <div class="panel">
                         <div class="panel-header">
-                            <span>Test Input</span>
-                            <button class="btn btn-primary" id="btn-test">▶ Test Pattern</button>
+                            <span>${t('panel.testInput')}</span>
+                            <button class="btn btn-primary" id="btn-test">${t('btn.testPattern')}</button>
                         </div>
                         <div class="panel-body">
-                            <textarea id="input" placeholder="Voer je test text hier in...">${this.state.input}</textarea>
+                            <textarea id="input" placeholder="${t('input.placeholder')}">${this.state.input}</textarea>
                         </div>
                     </div>
                 `;
             }
-            
+
             createResultsPanel() {
                 return `
                     <div class="panel">
                         <div class="panel-header">
-                            <span>Matches</span>
-                            <span class="match-count" id="match-count">0 matches</span>
+                            <span>${t('panel.matches')}</span>
+                            <span class="match-count" id="match-count">${t('match.count.zero')}</span>
                         </div>
                         <div class="panel-body" id="results">
-                            <div class="empty-state">Klik op "Test Pattern" om te beginnen</div>
+                            <div class="empty-state">${t('results.start')}</div>
                         </div>
                     </div>
                 `;
             }
-            
+
             attachEventListeners() {
                 document.getElementById('btn-home').onclick = () => {
                     localStorage.removeItem('activeLayout');
@@ -817,7 +1056,7 @@
                     });
                 });
             }
-            
+
             loadExample(example) {
                 this.state.pattern = example.pattern;
                 this.state.input = example.input;
@@ -825,15 +1064,24 @@
                 document.getElementById('input').value = example.input;
                 this.runRegex();
             }
-            
+
             debouncedRun() {
                 clearTimeout(this.debounceTimer);
                 this.debounceTimer = setTimeout(() => this.runRegex(), 500);
             }
-            
+
+            formatMatchCount(count) {
+                if (count === 0) return t('match.count.zero');
+                if (count === 1) return t('match.count.one', { count });
+                return t('match.count.other', { count });
+            }
+
             runRegex() {
-                this.state.pattern = document.getElementById('pattern').value;
-                this.state.input = document.getElementById('input').value;
+                const patternEl = document.getElementById('pattern');
+                const inputEl = document.getElementById('input');
+
+                this.state.pattern = patternEl.value;
+                this.state.input = inputEl.value;
                 this.state.flags = {
                     g: document.getElementById('flag-g').checked,
                     i: document.getElementById('flag-i').checked,
@@ -876,34 +1124,45 @@
                     }
                     
                     this.state.matches = matches;
-                    countSpan.textContent = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+                    countSpan.textContent = this.formatMatchCount(matches.length);
                     
                     if (matches.length === 0) {
-                        resultsDiv.innerHTML = '<div class="empty-state">Geen matches gevonden</div>';
+                        resultsDiv.innerHTML = `<div class="empty-state">${t('results.noMatches')}</div>`;
                     } else {
-                        resultsDiv.innerHTML = matches.map((match, idx) => `
-                            <div class="match-item">
+                        resultsDiv.innerHTML = matches.map((match, idx) => {
+                            const header = `
                                 <div class="match-header">
-                                    <strong>Match #${idx + 1}</strong>
-                                    <span>Position: ${match.index}-${match.index + match.text.length}</span>
+                                    <strong>${t('match.header', { index: idx + 1 })}</strong>
+                                    <span>${t('match.position', { start: match.index, end: match.index + match.text.length })}</span>
                                 </div>
-                                <div class="match-text">${this.escapeHtml(match.text)}</div>
-                                ${match.groups.length > 0 ? `
+                            `;
+
+                            const groups = match.groups.length > 0
+                                ? `
                                     <div style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted);">
-                                        <strong>Captured groups:</strong> ${match.groups.map((g, i) => `$${i+1}: "${this.escapeHtml(g || '')}"`).join(', ')}
+                                        <strong>${t('match.captured')}</strong>
+                                        ${match.groups.map((g, i) => `$${i + 1}: \"${this.escapeHtml(g || '')}\"`).join(', ')}
                                     </div>
-                                ` : ''}
-                            </div>
-                        `).join('');
+                                `
+                                : '';
+
+                            return `
+                                <div class="match-item">
+                                    ${header}
+                                    <div class="match-text">${this.escapeHtml(match.text)}</div>
+                                    ${groups}
+                                </div>
+                            `;
+                        }).join('');
                     }
                     
                 } catch (error) {
                     errorDiv.innerHTML = `<div class="error-message">❌ ${this.escapeHtml(error.message)}</div>`;
-                    resultsDiv.innerHTML = '<div class="empty-state">Fix de regex error om te testen</div>';
-                    countSpan.textContent = '0 matches';
+                    resultsDiv.innerHTML = `<div class="empty-state">${t('results.fixRegex')}</div>`;
+                    countSpan.textContent = t('match.count.zero');
                 }
             }
-            
+
             shareUrl() {
                 const params = new URLSearchParams({
                     p: this.state.pattern,
@@ -914,12 +1173,12 @@
                 });
                 const url = `${window.location.origin}${window.location.pathname}?${params}`;
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('🔗 Link gekopieerd naar clipboard!');
+                    alert(t('share.copied'));
                 }).catch(() => {
-                    prompt('Kopieer deze link:', url);
+                    prompt(t('share.prompt'), url);
                 });
             }
-            
+
             escapeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
@@ -928,7 +1187,7 @@
         }
         
         // Initialize app
-        new RegexPlaygroundApp();
+        window.__regexPlaygroundApp = new RegexPlaygroundApp();
     </script>
 </body>
 </html>

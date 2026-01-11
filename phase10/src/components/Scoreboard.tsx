@@ -1,5 +1,6 @@
 import { PlayerScore } from '../types';
 import { getWinner } from '../utils/gameLogic';
+import { useI18n } from '../i18n';
 
 interface ScoreboardProps {
   scores: PlayerScore[];
@@ -18,6 +19,8 @@ export function Scoreboard({
   onNewGame,
   onGeneratePhase,
 }: ScoreboardProps) {
+  const { lang, setLang, t } = useI18n();
+
   const winner = getWinner(scores);
   const sortedScores = [...scores].sort((a, b) => {
     if (a.currentPhase !== b.currentPhase) {
@@ -29,8 +32,22 @@ export function Scoreboard({
   return (
     <div className="container">
       <div className="header">
-        <h1>🎲 Phase 10 Scorekeeper</h1>
-        <p>Ronde {currentRound}</p>
+        <div className="flex justify-between align-center" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1>{t('scoreboard.title')}</h1>
+            <p>{t('scoreboard.round', { round: currentRound })}</p>
+          </div>
+          <select
+            className="form-select"
+            value={lang}
+            onChange={(e) => setLang(e.target.value as any)}
+            aria-label={t('common.language')}
+            style={{ width: '120px' }}
+          >
+            <option value="nl">🇧🇪 NL</option>
+            <option value="en">🇬🇧 EN</option>
+          </select>
+        </div>
       </div>
 
       {winner && (
@@ -41,27 +58,29 @@ export function Scoreboard({
             textAlign: 'center',
           }}
         >
-          <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏆 Winnaar!</h2>
+          <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{t('scoreboard.winnerTitle')}</h2>
           <p style={{ fontSize: '1.5rem', fontWeight: 600 }}>{winner.name}</p>
-          <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Totaal: {winner.totalPoints} punten</p>
+          <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>
+            {t('scoreboard.totalPoints', { points: winner.totalPoints })}
+          </p>
         </div>
       )}
 
       <div className="card mb-3">
         <div className="flex gap-2 mb-3" style={{ flexWrap: 'wrap' }}>
           <button className="btn btn-primary" onClick={onEndRound} style={{ flex: 1, minWidth: '200px' }}>
-            ✅ Einde Ronde
+            {t('scoreboard.btn.endRound')}
           </button>
           <button className="btn btn-secondary" onClick={onViewHistory} style={{ flex: 1, minWidth: '200px' }}>
-            📜 Rondegeschiedenis
+            {t('scoreboard.btn.history')}
           </button>
         </div>
         <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
           <button className="btn btn-secondary" onClick={onGeneratePhase} style={{ flex: 1, minWidth: '200px' }}>
-            🎯 Custom Fasen
+            {t('scoreboard.btn.customPhases')}
           </button>
           <button className="btn btn-danger" onClick={onNewGame} style={{ flex: 1, minWidth: '200px' }}>
-            🔄 Nieuw Spel
+            {t('scoreboard.btn.newGame')}
           </button>
         </div>
       </div>
@@ -70,11 +89,11 @@ export function Scoreboard({
         <table className="table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Speler</th>
-              <th>Fase</th>
-              <th>Totaal Punten</th>
-              <th>Laatste Ronde</th>
+              <th>{t('table.rank')}</th>
+              <th>{t('table.player')}</th>
+              <th>{t('table.phase')}</th>
+              <th>{t('table.totalPoints')}</th>
+              <th>{t('table.lastRound')}</th>
             </tr>
           </thead>
           <tbody>
@@ -85,7 +104,7 @@ export function Scoreboard({
                   <strong style={{ color: 'var(--light)' }}>{score.name}</strong>
                   {score.currentPhase >= 10 && (
                     <span className="badge badge-success" style={{ marginLeft: '0.5rem' }}>
-                      Voltooid!
+                      {t('badge.completed')}
                     </span>
                   )}
                 </td>
@@ -99,13 +118,11 @@ export function Scoreboard({
                       padding: '0.5rem 1rem',
                     }}
                   >
-                    Fase {score.currentPhase}
+                    {t('phase.label', { phase: score.currentPhase })}
                   </span>
                 </td>
                 <td>
-                  <strong style={{ fontSize: '1.2rem', color: 'var(--light)' }}>
-                    {score.totalPoints}
-                  </strong>
+                  <strong style={{ fontSize: '1.2rem', color: 'var(--light)' }}>{score.totalPoints}</strong>
                 </td>
                 <td style={{ color: score.lastRoundPoints > 0 ? 'var(--danger)' : 'var(--success)' }}>
                   +{score.lastRoundPoints}
