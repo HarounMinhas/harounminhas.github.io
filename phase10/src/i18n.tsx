@@ -14,7 +14,7 @@ const LANG_STORAGE_KEY = 'lang';
 
 const TRANSLATIONS: Record<Lang, Record<string, string>> = {
   nl: {
-    'app.title': 'ome',
+    'app.title': 'Phase 10',
 
     'common.language': 'Taal',
     'common.unknown': 'Onbekend',
@@ -106,7 +106,7 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'start.btn.start': 'Start spel →',
   },
   en: {
-    'app.title': 'ome',
+    'app.title': 'Phase 10',
 
     'common.language': 'Language',
     'common.unknown': 'Unknown',
