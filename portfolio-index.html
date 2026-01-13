@@ -315,6 +315,20 @@
             cursor: pointer;
             text-decoration: none;
         }
+
+        /* iOS glass (only for cards that opt-in) */
+        .project-card.ios-glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .project-card.ios-glass::before,
+        .project-card.ios-glass::after {
+            display: none;
+        }
         
         .project-card::before,
         .project-card::after {
@@ -1002,13 +1016,13 @@
                     <!-- Phase 10 Scorekeeper Project -->
                     <div class="col-lg-4 col-md-6">
                         <div class="card-wrapper">
-                            <a href="./phase10/" class="project-card">
+                            <a href="./phase10/" class="project-card ios-glass">
                                 <div class="project-card-top-bar"></div>
                                 <div class="project-content">
                                     <div class="project-icon">
                                         <i class="bi bi-dice-5-fill"></i>
                                     </div>
-                                    <h3 class="project-title">Phase 10 Scorekeeper</h3>
+                                    <h3 class="project-title" data-i18n="project.phase10.title">Phase 10 Scorekeeper</h3>
                                     <p class="project-description" data-i18n="project.phase10.desc">
                                         Houd scores bij tijdens Phase 10. 
                                         Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.
@@ -1093,6 +1107,7 @@
                 'project.zen.cta': 'Start',
                 'project.regex.desc': 'Test regex patterns direct in je browser. Zie matches live. Kies uit 3 layouts. Deel je pattern via URL.',
                 'project.regex.cta': 'Open',
+                'project.phase10.title': 'Phase 10 Scorekeeper',
                 'project.phase10.desc': 'Houd scores bij tijdens Phase 10. Bekijk geschiedenis. Maak fouten ongedaan. Genereer random fases.',
                 'project.phase10.cta': 'Start',
                 'project.colorhunt.desc': 'Test ColorHunt palettes op Bootstrap componenten. Zie direct hoe kleuren werken. Pas ze live toe.',
@@ -1118,6 +1133,7 @@
                 'project.zen.cta': 'Start',
                 'project.regex.desc': 'Test regex patterns directly in your browser. See matches live. Choose from 3 layouts. Share your pattern via URL.',
                 'project.regex.cta': 'Open',
+                'project.phase10.title': 'Phase 10 Scorekeeper',
                 'project.phase10.desc': 'Track scores during Phase 10. View history. Undo mistakes. Generate random phases.',
                 'project.phase10.cta': 'Start',
                 'project.colorhunt.desc': 'Test ColorHunt palettes on Bootstrap components. See how colors work instantly. Apply them live.',
