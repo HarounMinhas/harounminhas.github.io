@@ -3,34 +3,34 @@
   --primary: #007AFF;
   --primary-light: #5AC8FA;
   --primary-dark: #0051D5;
-  
+
   /* Modern Gray Glass Base */
   --glass-base: rgba(28, 28, 30, 0.72);
   --glass-elevated: rgba(44, 44, 46, 0.85);
   --glass-highlight: rgba(58, 58, 60, 0.92);
-  
+
   /* iOS Glass Effects */
   --glass-bg: rgba(44, 44, 46, 0.68);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-hover: rgba(58, 58, 60, 0.75);
   --glass-active: rgba(72, 72, 74, 0.82);
-  
+
   /* Text Colors - iOS Style */
   --text-primary: rgba(255, 255, 255, 0.92);
   --text-secondary: rgba(235, 235, 245, 0.6);
   --text-muted: rgba(235, 235, 245, 0.3);
-  
+
   /* Semantic Colors */
   --success: #34C759;
   --warning: #FF9500;
   --danger: #FF3B30;
-  
+
   /* iOS Blur & Shadow Effects */
   --shadow-sm: 0 2px 16px rgba(0, 0, 0, 0.12);
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
   --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.24);
   --glow: 0 0 24px rgba(0, 122, 255, 0.25);
-  
+
   /* Border Radius - iOS Style */
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -62,7 +62,64 @@ body {
   min-height: 100vh;
 }
 
-/* Scope theme styles to app content (avoid clashing with Bootstrap navbar) */
+/* Glass navbar (Bootstrap structure, our visuals) */
+.p10-navbar {
+  background: rgba(44, 44, 46, 0.55) !important;
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.p10-navbar .navbar-brand,
+.p10-navbar .nav-link {
+  color: var(--text-primary) !important;
+}
+
+.p10-navbar .navbar-toggler {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.p10-navbar .navbar-toggler:focus {
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+}
+
+.p10-navbar .dropdown-menu {
+  background: rgba(44, 44, 46, 0.92);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.p10-navbar .dropdown-item {
+  color: var(--text-primary);
+}
+
+.p10-navbar .dropdown-item:hover,
+.p10-navbar .dropdown-item:focus {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.p10-navbar .dropdown-divider {
+  border-top: 1px solid var(--glass-border);
+}
+
+.p10-navbar .form-select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}
+
+.p10-navbar .form-select:focus {
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.5);
+}
+
+/* Scope theme styles to app content */
 .p10-content {
   padding: 2rem 1rem;
 }
@@ -169,6 +226,7 @@ body {
   overflow: hidden;
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
+  min-height: 220px;
 }
 
 .p10-content .table {
@@ -249,7 +307,7 @@ body {
   color: var(--text-muted);
 }
 
-/* Modal overlay + modal: override Bootstrap's .modal display/position when used inside our overlay */
+/* Modal overlay + modal */
 .p10-content .modal-overlay {
   position: fixed;
   top: 0;
@@ -358,7 +416,7 @@ body {
   background: rgba(0, 122, 255, 0.03);
 }
 
-/* Toast (renamed to avoid Bootstrap's .toast) */
+/* Toast */
 .p10-toast {
   position: fixed;
   bottom: 2rem;
@@ -389,7 +447,7 @@ body {
   }
 }
 
-/* Phase List Styles (unchanged) */
+/* Phase List Styles */
 .phase-list {
   display: flex;
   flex-direction: column;
@@ -623,19 +681,6 @@ body {
 
   .p10-content .container {
     padding: 1rem 0.5rem;
-  }
-
-  .p10-content .btn {
-    width: 100%;
-  }
-
-  .p10-content .table {
-    font-size: 0.875rem;
-  }
-
-  .p10-content .table td,
-  .p10-content .table th {
-    padding: 0.75rem 0.5rem;
   }
 
   .p10-toast {

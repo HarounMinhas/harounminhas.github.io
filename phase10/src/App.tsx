@@ -152,7 +152,7 @@ function App() {
 
   return (
     <div className="app">
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+      <nav className="navbar navbar-expand-lg p10-navbar">
         <div className="container">
           <span className="navbar-brand fw-semibold">{t('app.title')}</span>
 
@@ -229,7 +229,11 @@ function App() {
 
           <div className="mb-3">
             {gameState.gameStarted ? (
-              <button className="btn btn-primary" onClick={() => setActiveModal('endRound')} style={{ width: '100%' }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => setActiveModal('endRound')}
+                style={{ width: '100%' }}
+              >
                 {t('action.endRound')}
               </button>
             ) : (
@@ -241,10 +245,13 @@ function App() {
 
           {gameState.gameStarted ? <Scoreboard scores={scores} /> : <PlayerSetup onStartGame={startGame} />}
 
-          {/* Fases: momenteel altijd via knop (later conditioneel op basis van saved phases) */}
           {gameState.gameStarted && (
             <div className="mt-3">
-              <button className="btn btn-secondary" onClick={() => setActiveModal('generator')} style={{ width: '100%' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setActiveModal('generator')}
+                style={{ width: '100%' }}
+              >
                 {t('action.generatePhases')}
               </button>
             </div>
