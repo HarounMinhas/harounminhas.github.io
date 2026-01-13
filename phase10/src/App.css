@@ -70,6 +70,70 @@ body {
   padding: 2rem 1rem;
 }
 
+/* Scoreboard Container Styles */
+.scoreboard-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.scoreboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+}
+
+.scoreboard-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.round-indicator {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.leader {
+  background: rgba(255, 215, 0, 0.1) !important;
+}
+
+.last-round-points {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.action-buttons {
+  margin-top: 2rem;
+}
+
+.btn-large {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.secondary-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.secondary-actions .btn {
+  flex: 1;
+  min-width: 150px;
+}
+
 /* iOS Glassmorphism Header */
 .header {
   text-align: center;
@@ -682,6 +746,11 @@ body {
   .phase-actions {
     width: 100%;
     justify-content: flex-end;
+  }
+
+  .secondary-actions .btn {
+    min-width: 100px;
+    font-size: 0.85rem;
   }
 }
 
