@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameState, Player, RoundEntry, Round } from './types';
 import { PlayerSetup } from './components/PlayerSetup';
 import { Scoreboard } from './components/Scoreboard';
@@ -20,7 +20,7 @@ type ToastState = {
 } | null;
 
 function App() {
-  const { lang, setLang, t } = useI18n();
+  const { t } = useI18n();
 
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = loadGame();
@@ -150,114 +150,24 @@ function App() {
 
   const scores = gameState.gameStarted ? calculatePlayerScores(gameState) : [];
 
+  if (!gameState.gameStarted) {
+    return (
+      <div className="app">
+        <PlayerSetup onStartGame={startGame} />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
-      <nav className="navbar navbar-expand-lg p10-navbar">
-        <div className="container">
-          <span className="navbar-brand fw-semibold">{t('app.title')}</span>
-
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#phase10Navbar"
-            aria-controls="phase10Navbar"
-            aria-expanded="false"
-            aria-label={t('nav.toggle')}
-          >
-            <span className="navbar-toggler-icon" />
-          </button>
-
-          <div className="collapse navbar-collapse" id="phase10Navbar">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {t('nav.extraOptions')}
-                </a>
-                <ul className="dropdown-menu">
-                  <li>
-                    <button className="dropdown-item" onClick={() => setActiveModal('history')}>
-                      {t('nav.history')}
-                    </button>
-                  </li>
-                  <li>
-                    <button className="dropdown-item" onClick={() => setActiveModal('generator')}>
-                      {t('nav.customPhases')}
-                    </button>
-                  </li>
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li>
-                  <li>
-                    <button className="dropdown-item text-danger" onClick={newGame}>
-                      {t('nav.newGame')}
-                    </button>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-
-            <div className="d-flex align-items-center gap-2">
-              <select
-                className="form-select form-select-sm"
-                value={lang}
-                onChange={(e) => setLang(e.target.value as any)}
-                aria-label={t('common.language')}
-                style={{ width: '110px' }}
-              >
-                <option value="nl">NL</option>
-                <option value="en">EN</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="p10-content">
-        <div className="container">
-          {gameState.gameStarted && (
-            <div style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-              {t('scoreboard.round', { round: gameState.currentRound })}
-            </div>
-          )}
-
-          <div className="mb-3">
-            {gameState.gameStarted ? (
-              <button
-                className="btn btn-primary"
-                onClick={() => setActiveModal('endRound')}
-                style={{ width: '100%' }}
-              >
-                {t('action.endRound')}
-              </button>
-            ) : (
-              <button className="btn btn-primary" onClick={resetToSetup} style={{ width: '100%' }}>
-                {t('action.newGame')}
-              </button>
-            )}
-          </div>
-
-          {gameState.gameStarted ? <Scoreboard scores={scores} /> : <PlayerSetup onStartGame={startGame} />}
-
-          {gameState.gameStarted && (
-            <div className="mt-3">
-              <button
-                className="btn btn-secondary"
-                onClick={() => setActiveModal('generator')}
-                style={{ width: '100%' }}
-              >
-                {t('action.generatePhases')}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <Scoreboard
+        scores={scores}
+        currentRound={gameState.currentRound}
+        onEndRound={() => setActiveModal('endRound')}
+        onViewHistory={() => setActiveModal('history')}
+        onNewGame={newGame}
+        onGeneratePhase={() => setActiveModal('generator')}
+      />
 
       {activeModal === 'endRound' && editingRound === null && (
         <EndRoundModal
