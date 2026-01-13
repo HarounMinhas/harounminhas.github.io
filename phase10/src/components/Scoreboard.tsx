@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PlayerScore } from '../types';
 import { useI18n } from '../i18n';
 
@@ -19,6 +20,7 @@ export function Scoreboard({
   onGeneratePhase 
 }: ScoreboardProps) {
   const { t } = useI18n();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const sortedScores = [...scores].sort((a, b) => {
     if (a.currentPhase !== b.currentPhase) {
@@ -26,6 +28,11 @@ export function Scoreboard({
     }
     return a.totalPoints - b.totalPoints;
   });
+
+  const handleMenuAction = (action: () => void) => {
+    action();
+    setMenuOpen(false);
+  };
 
   return (
     <div className="scoreboard-container">
@@ -69,16 +76,40 @@ export function Scoreboard({
           {t('scoreboard.btn.endRound')}
         </button>
         
-        <div className="secondary-actions">
-          <button className="btn btn-secondary" onClick={onViewHistory}>
-            {t('scoreboard.btn.viewHistory')}
+        <div className="menu-container">
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{ width: '100%' }}
+          >
+            ☰ Menu
           </button>
-          <button className="btn btn-secondary" onClick={onGeneratePhase}>
-            {t('scoreboard.btn.phaseGenerator')}
-          </button>
-          <button className="btn btn-danger" onClick={onNewGame}>
-            {t('scoreboard.btn.newGame')}
-          </button>
+          
+          {menuOpen && (
+            <>
+              <div className="menu-overlay" onClick={() => setMenuOpen(false)} />
+              <div className="menu-dropdown">
+                <button 
+                  className="menu-item" 
+                  onClick={() => handleMenuAction(onViewHistory)}
+                >
+                  📜 {t('scoreboard.btn.viewHistory')}
+                </button>
+                <button 
+                  className="menu-item" 
+                  onClick={() => handleMenuAction(onGeneratePhase)}
+                >
+                  ✨ {t('scoreboard.btn.phaseGenerator')}
+                </button>
+                <button 
+                  className="menu-item menu-item-danger" 
+                  onClick={() => handleMenuAction(onNewGame)}
+                >
+                  🔄 {t('scoreboard.btn.newGame')}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
