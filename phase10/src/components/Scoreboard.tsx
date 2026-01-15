@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { PlayerScore } from '../types';
+import { PlayerScore, PhaseDefinition } from '../types';
 import { useI18n } from '../i18n';
 
 interface ScoreboardProps {
   scores: PlayerScore[];
   currentRound: number;
+  phases: PhaseDefinition[];
   onEndRound: () => void;
   onViewHistory: () => void;
   onNewGame: () => void;
@@ -14,6 +15,7 @@ interface ScoreboardProps {
 export function Scoreboard({
   scores,
   currentRound,
+  phases,
   onEndRound,
   onViewHistory,
   onNewGame,
@@ -38,20 +40,6 @@ export function Scoreboard({
     setLang(next);
     setMenuOpen(false);
   };
-
-  // Default Phase 10 phases
-  const defaultPhases = [
-    { phase: 1, description: '2 sets of 3' },
-    { phase: 2, description: '1 set of 3 + 1 run of 4' },
-    { phase: 3, description: '1 set of 4 + 1 run of 4' },
-    { phase: 4, description: '1 run of 7' },
-    { phase: 5, description: '1 run of 8' },
-    { phase: 6, description: '1 run of 9' },
-    { phase: 7, description: '2 sets of 4' },
-    { phase: 8, description: '7 cards of one color' },
-    { phase: 9, description: '1 set of 5 + 1 set of 2' },
-    { phase: 10, description: '1 set of 5 + 1 set of 3' },
-  ];
 
   return (
     <div className="scoreboard-container">
@@ -136,25 +124,37 @@ export function Scoreboard({
       </button>
 
       <div className="phases-reference-section">
-        <h3 className="phases-reference-title">Phase Descriptions</h3>
-        <div className="table-container">
-          <table className="table phases-table">
-            <thead>
-              <tr>
-                <th>Phase #</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {defaultPhases.map((phase) => (
-                <tr key={phase.phase}>
-                  <td style={{ fontWeight: 600 }}>Phase {phase.phase}</td>
-                  <td>{phase.description}</td>
+        <h3 className="phases-reference-title">{t('phases.overview.title')}</h3>
+
+        {phases.length === 0 ? (
+          <div className="p10-empty-phases">
+            <p style={{ color: 'var(--text-secondary)' }}>{t('phases.overview.empty')}</p>
+            <button className="btn btn-primary" onClick={onGeneratePhase}>
+              {t('action.generatePhases')}
+            </button>
+          </div>
+        ) : (
+          <div className="table-container">
+            <table className="table phases-table">
+              <thead>
+                <tr>
+                  <th>{t('phases.overview.col.phase')}</th>
+                  <th>{t('phases.overview.col.description')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {phases.map((phase, idx) => (
+                  <tr key={idx}>
+                    <td style={{ fontWeight: 600 }}>{t('phase.label', { phase: idx + 1 })}</td>
+                    <td>
+                      {phase.title} — {phase.description}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

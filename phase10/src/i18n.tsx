@@ -18,11 +18,13 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     'common.language': 'Taal',
     'common.unknown': 'Onbekend',
+    'common.ok': 'OK',
+    'common.cancel': 'Annuleren',
 
     'nav.toggle': 'Menu',
     'nav.extraOptions': 'Extra opties',
     'nav.history': 'Rondegeschiedenis',
-    'nav.customPhases': 'Custom fases',
+    'nav.customPhases': 'Genereer fases',
     'nav.newGame': 'Nieuw spel',
 
     'confirm.newGame': 'Weet je zeker dat je een nieuw spel wilt starten? Het huidige spel wordt gewist.',
@@ -46,6 +48,11 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     'badge.completed': 'Voltooid!',
     'phase.label': 'Fase {phase}',
+
+    'phases.overview.title': 'Fase overzicht',
+    'phases.overview.empty': 'Nog geen fases ingesteld. Genereer een set om te starten.',
+    'phases.overview.col.phase': 'Fase',
+    'phases.overview.col.description': 'Beschrijving',
 
     'setup.subtitle': 'Voeg spelers toe om te beginnen',
     'setup.label.playerName': 'Spelernaam',
@@ -76,23 +83,23 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'history.status.notCompleted': 'Niet voltooid',
     'history.btn.close': 'Sluiten',
 
-    'generator.title': 'Custom fases',
+    'generator.title': 'Genereer fases',
     'generator.difficulty': 'Moeilijkheid: {difficulty}',
     'generator.easy': 'Makkelijk',
     'generator.hard': 'Moeilijk',
     'generator.btn.replace': 'Vervang fase',
     'generator.btn.generate': 'Genereer fase',
     'generator.btn.surprise': 'Surprise me',
-    'generator.section.myPhases': 'Mijn fases ({count}/{max})',
+    'generator.section.myPhases': 'Fases in set ({count}/{max})',
     'generator.btn.clearAll': 'Wis alles',
     'generator.confirm.clearAll': 'Weet je zeker dat je alle fases wilt verwijderen?',
     'generator.tooltip.deletePhase': 'Verwijder fase',
-    'generator.empty.text': 'Geen custom fases nog. Klik op "Genereer fase" om te beginnen,\nof probeer "Surprise me!" voor een volledige set!',
+    'generator.empty.text': 'Nog geen fases in deze set. Klik op "Genereer fase" om te beginnen,\nof kies "Surprise me!" voor een volledige set!',
     'generator.howItWorks.title': 'Hoe werkt het?',
-    'generator.howItWorks.li1': 'Klik op "Genereer fase" om een nieuwe fase toe te voegen (max 10)',
+    'generator.howItWorks.li1': 'Klik op "Genereer fase" om een fase toe te voegen (max 10)',
     'generator.howItWorks.li2': 'Klik op een fase om deze te selecteren en te vervangen',
     'generator.howItWorks.li3': '"Surprise me!" genereert 10 fases met oplopende moeilijkheid',
-    'generator.howItWorks.li4': 'Gebruik deze lijst tijdens het spel als referentie',
+    'generator.howItWorks.li4': 'Klik op OK om deze set toe te passen op je spel',
     'generator.btn.close': 'Sluiten',
 
     // Legacy aliases (kept for backwards compatibility)
@@ -111,11 +118,13 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     'common.language': 'Language',
     'common.unknown': 'Unknown',
+    'common.ok': 'OK',
+    'common.cancel': 'Cancel',
 
     'nav.toggle': 'Menu',
     'nav.extraOptions': 'Extra options',
     'nav.history': 'Round history',
-    'nav.customPhases': 'Custom phases',
+    'nav.customPhases': 'Generate phases',
     'nav.newGame': 'New game',
 
     'confirm.newGame': 'Start a new game? The current game will be cleared.',
@@ -139,6 +148,11 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     'badge.completed': 'Completed!',
     'phase.label': 'Phase {phase}',
+
+    'phases.overview.title': 'Phases overview',
+    'phases.overview.empty': 'No phases set yet. Generate a set to start.',
+    'phases.overview.col.phase': 'Phase',
+    'phases.overview.col.description': 'Description',
 
     'setup.subtitle': 'Add players to start',
     'setup.label.playerName': 'Player name',
@@ -169,23 +183,23 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'history.status.notCompleted': 'Not completed',
     'history.btn.close': 'Close',
 
-    'generator.title': 'Custom phases',
+    'generator.title': 'Generate phases',
     'generator.difficulty': 'Difficulty: {difficulty}',
     'generator.easy': 'Easy',
     'generator.hard': 'Hard',
     'generator.btn.replace': 'Replace phase',
     'generator.btn.generate': 'Generate phase',
     'generator.btn.surprise': 'Surprise me',
-    'generator.section.myPhases': 'My phases ({count}/{max})',
+    'generator.section.myPhases': 'Phases in set ({count}/{max})',
     'generator.btn.clearAll': 'Clear all',
     'generator.confirm.clearAll': 'Are you sure you want to remove all phases?',
     'generator.tooltip.deletePhase': 'Remove phase',
-    'generator.empty.text': 'No custom phases yet. Click "Generate phase" to start,\nor try "Surprise me!" for a full set!',
+    'generator.empty.text': 'No phases in this set yet. Click "Generate phase" to start,\nor choose "Surprise me!" for a full set!',
     'generator.howItWorks.title': 'How does it work?',
-    'generator.howItWorks.li1': 'Click "Generate phase" to add a new phase (max 10)',
+    'generator.howItWorks.li1': 'Click "Generate phase" to add a phase (max 10)',
     'generator.howItWorks.li2': 'Click a phase to select and replace it',
     'generator.howItWorks.li3': '"Surprise me!" generates 10 phases with increasing difficulty',
-    'generator.howItWorks.li4': 'Use this list as a reference during the game',
+    'generator.howItWorks.li4': 'Click OK to apply this set to your game',
     'generator.btn.close': 'Close',
 
     // Legacy aliases (kept for backwards compatibility)

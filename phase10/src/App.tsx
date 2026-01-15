@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GameState, Player, RoundEntry, Round } from './types';
+import { GameState, Player, RoundEntry, Round, PhaseDefinition } from './types';
 import { PlayerSetup } from './components/PlayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { EndRoundModal } from './components/EndRoundModal';
@@ -24,14 +24,20 @@ function App() {
 
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = loadGame();
-    return (
-      saved || {
-        players: [],
-        rounds: [],
-        currentRound: 1,
-        gameStarted: false,
-      }
-    );
+    if (saved) {
+      return {
+        ...saved,
+        phases: saved.phases ?? [],
+      };
+    }
+
+    return {
+      players: [],
+      rounds: [],
+      currentRound: 1,
+      gameStarted: false,
+      phases: [],
+    };
   });
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -52,6 +58,7 @@ function App() {
       rounds: [],
       currentRound: 1,
       gameStarted: true,
+      phases: [],
     });
   };
 
@@ -64,7 +71,7 @@ function App() {
     };
 
     const previousState = { ...gameState };
-    const newState = {
+    const newState: GameState = {
       ...gameState,
       rounds: [...gameState.rounds, newRound],
       currentRound: gameState.currentRound + 1,
@@ -118,6 +125,7 @@ function App() {
       rounds: [],
       currentRound: 1,
       gameStarted: false,
+      phases: [],
     });
     setLastAction(null);
     setToast(null);
@@ -158,11 +166,21 @@ function App() {
     );
   }
 
+  const phasesList = gameState.phases ?? [];
+
+  const applyPhases = (phases: PhaseDefinition[]) => {
+    setGameState((prev) => ({
+      ...prev,
+      phases,
+    }));
+  };
+
   return (
     <div className="app">
       <Scoreboard
         scores={scores}
         currentRound={gameState.currentRound}
+        phases={phasesList}
         onEndRound={() => setActiveModal('endRound')}
         onViewHistory={() => setActiveModal('history')}
         onNewGame={newGame}
@@ -202,7 +220,16 @@ function App() {
         />
       )}
 
-      {activeModal === 'generator' && <PhaseGenerator onClose={() => setActiveModal(null)} />}
+      {activeModal === 'generator' && (
+        <PhaseGenerator
+          initialPhases={phasesList}
+          onCancel={() => setActiveModal(null)}
+          onConfirm={(phases) => {
+            applyPhases(phases);
+            setActiveModal(null);
+          }}
+        />
+      )}
 
       {toast && (
         <Toast

@@ -143,6 +143,17 @@ body {
   font-size: 0.9rem;
 }
 
+.p10-empty-phases {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.12);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /* Menu Dropdown */
 .menu-container {
   position: relative;

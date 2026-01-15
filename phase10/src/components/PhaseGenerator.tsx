@@ -1,59 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { generateRandomPhase } from '../utils/phaseGenerator';
 import { PhaseDefinition } from '../types';
 import { useI18n } from '../i18n';
 
 interface PhaseGeneratorProps {
-  onClose: () => void;
+  initialPhases: PhaseDefinition[];
+  onConfirm: (phases: PhaseDefinition[]) => void;
+  onCancel: () => void;
 }
 
-const STORAGE_KEY = 'phase10_custom_phases';
 const MAX_PHASES = 10;
 const DIFFICULTY_DISTRIBUTION = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
 
-export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
+export function PhaseGenerator({ initialPhases, onConfirm, onCancel }: PhaseGeneratorProps) {
   const { t } = useI18n();
 
   const [difficulty, setDifficulty] = useState(3);
-  const [customPhases, setCustomPhases] = useState<PhaseDefinition[]>([]);
+  const [draftPhases, setDraftPhases] = useState<PhaseDefinition[]>(() => initialPhases);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
 
-  // Load saved phase list from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setCustomPhases(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to load saved phases:', e);
-      }
-    }
-  }, []);
-
-  // Save phase list to localStorage whenever it changes
-  useEffect(() => {
-    if (customPhases.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(customPhases));
-    }
-  }, [customPhases]);
+    setDraftPhases(initialPhases);
+    setSelectedPhaseIndex(null);
+  }, [initialPhases]);
 
   const generate = () => {
     const phase = generateRandomPhase(difficulty);
 
     if (selectedPhaseIndex !== null) {
-      const newPhases = [...customPhases];
-      newPhases[selectedPhaseIndex] = phase;
-      setCustomPhases(newPhases);
+      const next = [...draftPhases];
+      next[selectedPhaseIndex] = phase;
+      setDraftPhases(next);
       setSelectedPhaseIndex(null);
-    } else if (customPhases.length < MAX_PHASES) {
-      setCustomPhases([...customPhases, phase]);
+    } else if (draftPhases.length < MAX_PHASES) {
+      setDraftPhases([...draftPhases, phase]);
     }
   };
 
   const removePhase = (index: number) => {
-    const newPhases = customPhases.filter((_, i) => i !== index);
-    setCustomPhases(newPhases);
+    const next = draftPhases.filter((_, i) => i !== index);
+    setDraftPhases(next);
 
     if (selectedPhaseIndex === index) {
       setSelectedPhaseIndex(null);
@@ -67,16 +54,15 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   };
 
   const surpriseMe = () => {
-    const newPhases = DIFFICULTY_DISTRIBUTION.map((diff) => generateRandomPhase(diff));
-    setCustomPhases(newPhases);
+    const next = DIFFICULTY_DISTRIBUTION.map((diff) => generateRandomPhase(diff));
+    setDraftPhases(next);
     setSelectedPhaseIndex(null);
   };
 
   const clearList = () => {
     if (confirm(t('generator.confirm.clearAll'))) {
-      setCustomPhases([]);
+      setDraftPhases([]);
       setSelectedPhaseIndex(null);
-      localStorage.removeItem(STORAGE_KEY);
     }
   };
 
@@ -89,11 +75,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   );
 
   return createPortal(
-    <div className="p10-modal-overlay" onClick={onClose}>
+    <div className="p10-modal-overlay" onClick={onCancel}>
       <div className="p10-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
         <div className="p10-modal-header">
           <h2 className="p10-modal-title">{t('generator.title')}</h2>
-          <button className="p10-modal-close" onClick={onClose}>
+          <button className="p10-modal-close" onClick={onCancel}>
             ✖
           </button>
         </div>
@@ -108,7 +94,10 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
               value={difficulty}
               onChange={(e) => setDifficulty(parseInt(e.target.value))}
             />
-            <div className="flex justify-between" style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+            <div
+              className="flex justify-between"
+              style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}
+            >
               <span>{t('generator.easy')}</span>
               <span>{t('generator.hard')}</span>
             </div>
@@ -118,7 +107,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             <button
               className="btn btn-primary"
               onClick={generate}
-              disabled={customPhases.length >= MAX_PHASES && selectedPhaseIndex === null}
+              disabled={draftPhases.length >= MAX_PHASES && selectedPhaseIndex === null}
               style={{ flex: 1 }}
             >
               {selectedPhaseIndex !== null ? t('generator.btn.replace') : t('generator.btn.generate')}
@@ -128,11 +117,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             </button>
           </div>
 
-          {customPhases.length > 0 && (
+          {draftPhases.length > 0 && (
             <>
               <div className="flex justify-between align-center mb-2">
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {t('generator.section.myPhases', { count: customPhases.length, max: MAX_PHASES })}
+                  {t('generator.section.myPhases', { count: draftPhases.length, max: MAX_PHASES })}
                 </h3>
                 <button className="btn btn-small btn-secondary" onClick={clearList}>
                   {t('generator.btn.clearAll')}
@@ -140,7 +129,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
               </div>
 
               <div className="phase-list">
-                {customPhases.map((phase, index) => (
+                {draftPhases.map((phase, index) => (
                   <div
                     key={index}
                     className={`phase-item ${selectedPhaseIndex === index ? 'selected' : ''}`}
@@ -159,7 +148,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
                       <div style={{ marginTop: '0.5rem' }}>{getDifficultyDots(phase.level)}</div>
                     </div>
                     <div className="phase-actions" onClick={(e) => e.stopPropagation()}>
-                      <button className="phase-action-btn delete" onClick={() => removePhase(index)} title={t('generator.tooltip.deletePhase')}>
+                      <button
+                        className="phase-action-btn delete"
+                        onClick={() => removePhase(index)}
+                        title={t('generator.tooltip.deletePhase')}
+                      >
                         🗑️
                       </button>
                     </div>
@@ -169,16 +162,33 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             </>
           )}
 
-          {customPhases.length === 0 && (
+          {draftPhases.length === 0 && (
             <div className="empty-state">
               <div className="empty-state-icon">🎲</div>
               <p style={{ whiteSpace: 'pre-line' }}>{t('generator.empty.text')}</p>
             </div>
           )}
 
-          <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--glass-bg)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
-            <h4 style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{t('generator.howItWorks.title')}</h4>
-            <ul style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: '1.6', paddingLeft: '1.25rem' }}>
+          <div
+            style={{
+              marginTop: '1.5rem',
+              padding: '1rem',
+              background: 'var(--glass-bg)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--glass-border)',
+            }}
+          >
+            <h4 style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
+              {t('generator.howItWorks.title')}
+            </h4>
+            <ul
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--text-secondary)',
+                lineHeight: '1.6',
+                paddingLeft: '1.25rem',
+              }}
+            >
               <li>{t('generator.howItWorks.li1')}</li>
               <li>{t('generator.howItWorks.li2')}</li>
               <li>{t('generator.howItWorks.li3')}</li>
@@ -188,8 +198,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
         </div>
 
         <div className="p10-modal-footer">
-          <button className="btn btn-secondary" onClick={onClose}>
-            {t('generator.btn.close')}
+          <button className="btn btn-secondary" onClick={onCancel}>
+            {t('common.cancel')}
+          </button>
+          <button className="btn btn-primary" onClick={() => onConfirm(draftPhases)}>
+            {t('common.ok')}
           </button>
         </div>
       </div>

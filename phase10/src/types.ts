@@ -17,11 +17,18 @@ export interface Round {
   timestamp: number;
 }
 
+export interface PhaseDefinition {
+  level: number;
+  title: string;
+  description: string;
+}
+
 export interface GameState {
   players: Player[];
   rounds: Round[];
   currentRound: number;
   gameStarted: boolean;
+  phases: PhaseDefinition[];
 }
 
 export interface PlayerScore {
@@ -30,10 +37,4 @@ export interface PlayerScore {
   currentPhase: number;
   totalPoints: number;
   lastRoundPoints: number;
-}
-
-export interface PhaseDefinition {
-  level: number;
-  title: string;
-  description: string;
 }
