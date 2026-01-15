@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { generateRandomPhase } from '../utils/phaseGenerator';
 import { PhaseDefinition } from '../types';
 import { useI18n } from '../i18n';
@@ -96,7 +97,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
     );
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
         <div className="modal-header">
@@ -236,6 +237,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

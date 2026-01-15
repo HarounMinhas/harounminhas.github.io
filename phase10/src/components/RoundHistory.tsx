@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Round, Player } from '../types';
 import { useI18n } from '../i18n';
 
@@ -17,7 +18,7 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
     return players.find((p) => p.id === playerId)?.name || t('common.unknown');
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
         <div className="modal-header">
@@ -29,18 +30,18 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
 
         <div className="modal-body">
           {rounds.length === 0 ? (
-            <p style={{ textAlign: 'center', color: 'var(--gray)', padding: '2rem' }}>{t('history.empty')}</p>
+            <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>{t('history.empty')}</p>
           ) : (
             <div className="flex flex-column gap-2">
               {rounds.map((round, index) => (
                 <div
                   key={round.id}
                   style={{
-                    background: selectedRound === index ? 'var(--primary)' : 'var(--dark-light)',
+                    background: selectedRound === index ? 'rgba(0, 122, 255, 0.2)' : 'var(--glass-bg)',
                     padding: '1rem',
-                    borderRadius: '0.5rem',
+                    borderRadius: '0.75rem',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
+                    border: '1px solid var(--glass-border)',
                   }}
                   onClick={() => setSelectedRound(selectedRound === index ? null : index)}
                 >
@@ -105,6 +106,7 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
