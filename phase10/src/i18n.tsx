@@ -257,7 +257,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     return (key: string, vars?: Vars) => {
       const template = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.nl?.[key];
       if (!template) {
-        if (import.meta.env?.DEV) {
+        const isDev = (import.meta as any).env?.DEV;
+        if (isDev) {
           // eslint-disable-next-line no-console
           console.warn(`[i18n] Missing key: ${key}`);
         }
