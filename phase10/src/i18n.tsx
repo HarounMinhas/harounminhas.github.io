@@ -95,6 +95,7 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'generator.howItWorks.li4': 'Gebruik deze lijst tijdens het spel als referentie',
     'generator.btn.close': 'Sluiten',
 
+    // Legacy aliases (kept for backwards compatibility)
     'start.subtitle': 'Voeg spelers toe om te beginnen',
     'start.placeholder.playerName': 'Spelernaam',
     'start.btn.add': 'Toevoegen',
@@ -187,6 +188,7 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'generator.howItWorks.li4': 'Use this list as a reference during the game',
     'generator.btn.close': 'Close',
 
+    // Legacy aliases (kept for backwards compatibility)
     'start.subtitle': 'Add players to start',
     'start.placeholder.playerName': 'Player name',
     'start.btn.add': 'Add',
@@ -227,6 +229,15 @@ function format(template: string, vars?: Vars): string {
   });
 }
 
+function humanizeKey(key: string): string {
+  const last = key.split('.').pop() || key;
+  const withSpaces = last
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .trim();
+  return withSpaces ? withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1) : key;
+}
+
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
@@ -244,7 +255,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const t = useMemo(() => {
     return (key: string, vars?: Vars) => {
-      const template = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.nl?.[key] ?? key;
+      const template = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.nl?.[key];
+      if (!template) {
+        if (import.meta.env?.DEV) {
+          // eslint-disable-next-line no-console
+          console.warn(`[i18n] Missing key: ${key}`);
+        }
+        return humanizeKey(key);
+      }
       return format(template, vars);
     };
   }, [lang]);
