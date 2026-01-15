@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { generateRandomPhase } from '../utils/phaseGenerator';
+import { generateRandomPhase, getAllPhases, getPhasesByDifficulty } from '../utils/phaseGenerator';
 import { PhaseDefinition } from '../types';
 import { useI18n } from '../i18n';
 
@@ -12,6 +12,25 @@ interface PhaseGeneratorProps {
 
 const MAX_PHASES = 10;
 const DIFFICULTY_DISTRIBUTION = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getUniquePhase(difficulty: number, usedTitles: Set<string>): PhaseDefinition {
+  // 1) Prefer phases of the requested difficulty
+  const pool = getPhasesByDifficulty(difficulty);
+  const candidates = pool.filter((p) => !usedTitles.has(p.title));
+  if (candidates.length > 0) return pickRandom(candidates);
+
+  // 2) Fallback: any phase (still unique)
+  const all = getAllPhases();
+  const allCandidates = all.filter((p) => !usedTitles.has(p.title));
+  if (allCandidates.length > 0) return pickRandom(allCandidates);
+
+  // 3) Absolute fallback (should only happen if literally every phase is already used)
+  return generateRandomPhase(difficulty);
+}
 
 export function PhaseGenerator({ initialPhases, onConfirm, onCancel }: PhaseGeneratorProps) {
   const { t } = useI18n();
@@ -25,15 +44,24 @@ export function PhaseGenerator({ initialPhases, onConfirm, onCancel }: PhaseGene
     setSelectedPhaseIndex(null);
   }, [initialPhases]);
 
-  const generate = () => {
-    const phase = generateRandomPhase(difficulty);
+  const usedTitles = useMemo(() => new Set(draftPhases.map((p) => p.title)), [draftPhases]);
 
+  const generate = () => {
     if (selectedPhaseIndex !== null) {
+      // Allow keeping the same title for this index, but disallow duplicates with others.
+      const usedExceptSelected = new Set(usedTitles);
+      usedExceptSelected.delete(draftPhases[selectedPhaseIndex]?.title);
+
+      const phase = getUniquePhase(difficulty, usedExceptSelected);
       const next = [...draftPhases];
       next[selectedPhaseIndex] = phase;
       setDraftPhases(next);
       setSelectedPhaseIndex(null);
-    } else if (draftPhases.length < MAX_PHASES) {
+      return;
+    }
+
+    if (draftPhases.length < MAX_PHASES) {
+      const phase = getUniquePhase(difficulty, usedTitles);
       setDraftPhases([...draftPhases, phase]);
     }
   };
@@ -54,7 +82,15 @@ export function PhaseGenerator({ initialPhases, onConfirm, onCancel }: PhaseGene
   };
 
   const surpriseMe = () => {
-    const next = DIFFICULTY_DISTRIBUTION.map((diff) => generateRandomPhase(diff));
+    const next: PhaseDefinition[] = [];
+    const used = new Set<string>();
+
+    for (const diff of DIFFICULTY_DISTRIBUTION) {
+      const phase = getUniquePhase(diff, used);
+      next.push(phase);
+      used.add(phase.title);
+    }
+
     setDraftPhases(next);
     setSelectedPhaseIndex(null);
   };
