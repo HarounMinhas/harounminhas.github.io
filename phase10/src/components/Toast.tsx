@@ -24,7 +24,7 @@ export function Toast({ message, action, onClose, duration = 5000 }: ToastProps)
           {action.label}
         </button>
       )}
-      <button className="modal-close" onClick={onClose} style={{ marginLeft: 'auto' }}>
+      <button className="p10-modal-close" onClick={onClose} style={{ marginLeft: 'auto' }}>
         ✖
       </button>
     </div>

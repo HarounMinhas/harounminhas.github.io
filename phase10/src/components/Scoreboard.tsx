@@ -11,15 +11,15 @@ interface ScoreboardProps {
   onGeneratePhase: () => void;
 }
 
-export function Scoreboard({ 
-  scores, 
-  currentRound, 
-  onEndRound, 
-  onViewHistory, 
-  onNewGame, 
-  onGeneratePhase 
+export function Scoreboard({
+  scores,
+  currentRound,
+  onEndRound,
+  onViewHistory,
+  onNewGame,
+  onGeneratePhase,
 }: ScoreboardProps) {
-  const { t } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const sortedScores = [...scores].sort((a, b) => {
@@ -31,6 +31,11 @@ export function Scoreboard({
 
   const handleMenuAction = (action: () => void) => {
     action();
+    setMenuOpen(false);
+  };
+
+  const handleLanguage = (next: 'nl' | 'en') => {
+    setLang(next);
     setMenuOpen(false);
   };
 
@@ -50,39 +55,47 @@ export function Scoreboard({
 
   return (
     <div className="scoreboard-container">
-      {/* Header with title and menu */}
       <div className="scoreboard-header-bar">
-        <h1 className="scoreboard-title">{t('scoreboard.title')}</h1>
-        
+        <h1 className="scoreboard-title">{t('app.title')}</h1>
+
         <div className="menu-container">
-          <button 
-            className="btn-menu" 
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            ☰ Menu
+          <button className="btn-menu" onClick={() => setMenuOpen(!menuOpen)}>
+            ☰ {t('nav.toggle')}
           </button>
-          
+
           {menuOpen && (
             <>
               <div className="menu-overlay" onClick={() => setMenuOpen(false)} />
               <div className="menu-dropdown">
-                <button 
-                  className="menu-item" 
-                  onClick={() => handleMenuAction(onViewHistory)}
-                >
-                  📜 {t('scoreboard.btn.viewHistory')}
+                <button className="menu-item" onClick={() => handleMenuAction(onViewHistory)}>
+                  📜 {t('nav.history')}
                 </button>
-                <button 
-                  className="menu-item" 
-                  onClick={() => handleMenuAction(onGeneratePhase)}
-                >
-                  ✨ {t('scoreboard.btn.phaseGenerator')}
+                <button className="menu-item" onClick={() => handleMenuAction(onGeneratePhase)}>
+                  ✨ {t('nav.customPhases')}
                 </button>
-                <button 
-                  className="menu-item menu-item-danger" 
-                  onClick={() => handleMenuAction(onNewGame)}
-                >
-                  🔄 {t('scoreboard.btn.newGame')}
+
+                <div className="menu-item menu-item-static" onClick={(e) => e.stopPropagation()}>
+                  <span>🌐 {t('common.language')}</span>
+                  <span className="menu-lang-buttons">
+                    <button
+                      className={`btn btn-small ${lang === 'nl' ? 'btn-primary' : 'btn-secondary'}`}
+                      onClick={() => handleLanguage('nl')}
+                      type="button"
+                    >
+                      NL
+                    </button>
+                    <button
+                      className={`btn btn-small ${lang === 'en' ? 'btn-primary' : 'btn-secondary'}`}
+                      onClick={() => handleLanguage('en')}
+                      type="button"
+                    >
+                      EN
+                    </button>
+                  </span>
+                </div>
+
+                <button className="menu-item menu-item-danger" onClick={() => handleMenuAction(onNewGame)}>
+                  🔄 {t('nav.newGame')}
                 </button>
               </div>
             </>
@@ -90,12 +103,8 @@ export function Scoreboard({
         </div>
       </div>
 
-      {/* Round indicator */}
-      <p className="round-indicator-top">
-        {t('scoreboard.round', { round: currentRound })}
-      </p>
+      <p className="round-indicator-top">{t('scoreboard.round', { round: currentRound })}</p>
 
-      {/* Players scores table */}
       <div className="scores-section">
         <div className="table-container">
           <table className="table">
@@ -122,12 +131,10 @@ export function Scoreboard({
         </div>
       </div>
 
-      {/* End Round button */}
       <button className="btn btn-primary btn-large" onClick={onEndRound}>
-        {t('scoreboard.btn.endRound')}
+        {t('action.endRound')}
       </button>
 
-      {/* Phases reference table at bottom */}
       <div className="phases-reference-section">
         <h3 className="phases-reference-title">Phase Descriptions</h3>
         <div className="table-container">
