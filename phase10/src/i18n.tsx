@@ -53,6 +53,7 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'phases.overview.empty': 'Nog geen fases ingesteld. Genereer een set om te starten.',
     'phases.overview.col.phase': 'Fase',
     'phases.overview.col.description': 'Beschrijving',
+    'phases.overview.col.explanation': 'Uitleg',
 
     'setup.subtitle': 'Voeg spelers toe om te beginnen',
     'setup.label.playerName': 'Spelernaam',
@@ -153,6 +154,7 @@ const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'phases.overview.empty': 'No phases set yet. Generate a set to start.',
     'phases.overview.col.phase': 'Phase',
     'phases.overview.col.description': 'Description',
+    'phases.overview.col.explanation': 'Explanation',
 
     'setup.subtitle': 'Add players to start',
     'setup.label.playerName': 'Player name',

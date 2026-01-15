@@ -62,8 +62,12 @@ export function Scoreboard({
                   ✨ {t('nav.customPhases')}
                 </button>
 
-                <div className="menu-item menu-item-static" onClick={(e) => e.stopPropagation()}>
-                  <span>🌐 {t('common.language')}</span>
+                <button className="menu-item menu-item-danger" onClick={() => handleMenuAction(onNewGame)}>
+                  🔄 {t('nav.newGame')}
+                </button>
+
+                <div className="menu-item menu-item-static" onClick={(e) => e.stopPropagation()} aria-label={t('common.language')}>
+                  <span aria-hidden="true">🌐</span>
                   <span className="menu-lang-buttons">
                     <button
                       className={`btn btn-small ${lang === 'nl' ? 'btn-primary' : 'btn-secondary'}`}
@@ -81,10 +85,6 @@ export function Scoreboard({
                     </button>
                   </span>
                 </div>
-
-                <button className="menu-item menu-item-danger" onClick={() => handleMenuAction(onNewGame)}>
-                  🔄 {t('nav.newGame')}
-                </button>
               </div>
             </>
           )}
@@ -140,15 +140,15 @@ export function Scoreboard({
                 <tr>
                   <th>{t('phases.overview.col.phase')}</th>
                   <th>{t('phases.overview.col.description')}</th>
+                  <th>{t('phases.overview.col.explanation')}</th>
                 </tr>
               </thead>
               <tbody>
                 {phases.map((phase, idx) => (
                   <tr key={idx}>
                     <td style={{ fontWeight: 600 }}>{t('phase.label', { phase: idx + 1 })}</td>
-                    <td>
-                      {phase.title} — {phase.description}
-                    </td>
+                    <td>{phase.title}</td>
+                    <td>{phase.description}</td>
                   </tr>
                 ))}
               </tbody>
