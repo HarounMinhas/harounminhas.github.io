@@ -485,11 +485,12 @@ button {
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* Force readable table headers (fix white text on light header backgrounds) */
+/* Strong override: keep table headers readable regardless of other CSS */
 .table thead {
-  background: rgba(0, 0, 0, 0.35) !important;
+  background: rgba(0, 0, 0, 0.45) !important;
 }
 
 .table thead th {
-  color: var(--text-primary) !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
 }
