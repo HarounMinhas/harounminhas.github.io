@@ -46,16 +46,16 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
   };
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2 className="modal-title">{t('endRound.title')}</h2>
-          <button className="modal-close" onClick={onClose}>
+    <div className="p10-modal-overlay" onClick={onClose}>
+      <div className="p10-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="p10-modal-header">
+          <h2 className="p10-modal-title">{t('endRound.title')}</h2>
+          <button className="p10-modal-close" onClick={onClose}>
             ✖
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="p10-modal-body">
           {players.map((player) => {
             const entry = entries.get(player.id)!;
             return (
@@ -117,7 +117,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
           })}
         </div>
 
-        <div className="modal-footer">
+        <div className="p10-modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>
             {t('endRound.btn.cancel')}
           </button>

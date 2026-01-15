@@ -42,13 +42,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
     const phase = generateRandomPhase(difficulty);
 
     if (selectedPhaseIndex !== null) {
-      // Replace selected phase
       const newPhases = [...customPhases];
       newPhases[selectedPhaseIndex] = phase;
       setCustomPhases(newPhases);
       setSelectedPhaseIndex(null);
     } else if (customPhases.length < MAX_PHASES) {
-      // Add new phase
       setCustomPhases([...customPhases, phase]);
     }
   };
@@ -65,16 +63,11 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
   };
 
   const selectPhase = (index: number) => {
-    if (selectedPhaseIndex === index) {
-      setSelectedPhaseIndex(null);
-    } else {
-      setSelectedPhaseIndex(index);
-    }
+    setSelectedPhaseIndex(selectedPhaseIndex === index ? null : index);
   };
 
   const surpriseMe = () => {
     const newPhases = DIFFICULTY_DISTRIBUTION.map((diff) => generateRandomPhase(diff));
-
     setCustomPhases(newPhases);
     setSelectedPhaseIndex(null);
   };
@@ -87,28 +80,25 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
     }
   };
 
-  const getDifficultyDots = (level: number) => {
-    return (
-      <div className="difficulty-dots">
-        {[1, 2, 3, 4, 5].map((dot) => (
-          <div key={dot} className={`difficulty-dot ${dot <= level ? 'active' : ''}`} />
-        ))}
-      </div>
-    );
-  };
+  const getDifficultyDots = (level: number) => (
+    <div className="difficulty-dots">
+      {[1, 2, 3, 4, 5].map((dot) => (
+        <div key={dot} className={`difficulty-dot ${dot <= level ? 'active' : ''}`} />
+      ))}
+    </div>
+  );
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
-        <div className="modal-header">
-          <h2 className="modal-title">{t('generator.title')}</h2>
-          <button className="modal-close" onClick={onClose}>
+    <div className="p10-modal-overlay" onClick={onClose}>
+      <div className="p10-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
+        <div className="p10-modal-header">
+          <h2 className="p10-modal-title">{t('generator.title')}</h2>
+          <button className="p10-modal-close" onClick={onClose}>
             ✖
           </button>
         </div>
 
-        <div className="modal-body">
-          {/* Difficulty Selector */}
+        <div className="p10-modal-body">
           <div className="form-group">
             <label className="form-label">{t('generator.difficulty', { difficulty })}</label>
             <input
@@ -118,16 +108,12 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
               value={difficulty}
               onChange={(e) => setDifficulty(parseInt(e.target.value))}
             />
-            <div
-              className="flex justify-between"
-              style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}
-            >
+            <div className="flex justify-between" style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
               <span>{t('generator.easy')}</span>
               <span>{t('generator.hard')}</span>
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-2 mb-3">
             <button
               className="btn btn-primary"
@@ -142,7 +128,6 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             </button>
           </div>
 
-          {/* Custom Phases List */}
           {customPhases.length > 0 && (
             <>
               <div className="flex justify-between align-center mb-2">
@@ -174,11 +159,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
                       <div style={{ marginTop: '0.5rem' }}>{getDifficultyDots(phase.level)}</div>
                     </div>
                     <div className="phase-actions" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        className="phase-action-btn delete"
-                        onClick={() => removePhase(index)}
-                        title={t('generator.tooltip.deletePhase')}
-                      >
+                      <button className="phase-action-btn delete" onClick={() => removePhase(index)} title={t('generator.tooltip.deletePhase')}>
                         🗑️
                       </button>
                     </div>
@@ -188,7 +169,6 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             </>
           )}
 
-          {/* Empty State */}
           {customPhases.length === 0 && (
             <div className="empty-state">
               <div className="empty-state-icon">🎲</div>
@@ -196,33 +176,9 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
             </div>
           )}
 
-          {/* Info Box */}
-          <div
-            style={{
-              marginTop: '1.5rem',
-              padding: '1rem',
-              background: 'var(--glass-bg)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--glass-border)',
-            }}
-          >
-            <h4
-              style={{
-                fontSize: '0.9rem',
-                marginBottom: '0.5rem',
-                color: 'var(--text-primary)',
-              }}
-            >
-              {t('generator.howItWorks.title')}
-            </h4>
-            <ul
-              style={{
-                fontSize: '0.875rem',
-                color: 'var(--text-secondary)',
-                lineHeight: '1.6',
-                paddingLeft: '1.25rem',
-              }}
-            >
+          <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--glass-bg)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+            <h4 style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{t('generator.howItWorks.title')}</h4>
+            <ul style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: '1.6', paddingLeft: '1.25rem' }}>
               <li>{t('generator.howItWorks.li1')}</li>
               <li>{t('generator.howItWorks.li2')}</li>
               <li>{t('generator.howItWorks.li3')}</li>
@@ -231,7 +187,7 @@ export function PhaseGenerator({ onClose }: PhaseGeneratorProps) {
           </div>
         </div>
 
-        <div className="modal-footer">
+        <div className="p10-modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>
             {t('generator.btn.close')}
           </button>

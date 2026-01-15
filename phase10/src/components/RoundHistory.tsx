@@ -19,16 +19,16 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
   };
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
-        <div className="modal-header">
-          <h2 className="modal-title">{t('history.title')}</h2>
-          <button className="modal-close" onClick={onClose}>
+    <div className="p10-modal-overlay" onClick={onClose}>
+      <div className="p10-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+        <div className="p10-modal-header">
+          <h2 className="p10-modal-title">{t('history.title')}</h2>
+          <button className="p10-modal-close" onClick={onClose}>
             ✖
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="p10-modal-body">
           {rounds.length === 0 ? (
             <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>{t('history.empty')}</p>
           ) : (
@@ -100,7 +100,7 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
           )}
         </div>
 
-        <div className="modal-footer">
+        <div className="p10-modal-footer">
           <button className="btn btn-primary" onClick={onClose}>
             {t('history.btn.close')}
           </button>
