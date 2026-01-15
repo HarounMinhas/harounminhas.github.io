@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Player, RoundEntry } from '../types';
 import { useI18n } from '../i18n';
 
@@ -44,7 +45,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
     onSave(Array.from(entries.values()));
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -63,8 +64,9 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                 style={{
                   marginBottom: '1.5rem',
                   padding: '1rem',
-                  background: 'var(--dark-light)',
-                  borderRadius: '0.5rem',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: '0.75rem',
                 }}
               >
                 <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>{player.name}</h3>
@@ -79,9 +81,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                       className="form-input"
                       min="0"
                       value={entry.points}
-                      onChange={(e) =>
-                        updateEntry(player.id, { points: parseInt(e.target.value) || 0 })
-                      }
+                      onChange={(e) => updateEntry(player.id, { points: parseInt(e.target.value) || 0 })}
                     />
                   </div>
 
@@ -92,9 +92,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                     <select
                       className="form-select"
                       value={entry.phaseAfterRound}
-                      onChange={(e) =>
-                        updateEntry(player.id, { phaseAfterRound: parseInt(e.target.value) })
-                      }
+                      onChange={(e) => updateEntry(player.id, { phaseAfterRound: parseInt(e.target.value) })}
                     >
                       {Array.from({ length: 10 }, (_, i) => i + 1).map((phase) => (
                         <option key={phase} value={phase}>
@@ -105,14 +103,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                   </div>
                 </div>
 
-                <label
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    cursor: 'pointer',
-                  }}
-                >
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
                     checked={entry.phaseCompleted}
@@ -135,6 +126,7 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
