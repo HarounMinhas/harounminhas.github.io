@@ -10,6 +10,13 @@ interface EndRoundModalProps {
   onClose: () => void;
 }
 
+function normalizePointsInput(raw: string): string {
+  if (raw === '') return '';
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n) || n < 0) return '0';
+  return String(n);
+}
+
 export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRoundModalProps) {
   const { t } = useI18n();
 
@@ -27,6 +34,10 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
     )
   );
 
+  const [pointsDraft, setPointsDraft] = useState<Map<string, string>>(
+    new Map(players.map((p) => [p.id, '0']))
+  );
+
   const updateEntry = (playerId: string, updates: Partial<RoundEntry>) => {
     const current = entries.get(playerId)!;
     const updated = { ...current, ...updates };
@@ -42,7 +53,17 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
   };
 
   const handleSave = () => {
-    onSave(Array.from(entries.values()));
+    const merged = players.map((p) => {
+      const base = entries.get(p.id)!;
+      const raw = pointsDraft.get(p.id) ?? '0';
+      const points = raw === '' ? 0 : parseInt(raw, 10) || 0;
+      return {
+        ...base,
+        points,
+      };
+    });
+
+    onSave(merged);
   };
 
   return createPortal(
@@ -58,6 +79,8 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
         <div className="p10-modal-body">
           {players.map((player) => {
             const entry = entries.get(player.id)!;
+            const pointsValue = pointsDraft.get(player.id) ?? '0';
+
             return (
               <div
                 key={player.id}
@@ -80,8 +103,34 @@ export function EndRoundModal({ players, currentPhases, onSave, onClose }: EndRo
                       type="number"
                       className="form-input"
                       min="0"
-                      value={entry.points}
-                      onChange={(e) => updateEntry(player.id, { points: parseInt(e.target.value) || 0 })}
+                      value={pointsValue}
+                      onFocus={(e) => {
+                        if (e.currentTarget.value === '0') {
+                          e.currentTarget.select();
+                        }
+                      }}
+                      onBlur={() => {
+                        const raw = pointsDraft.get(player.id) ?? '0';
+                        if (raw === '') {
+                          setPointsDraft((prev) => {
+                            const next = new Map(prev);
+                            next.set(player.id, '0');
+                            return next;
+                          });
+                        }
+                      }}
+                      onChange={(e) => {
+                        const normalized = normalizePointsInput(e.target.value);
+
+                        setPointsDraft((prev) => {
+                          const next = new Map(prev);
+                          next.set(player.id, normalized);
+                          return next;
+                        });
+
+                        const points = normalized === '' ? 0 : parseInt(normalized, 10) || 0;
+                        updateEntry(player.id, { points });
+                      }}
                     />
                   </div>
 

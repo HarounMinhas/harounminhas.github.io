@@ -12,6 +12,15 @@ interface ScoreboardProps {
   onGeneratePhase: () => void;
 }
 
+type RankKey = {
+  currentPhase: number;
+  totalPoints: number;
+};
+
+function isSameRank(a: RankKey, b: RankKey): boolean {
+  return a.currentPhase === b.currentPhase && a.totalPoints === b.totalPoints;
+}
+
 export function Scoreboard({
   scores,
   currentRound,
@@ -30,6 +39,15 @@ export function Scoreboard({
     }
     return a.totalPoints - b.totalPoints;
   });
+
+  const noScoresYet = sortedScores.every((s) => s.totalPoints === 0 && s.currentPhase === 1);
+
+  const top = sortedScores[0];
+  const second = sortedScores[1];
+  const hasTieForFirst = !!(top && second && isSameRank(top, second));
+
+  const showCrown = !!(top && !noScoresYet && !hasTieForFirst);
+  const leaderId = showCrown ? top.playerId : null;
 
   const handleMenuAction = (action: () => void) => {
     action();
@@ -66,7 +84,11 @@ export function Scoreboard({
                   🔄 {t('nav.newGame')}
                 </button>
 
-                <div className="menu-item menu-item-static" onClick={(e) => e.stopPropagation()} aria-label={t('common.language')}>
+                <div
+                  className="menu-item menu-item-static"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={t('common.language')}
+                >
                   <span aria-hidden="true">🌐</span>
                   <span className="menu-lang-buttons">
                     <button
@@ -104,16 +126,22 @@ export function Scoreboard({
               </tr>
             </thead>
             <tbody>
-              {sortedScores.map((score, index) => (
-                <tr key={score.playerId} className={index === 0 ? 'leader' : ''}>
-                  <td style={{ fontWeight: 600 }}>
-                    {index === 0 && '👑 '}
-                    {score.name}
-                  </td>
-                  <td>{t('phase.label', { phase: score.currentPhase })}</td>
-                  <td>{score.totalPoints}</td>
-                </tr>
-              ))}
+              {sortedScores.map((score) => {
+                const isLeader = leaderId === score.playerId;
+
+                return (
+                  <tr key={score.playerId} className={isLeader ? 'leader' : ''}>
+                    <td style={{ fontWeight: 600 }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>{score.name}</span>
+                        {isLeader && <span aria-label="leader">👑</span>}
+                      </span>
+                    </td>
+                    <td>{t('phase.label', { phase: score.currentPhase })}</td>
+                    <td>{score.totalPoints}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
