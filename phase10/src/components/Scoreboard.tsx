@@ -34,53 +34,30 @@ export function Scoreboard({
     setMenuOpen(false);
   };
 
+  // Default Phase 10 phases
+  const defaultPhases = [
+    { phase: 1, description: '2 sets of 3' },
+    { phase: 2, description: '1 set of 3 + 1 run of 4' },
+    { phase: 3, description: '1 set of 4 + 1 run of 4' },
+    { phase: 4, description: '1 run of 7' },
+    { phase: 5, description: '1 run of 8' },
+    { phase: 6, description: '1 run of 9' },
+    { phase: 7, description: '2 sets of 4' },
+    { phase: 8, description: '7 cards of one color' },
+    { phase: 9, description: '1 set of 5 + 1 set of 2' },
+    { phase: 10, description: '1 set of 5 + 1 set of 3' },
+  ];
+
   return (
     <div className="scoreboard-container">
-      <div className="scoreboard-header">
-        <h1>{t('scoreboard.title')}</h1>
-        <p className="round-indicator">
-          {t('scoreboard.round', { round: currentRound })}
-        </p>
-      </div>
-
-      <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>{t('table.player')}</th>
-              <th>{t('table.phase')}</th>
-              <th>{t('table.totalPoints')}</th>
-              <th>{t('table.lastRound')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedScores.map((score, index) => (
-              <tr key={score.playerId} className={index === 0 ? 'leader' : ''}>
-                <td style={{ fontWeight: 600 }}>
-                  {index === 0 && '👑 '}
-                  {score.name}
-                </td>
-                <td>{t('phase.label', { phase: score.currentPhase })}</td>
-                <td>{score.totalPoints}</td>
-                <td className="last-round-points">
-                  {score.lastRoundPoints > 0 ? `+${score.lastRoundPoints}` : score.lastRoundPoints}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="action-buttons">
-        <button className="btn btn-primary btn-large" onClick={onEndRound}>
-          {t('scoreboard.btn.endRound')}
-        </button>
+      {/* Header with title and menu */}
+      <div className="scoreboard-header-bar">
+        <h1 className="scoreboard-title">{t('scoreboard.title')}</h1>
         
         <div className="menu-container">
           <button 
-            className="btn btn-secondary" 
+            className="btn-menu" 
             onClick={() => setMenuOpen(!menuOpen)}
-            style={{ width: '100%' }}
           >
             ☰ Menu
           </button>
@@ -110,6 +87,66 @@ export function Scoreboard({
               </div>
             </>
           )}
+        </div>
+      </div>
+
+      {/* Round indicator */}
+      <p className="round-indicator-top">
+        {t('scoreboard.round', { round: currentRound })}
+      </p>
+
+      {/* Players scores table */}
+      <div className="scores-section">
+        <div className="table-container">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>{t('table.player')}</th>
+                <th>{t('table.phase')}</th>
+                <th>{t('table.totalPoints')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedScores.map((score, index) => (
+                <tr key={score.playerId} className={index === 0 ? 'leader' : ''}>
+                  <td style={{ fontWeight: 600 }}>
+                    {index === 0 && '👑 '}
+                    {score.name}
+                  </td>
+                  <td>{t('phase.label', { phase: score.currentPhase })}</td>
+                  <td>{score.totalPoints}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* End Round button */}
+      <button className="btn btn-primary btn-large" onClick={onEndRound}>
+        {t('scoreboard.btn.endRound')}
+      </button>
+
+      {/* Phases reference table at bottom */}
+      <div className="phases-reference-section">
+        <h3 className="phases-reference-title">Phase Descriptions</h3>
+        <div className="table-container">
+          <table className="table phases-table">
+            <thead>
+              <tr>
+                <th>Phase #</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {defaultPhases.map((phase) => (
+                <tr key={phase.phase}>
+                  <td style={{ fontWeight: 600 }}>Phase {phase.phase}</td>
+                  <td>{phase.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
