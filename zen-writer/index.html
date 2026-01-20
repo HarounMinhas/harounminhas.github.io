@@ -355,6 +355,98 @@
             font-size: 0.75rem;
             color: var(--text-muted);
         }
+
+        @media (max-width: 900px) {
+            body {
+                overflow: auto;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+                padding: 0.75rem 1rem;
+                gap: 0.5rem 0.75rem;
+            }
+
+            .toolbar-right {
+                width: 100%;
+                margin-left: 0;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                font-size: 0.7rem;
+            }
+
+            .editor-container {
+                height: auto;
+                min-height: calc(100vh - 120px);
+                padding: 2rem 1.5rem;
+            }
+
+            body.fullscreen .editor-container {
+                padding: 3rem 1.5rem;
+            }
+
+            .document-title {
+                font-size: 2rem;
+                min-height: 52px;
+            }
+
+            .editor {
+                font-size: 1.05rem;
+                line-height: 1.7;
+            }
+
+            .modal-content,
+            .format-modal {
+                width: 92%;
+                max-width: 520px;
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .toolbar-btn {
+                padding: 0.6rem 0.75rem;
+                min-height: 44px;
+            }
+
+            .toolbar-btn span:last-child {
+                display: none;
+            }
+
+            .toolbar-divider {
+                display: none;
+            }
+
+            .toolbar-select {
+                min-height: 44px;
+            }
+
+            .editor-container {
+                min-height: calc(100vh - 140px);
+                padding: 1.5rem 1rem;
+            }
+
+            .document-title {
+                font-size: 1.7rem;
+                margin-bottom: 1rem;
+            }
+
+            .editor {
+                font-size: 1rem;
+                min-height: 360px;
+            }
+
+            .format-buttons {
+                flex-direction: column;
+            }
+
+            .fullscreen-hint {
+                right: 1rem;
+                left: 1rem;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
