@@ -4,11 +4,13 @@ import type { ProviderId } from '@musicdiscovery/shared';
 import AppRoutes from './AppRoutes';
 import BackgroundSurface from './components/BackgroundSurface';
 import BackgroundToggle, { type BackgroundMode } from './components/BackgroundToggle';
+import ServerStatusOverlay from './components/ServerStatusOverlay';
 import ThemeToggle, { type ThemeMode } from './components/ThemeToggle';
 import './styles.css';
 import { useArtistDetails } from './hooks/useArtistDetails';
 import { useArtistSearch } from './hooks/useArtistSearch';
 import { useProviderSelection } from './hooks/useProviderSelection';
+import { useServerStatus } from './hooks/useServerStatus';
 import { useTabState } from './hooks/useTabState';
 import { useToastQueue } from './hooks/useToastQueue';
 import { useScrollPreserver } from './hooks/useScrollPreserver';
@@ -21,6 +23,7 @@ function AppInner(): JSX.Element {
   const preserveScroll = useScrollPreserver();
   const { toasts, pushToast } = useToastQueue();
   const { t, lang, setLang } = useI18n();
+  const serverStatus = useServerStatus();
 
   const {
     provider,
@@ -349,6 +352,14 @@ function AppInner(): JSX.Element {
             </div>
           </div>
         </div>
+      ) : null}
+
+      {serverStatus.visible ? (
+        <ServerStatusOverlay
+          phase={serverStatus.phase}
+          progress={serverStatus.progress}
+          onRetry={serverStatus.retryNow}
+        />
       ) : null}
 
       <AppRoutes header={headerProps} search={searchProps} tabs={tabsProps} detail={detailProps} toasts={toasts} />

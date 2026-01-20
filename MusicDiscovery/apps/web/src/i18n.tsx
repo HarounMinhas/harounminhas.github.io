@@ -11,8 +11,16 @@ const MESSAGES = {
     'intro.line1':
       'Zoeken kan in het begin wat traag zijn. Dit komt omdat de app nog in testfase zit en op gratis services draait.',
     'intro.line2':
-      'Krijg je niet meteen resultaten? Refresh even of wacht een minuutje — dan is de service waarschijnlijk aan het opstarten.',
+      'Krijg je niet meteen resultaten? Refresh even of wacht een minuutje - dan is de service waarschijnlijk aan het opstarten.',
     'intro.ok': 'Oké, begrepen',
+
+    'server.aria': 'Server status',
+    'server.title': 'Server status',
+    'server.connecting': 'Verbinden met server...',
+    'server.booting': 'Server is aan het opstarten...',
+    'server.progress': 'Voortgang (indicatie): {percent}%',
+    'server.note': 'Deze server draait op een gratis tier en kan even nodig hebben om op te starten.',
+    'server.retry': 'Opnieuw proberen',
 
     'settings.aria': 'Instellingen',
     'settings.title': 'Instellingen',
@@ -49,8 +57,16 @@ const MESSAGES = {
     'intro.line1':
       'Searching can be a bit slow at first. This is because the app is still in testing and runs on free services.',
     'intro.line2':
-      'Not getting results right away? Refresh or wait a minute — the service is probably waking up.',
+      'Not getting results right away? Refresh or wait a minute - the service is probably waking up.',
     'intro.ok': 'Got it',
+
+    'server.aria': 'Server status',
+    'server.title': 'Server status',
+    'server.connecting': 'Connecting to server...',
+    'server.booting': 'Server is starting up...',
+    'server.progress': 'Progress (estimate): {percent}%',
+    'server.note': 'This server runs on a free tier and can take a moment to wake up.',
+    'server.retry': 'Retry now',
 
     'settings.aria': 'Settings',
     'settings.title': 'Settings',

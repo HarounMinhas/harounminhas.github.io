@@ -180,7 +180,8 @@ a {
 }
 
 .intro-overlay,
-.settings-overlay {
+.settings-overlay,
+.server-status-overlay {
   position: fixed;
   inset: 0;
   z-index: 1100;
@@ -190,6 +191,13 @@ a {
   z-index: 1050;
 }
 
+.server-status-overlay {
+  z-index: 1150;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
 .intro-overlay {
   display: grid;
   place-items: center;
@@ -197,7 +205,8 @@ a {
 }
 
 .intro-overlay__backdrop,
-.settings-overlay__backdrop {
+.settings-overlay__backdrop,
+.server-status-overlay__backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
@@ -208,7 +217,8 @@ a {
 }
 
 .intro-overlay__panel,
-.settings-overlay__panel {
+.settings-overlay__panel,
+.server-status-overlay__panel {
   position: relative;
   width: min(540px, 100%);
   padding: 1.5rem;
@@ -226,6 +236,13 @@ a {
   right: 1.25rem;
 }
 
+.server-status-overlay__panel {
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .settings-overlay__content {
   display: flex;
   flex-direction: column;
@@ -234,10 +251,69 @@ a {
 }
 
 html[data-theme="light"] .intro-overlay__panel,
-html[data-theme="light"] .settings-overlay__panel {
+html[data-theme="light"] .settings-overlay__panel,
+html[data-theme="light"] .server-status-overlay__panel {
   background: rgba(255, 255, 255, 0.8);
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 24px 48px rgba(20, 25, 30, 0.12);
+}
+
+.server-status__headline {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.server-status__progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.server-status__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8aa8ff, #6fe2b5);
+  transition: width 0.4s ease;
+}
+
+html[data-theme="light"] .server-status__progress {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.server-status__percent {
+  margin: 0;
+}
+
+.server-status__note {
+  margin: 0;
+}
+
+.server-status__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.server-status__button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  background: rgba(119, 153, 255, 0.22);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.server-status__button:hover,
+.server-status__button:focus-visible {
+  outline: none;
+  background: rgba(119, 153, 255, 0.3);
+  border-color: rgba(119, 153, 255, 0.55);
+  transform: translateY(-1px);
 }
 
 .intro-overlay__actions {
