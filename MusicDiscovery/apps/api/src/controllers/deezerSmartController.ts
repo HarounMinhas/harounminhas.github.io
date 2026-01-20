@@ -5,6 +5,7 @@ import { relatedByBandOrMembers } from '../services/smartRelatedService.js';
 import { getSmartRelatedConfig } from '../services/smartRelatedConfig.js';
 import { SmartRelatedError } from '../services/errors.js';
 import { logger } from '../logger.js';
+import { getDeterministicFallbackSimilarArtists } from '../services/fallbackSimilarArtists/index.js';
 
 function parseLimit(value: unknown, fallback = 10, max = 20) {
   const numeric = Number(value);
@@ -73,7 +74,21 @@ export async function getSmartRelated(req: Request, res: Response) {
     res.json(payload);
   } catch (error) {
     const tookMs = Date.now() - startedAt;
+
     if (error instanceof SmartRelatedError) {
+      // Issue 1: only trigger deterministic fallback when the original algorithm has no results.
+      // In this codebase "no results" is represented by NOT_FOUND.
+      if (error.code === 'NOT_FOUND' && allowFallback) {
+        const fallback = await getDeterministicFallbackSimilarArtists({ log, query, limit });
+
+        // For Issue 1 we intentionally do NOT map fallback results into the public API response yet,
+        // because later issues will define provider integrations and the final response shape.
+        // If fallback yields results in future issues, this is where response adaptation will happen.
+        if (fallback.items.length > 0) {
+          log.info({ query, tookMs, strategy: fallback.strategy }, 'smart-related deterministic fallback produced results');
+        }
+      }
+
       log.warn({ query, tookMs, code: error.code, details: error.details ?? {} }, 'smart-related lookup failed');
       const status = mapErrorToStatus(error.code);
       res.status(status).json({
@@ -85,6 +100,7 @@ export async function getSmartRelated(req: Request, res: Response) {
       });
       return;
     }
+
     log.error({ query, tookMs, err: error }, 'smart-related lookup crashed');
     res.status(500).json({
       error: {
