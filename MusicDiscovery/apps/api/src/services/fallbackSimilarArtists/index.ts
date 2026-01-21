@@ -1,4 +1,5 @@
 import type { Logger } from 'pino';
+import { getSimilarArtistsFromDiscogs } from './discogs.js';
 import { getSimilarArtistsFromLastFm } from './lastfm.js';
 import { getSimilarArtistsFromMusicBrainz } from './musicbrainz.js';
 import type { FallbackResult } from './types.js';
@@ -29,7 +30,11 @@ export async function getDeterministicFallbackSimilarArtists(
       return { strategy: 'deterministic-fallback', items: musicbrainz, cacheHit: false };
     }
 
-    // 3) Discogs (Issue 4)
+    // 3) Discogs
+    const discogs = await getSimilarArtistsFromDiscogs(query, limit, log);
+    if (discogs.length > 0) {
+      return { strategy: 'deterministic-fallback', items: discogs, cacheHit: false };
+    }
 
     return { strategy: 'deterministic-fallback', items: [], cacheHit: false };
   } catch (error) {
