@@ -1,10 +1,13 @@
 import type { Logger } from 'pino';
 import { fetchJson, HttpStatusError, HttpTimeoutError } from '../../utils/http.js';
 import { normalizeArtistName } from './normalize.js';
+import { ProviderRateLimitError, createProviderLimiter, withProviderRateLimit } from './rateLimit.js';
 import type { FallbackSimilarArtist } from './types.js';
 
 const DISCOGS_BASE_URL = 'https://api.discogs.com';
 const DISCOGS_USER_AGENT = 'MusicDiscovery/1.0 (+https://harounminhas.github.io)';
+
+const discogsLimiter = createProviderLimiter('discogs', () => 1100);
 
 interface DiscogsSearchResult {
   id?: number;
@@ -47,9 +50,6 @@ interface DiscogsReleaseDetails {
   styles?: string[];
   labels?: DiscogsLabel[];
 }
-
-let queue: Promise<void> = Promise.resolve();
-let lastRequestAt = 0;
 
 export async function getSimilarArtistsFromDiscogs(
   artistName: string,
@@ -129,6 +129,7 @@ export async function getSimilarArtistsFromDiscogs(
 
     return items;
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     if (error instanceof HttpTimeoutError) {
       log.warn({ url: error.url }, 'Discogs request timed out (swallowed)');
       return [];
@@ -145,7 +146,7 @@ export async function getSimilarArtistsFromDiscogs(
 async function searchBestArtist(query: string, log: Logger): Promise<DiscogsSearchResult | null> {
   const url = `${DISCOGS_BASE_URL}/database/search?q=${encodeURIComponent(query)}&type=artist&per_page=5&page=1`;
   try {
-    const response = await requestDiscogs<DiscogsSearchResponse>(url);
+    const response = await requestDiscogs<DiscogsSearchResponse>(url, log);
     const results = (response.results ?? []).filter((r) => String(r.type ?? '').toLowerCase() === 'artist');
     if (results.length === 0) return null;
 
@@ -166,6 +167,7 @@ async function searchBestArtist(query: string, log: Logger): Promise<DiscogsSear
 
     return best?.item ?? results[0]!;
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return null;
     log.warn({ err: error, query }, 'Discogs artist search failed (swallowed)');
     return null;
   }
@@ -174,7 +176,7 @@ async function searchBestArtist(query: string, log: Logger): Promise<DiscogsSear
 async function getArtistReleases(artistId: number, log: Logger): Promise<DiscogsArtistRelease[]> {
   const url = `${DISCOGS_BASE_URL}/artists/${artistId}/releases?sort=year&sort_order=desc&per_page=25&page=1`;
   try {
-    const response = await requestDiscogs<DiscogsArtistReleasesResponse>(url);
+    const response = await requestDiscogs<DiscogsArtistReleasesResponse>(url, log);
     const releases = response.releases ?? [];
 
     // Prefer main artist appearances when possible.
@@ -185,6 +187,7 @@ async function getArtistReleases(artistId: number, log: Logger): Promise<Discogs
       .filter((r) => !!r.id && (r.type === 'master' || r.type === 'release'))
       .slice(0, 8);
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     log.warn({ err: error, artistId }, 'Discogs artist releases lookup failed (swallowed)');
     return [];
   }
@@ -231,8 +234,9 @@ async function buildSceneSignature(releases: DiscogsArtistRelease[], log: Logger
 async function getMasterDetails(masterId: number, log: Logger): Promise<DiscogsMasterDetails | null> {
   const url = `${DISCOGS_BASE_URL}/masters/${masterId}`;
   try {
-    return await requestDiscogs<DiscogsMasterDetails>(url);
+    return await requestDiscogs<DiscogsMasterDetails>(url, log);
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return null;
     log.warn({ err: error, masterId }, 'Discogs master lookup failed (swallowed)');
     return null;
   }
@@ -241,8 +245,9 @@ async function getMasterDetails(masterId: number, log: Logger): Promise<DiscogsM
 async function getReleaseDetails(releaseId: number, log: Logger): Promise<DiscogsReleaseDetails | null> {
   const url = `${DISCOGS_BASE_URL}/releases/${releaseId}`;
   try {
-    return await requestDiscogs<DiscogsReleaseDetails>(url);
+    return await requestDiscogs<DiscogsReleaseDetails>(url, log);
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return null;
     log.warn({ err: error, releaseId }, 'Discogs release lookup failed (swallowed)');
     return null;
   }
@@ -251,9 +256,10 @@ async function getReleaseDetails(releaseId: number, log: Logger): Promise<Discog
 async function searchReleasesByLabel(label: string, log: Logger): Promise<DiscogsSearchResult[]> {
   const url = `${DISCOGS_BASE_URL}/database/search?type=release&label=${encodeURIComponent(label)}&per_page=10&page=1`;
   try {
-    const response = await requestDiscogs<DiscogsSearchResponse>(url);
+    const response = await requestDiscogs<DiscogsSearchResponse>(url, log);
     return response.results ?? [];
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     log.warn({ err: error, label }, 'Discogs label search failed (swallowed)');
     return [];
   }
@@ -262,16 +268,17 @@ async function searchReleasesByLabel(label: string, log: Logger): Promise<Discog
 async function searchReleasesByStyle(style: string, log: Logger): Promise<DiscogsSearchResult[]> {
   const url = `${DISCOGS_BASE_URL}/database/search?type=release&style=${encodeURIComponent(style)}&per_page=10&page=1`;
   try {
-    const response = await requestDiscogs<DiscogsSearchResponse>(url);
+    const response = await requestDiscogs<DiscogsSearchResponse>(url, log);
     return response.results ?? [];
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     log.warn({ err: error, style }, 'Discogs style search failed (swallowed)');
     return [];
   }
 }
 
-async function requestDiscogs<T>(url: string): Promise<T> {
-  return schedule(async () => {
+async function requestDiscogs<T>(url: string, log: Logger): Promise<T> {
+  return await withProviderRateLimit('discogs', discogsLimiter, log, async () => {
     const headers: Record<string, string> = {
       Accept: 'application/json',
       'User-Agent': DISCOGS_USER_AGENT
@@ -284,27 +291,6 @@ async function requestDiscogs<T>(url: string): Promise<T> {
 
     return await fetchJson<T>(url, { headers });
   });
-}
-
-function schedule<T>(task: () => Promise<T>): Promise<T> {
-  const runner = async () => {
-    const now = Date.now();
-    const wait = Math.max(0, 1100 - (now - lastRequestAt));
-    if (wait > 0) await delay(wait);
-    lastRequestAt = Date.now();
-    return task();
-  };
-
-  const result = queue.then(runner);
-  queue = result.then(
-    () => undefined,
-    () => undefined
-  );
-  return result;
-}
-
-function delay(duration: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, duration));
 }
 
 function addCandidate(

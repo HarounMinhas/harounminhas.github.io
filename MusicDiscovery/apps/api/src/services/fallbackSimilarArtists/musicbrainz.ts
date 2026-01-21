@@ -2,9 +2,12 @@ import type { Logger } from 'pino';
 import { fetchJson, HttpStatusError, HttpTimeoutError } from '../../utils/http.js';
 import { getSmartRelatedConfig } from '../smartRelatedConfig.js';
 import { normalizeArtistName } from './normalize.js';
+import { ProviderRateLimitError, createProviderLimiter, withProviderRateLimit } from './rateLimit.js';
 import type { FallbackSimilarArtist } from './types.js';
 
 const MUSICBRAINZ_BASE_URL = 'https://musicbrainz.org/ws/2';
+
+const musicBrainzLimiter = createProviderLimiter('musicbrainz', () => getSmartRelatedConfig().musicBrainzRateLimitMs);
 
 interface MusicBrainzSearchArtist {
   id: string;
@@ -34,9 +37,6 @@ interface MusicBrainzArtistDetails {
   tags?: MusicBrainzTag[];
   relations?: MusicBrainzArtistRelation[];
 }
-
-let queue: Promise<void> = Promise.resolve();
-let lastRequestAt = 0;
 
 export async function getSimilarArtistsFromMusicBrainz(
   artistName: string,
@@ -141,6 +141,7 @@ export async function getSimilarArtistsFromMusicBrainz(
 
     return scored;
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     if (error instanceof HttpTimeoutError) {
       log.warn({ url: error.url }, 'MusicBrainz request timed out (swallowed)');
       return [];
@@ -158,7 +159,7 @@ async function searchBestArtist(query: string, log: Logger): Promise<MusicBrainz
   try {
     const escaped = query.replace(/"/g, '\\"');
     const url = `${MUSICBRAINZ_BASE_URL}/artist?query=${encodeURIComponent(`artist:"${escaped}"`)}&fmt=json&limit=5`;
-    const response = await requestMusicBrainz<MusicBrainzSearchResponse>(url);
+    const response = await requestMusicBrainz<MusicBrainzSearchResponse>(url, log);
     const artists = response.artists ?? [];
     if (artists.length === 0) return null;
 
@@ -179,6 +180,7 @@ async function searchBestArtist(query: string, log: Logger): Promise<MusicBrainz
 
     return best?.item ?? null;
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return null;
     log.warn({ err: error, query }, 'MusicBrainz search failed (swallowed)');
     return null;
   }
@@ -187,8 +189,9 @@ async function searchBestArtist(query: string, log: Logger): Promise<MusicBrainz
 async function getArtistDetails(mbid: string, log: Logger): Promise<MusicBrainzArtistDetails | null> {
   try {
     const url = `${MUSICBRAINZ_BASE_URL}/artist/${encodeURIComponent(mbid)}?inc=tags+artist-rels&fmt=json`;
-    return await requestMusicBrainz<MusicBrainzArtistDetails>(url);
+    return await requestMusicBrainz<MusicBrainzArtistDetails>(url, log);
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return null;
     log.warn({ err: error, mbid }, 'MusicBrainz artist lookup failed (swallowed)');
     return null;
   }
@@ -198,9 +201,10 @@ async function searchArtistsByTag(tagName: string, log: Logger): Promise<MusicBr
   try {
     const escaped = tagName.replace(/"/g, '\\"');
     const url = `${MUSICBRAINZ_BASE_URL}/artist?query=${encodeURIComponent(`tag:"${escaped}"`)}&fmt=json&limit=5`;
-    const response = await requestMusicBrainz<MusicBrainzSearchResponse>(url);
+    const response = await requestMusicBrainz<MusicBrainzSearchResponse>(url, log);
     return response.artists ?? [];
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     log.warn({ err: error, tagName }, 'MusicBrainz tag search failed (swallowed)');
     return [];
   }
@@ -245,8 +249,8 @@ function countryMatchWeight(seedCountry: string, candidateCountry: string | unde
   return seedCountry === candidate ? 0.1 : 0;
 }
 
-async function requestMusicBrainz<T>(url: string): Promise<T> {
-  return schedule(async () => {
+async function requestMusicBrainz<T>(url: string, log: Logger): Promise<T> {
+  return await withProviderRateLimit('musicbrainz', musicBrainzLimiter, log, async () => {
     return await fetchJson<T>(url, { headers: getHeaders() });
   });
 }
@@ -257,28 +261,6 @@ function getHeaders(): Record<string, string> {
     'User-Agent': config.musicBrainzUserAgent,
     Accept: 'application/json'
   };
-}
-
-function schedule<T>(task: () => Promise<T>): Promise<T> {
-  const runner = async () => {
-    const config = getSmartRelatedConfig();
-    const now = Date.now();
-    const wait = Math.max(0, config.musicBrainzRateLimitMs - (now - lastRequestAt));
-    if (wait > 0) await delay(wait);
-    lastRequestAt = Date.now();
-    return task();
-  };
-
-  const result = queue.then(runner);
-  queue = result.then(
-    () => undefined,
-    () => undefined
-  );
-  return result;
-}
-
-function delay(duration: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, duration));
 }
 
 function clamp01(value: number): number {

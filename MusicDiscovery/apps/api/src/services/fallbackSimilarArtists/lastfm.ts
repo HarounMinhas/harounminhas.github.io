@@ -2,9 +2,13 @@ import type { Logger } from 'pino';
 import { env } from '../../env.js';
 import { fetchJson, HttpStatusError, HttpTimeoutError } from '../../utils/http.js';
 import { normalizeArtistName } from './normalize.js';
+import { ProviderRateLimitError, createProviderLimiter, withProviderRateLimit } from './rateLimit.js';
 import type { FallbackSimilarArtist } from './types.js';
 
 const LASTFM_BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
+
+// Conservative rate limit guard (avoid bursting + keep deterministic behavior).
+const lastfmLimiter = createProviderLimiter('lastfm', () => 1000);
 
 interface LastFmSimilarArtist {
   name?: string;
@@ -42,8 +46,10 @@ export async function getSimilarArtistsFromLastFm(
     url.searchParams.set('limit', String(Math.min(Math.max(limit, 1), 25)));
     url.searchParams.set('autocorrect', '1');
 
-    const payload = await fetchJson<LastFmSimilarArtistsResponse>(url.toString(), {
-      headers: { Accept: 'application/json' }
+    const payload = await withProviderRateLimit('lastfm', lastfmLimiter, log, async () => {
+      return await fetchJson<LastFmSimilarArtistsResponse>(url.toString(), {
+        headers: { Accept: 'application/json' }
+      });
     });
 
     if (payload.error) {
@@ -82,6 +88,7 @@ export async function getSimilarArtistsFromLastFm(
 
     return results;
   } catch (error) {
+    if (error instanceof ProviderRateLimitError) return [];
     if (error instanceof HttpTimeoutError) {
       log.warn({ url: error.url }, 'Last.fm request timed out (swallowed)');
       return [];
