@@ -241,7 +241,8 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
     );
 
     if (items.length > 0) {
-      const parsed = RelatedArtistsResponseSchema.parse({ items });
+      const labeled = items.map((item) => ({ ...item, uxLabel: 'audio-similarity-based' }));
+      const parsed = RelatedArtistsResponseSchema.parse({ items: labeled });
       res.json(parsed);
       return;
     }
@@ -269,7 +270,7 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
       return;
     }
 
-    const resolved: { id: string; name: string; imageUrl?: string; genres?: string[]; popularity?: number }[] = [];
+    const resolved: { id: string; name: string; imageUrl?: string; genres?: string[]; popularity?: number; uxLabel?: string }[] = [];
     const seenIds = new Set<string>();
 
     await mapWithConcurrency(
@@ -285,7 +286,7 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
 
           if (seenIds.has(best.id)) return;
           seenIds.add(best.id);
-          resolved.push(best);
+          resolved.push({ ...best, uxLabel: candidate.uxLabel });
         } catch (error) {
           // Never throw from fallback logic.
           log.warn({ err: error, candidate: candidate.name }, 'Failed to resolve fallback artist name (swallowed)');

@@ -48,6 +48,17 @@ function getLog(req: Request) {
   return base.child({ route: 'smart-related' });
 }
 
+function strategyToUxLabel(strategy: string): string {
+  switch (strategy) {
+    case 'deezer-related':
+      return 'audio-similarity-based';
+    case 'fallback-members-aggregation':
+      return 'metadata-based';
+    default:
+      return 'metadata-based';
+  }
+}
+
 export async function getSmartRelated(req: Request, res: Response) {
   const startedAt = Date.now();
   const config = getSmartRelatedConfig();
@@ -63,10 +74,13 @@ export async function getSmartRelated(req: Request, res: Response) {
     const result = await relatedByBandOrMembers(query, limit, { allowFallback });
     const tookMs = Date.now() - startedAt;
     log.info({ query, tookMs, strategy: result.strategy, cacheHit: result.cacheHit }, 'smart-related lookup succeeded');
+
+    const uxLabel = strategyToUxLabel(result.strategy);
+
     const payload = SmartRelatedResponseSchema.parse({
       query,
       strategy: result.strategy,
-      items: result.items,
+      items: result.items.map((item) => ({ ...item, uxLabel })),
       seeds: result.seeds,
       cache: { hit: result.cacheHit },
       tookMs
