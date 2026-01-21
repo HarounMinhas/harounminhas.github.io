@@ -12,3 +12,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Optional: set this securely in the Render dashboard (do not commit a value).
+      - key: LASTFM_API_KEY
+        sync: false

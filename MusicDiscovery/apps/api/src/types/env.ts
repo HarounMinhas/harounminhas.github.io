@@ -34,7 +34,8 @@ export const EnvSchema = z.object({
     .string()
     .min(1)
     .default('MusicDiscoverySmartRelated/1.0 (musicdiscovery.local; dev@musicdiscovery.local)'),
-  SMART_RELATED_MUSICBRAINZ_RATE_LIMIT_MS: z.coerce.number().min(200).max(60000).default(1000)
+  SMART_RELATED_MUSICBRAINZ_RATE_LIMIT_MS: z.coerce.number().min(200).max(60000).default(1000),
+  LASTFM_API_KEY: z.string().min(1).optional()
 });
 
 export type Env = z.infer<typeof EnvSchema>;
