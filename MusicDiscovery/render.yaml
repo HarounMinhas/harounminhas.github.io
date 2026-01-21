@@ -15,3 +15,6 @@ services:
       # Optional: set this securely in the Render dashboard (do not commit a value).
       - key: LASTFM_API_KEY
         sync: false
+      # Optional: Discogs Personal Access Token (recommended to avoid strict anonymous rate limits).
+      - key: DISCOGS_TOKEN
+        sync: false
