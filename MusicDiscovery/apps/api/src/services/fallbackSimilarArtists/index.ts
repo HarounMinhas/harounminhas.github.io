@@ -1,5 +1,6 @@
 import type { Logger } from 'pino';
 import { getSimilarArtistsFromLastFm } from './lastfm.js';
+import { getSimilarArtistsFromMusicBrainz } from './musicbrainz.js';
 import type { FallbackResult } from './types.js';
 
 interface FallbackContext {
@@ -22,7 +23,12 @@ export async function getDeterministicFallbackSimilarArtists(
       return { strategy: 'deterministic-fallback', items: lastfm, cacheHit: false };
     }
 
-    // 2) MusicBrainz (Issue 3)
+    // 2) MusicBrainz
+    const musicbrainz = await getSimilarArtistsFromMusicBrainz(query, limit, log);
+    if (musicbrainz.length > 0) {
+      return { strategy: 'deterministic-fallback', items: musicbrainz, cacheHit: false };
+    }
+
     // 3) Discogs (Issue 4)
 
     return { strategy: 'deterministic-fallback', items: [], cacheHit: false };
