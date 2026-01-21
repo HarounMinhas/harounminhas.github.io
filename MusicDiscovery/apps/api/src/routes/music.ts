@@ -16,6 +16,9 @@ import {
 import { getDefaultProviderMode, getProviderMetadata, resolveProvider } from '../providerRegistry.js';
 import type { Logger } from 'pino';
 import { logger } from '../logger.js';
+import { mapWithConcurrency } from '../utils/concurrency.js';
+import { getDeterministicFallbackSimilarArtists } from '../services/fallbackSimilarArtists/index.js';
+import { normalizeArtistName } from '../services/fallbackSimilarArtists/normalize.js';
 
 const router = Router();
 
@@ -230,12 +233,69 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
   try {
     const limit = parseLimit(req.query.limit);
     const { mode, provider } = resolveProvider(req);
+
     const items = await withCache(
       `artist:${mode}:${req.params.id}:related:${limit}`,
       1000 * 60 * 60 * 24,
       () => provider.getRelatedArtists(req.params.id!, limit)
     );
-    const parsed = RelatedArtistsResponseSchema.parse({ items });
+
+    if (items.length > 0) {
+      const parsed = RelatedArtistsResponseSchema.parse({ items });
+      res.json(parsed);
+      return;
+    }
+
+    // Issue 2: deterministic fallback runs ONLY when the original provider returns 0 related artists.
+    const log = getRequestLogger(req, { route: 'related', providerMode: mode, artistId: req.params.id });
+
+    const artist = await withCache(
+      `artist:${mode}:${req.params.id}`,
+      1000 * 60 * 60 * 24,
+      () => provider.getArtist(req.params.id!)
+    );
+
+    const queryName = String(artist?.name ?? '').trim();
+    if (!queryName) {
+      const parsed = RelatedArtistsResponseSchema.parse({ items: [] });
+      res.json(parsed);
+      return;
+    }
+
+    const fallback = await getDeterministicFallbackSimilarArtists({ log, query: queryName, limit });
+    if (fallback.items.length === 0) {
+      const parsed = RelatedArtistsResponseSchema.parse({ items: [] });
+      res.json(parsed);
+      return;
+    }
+
+    const resolved: { id: string; name: string; imageUrl?: string; genres?: string[]; popularity?: number }[] = [];
+    const seenIds = new Set<string>();
+
+    await mapWithConcurrency(
+      fallback.items,
+      async (candidate) => {
+        try {
+          const searchResults = await provider.searchArtists(candidate.name, 5);
+          if (!searchResults.length) return;
+
+          const candidateKey = candidate.normalizedName;
+          const exact = searchResults.find((result) => normalizeArtistName(result.name) === candidateKey);
+          const best = exact ?? searchResults[0]!;
+
+          if (seenIds.has(best.id)) return;
+          seenIds.add(best.id);
+          resolved.push(best);
+        } catch (error) {
+          // Never throw from fallback logic.
+          log.warn({ err: error, candidate: candidate.name }, 'Failed to resolve fallback artist name (swallowed)');
+        }
+      },
+      3
+    );
+
+    const finalItems = resolved.slice(0, limit);
+    const parsed = RelatedArtistsResponseSchema.parse({ items: finalItems });
     res.json(parsed);
   } catch (error) {
     next(error);
