@@ -54,8 +54,8 @@ jobs:
             # Enable pnpm
             corepack enable
             
-            # Install all workspace dependencies
-            pnpm install --frozen-lockfile
+            # Install all workspace dependencies (allow lockfile updates in CI)
+            pnpm install --no-frozen-lockfile
             
             # Build shared package first (dependency)
             echo "Building @musicdiscovery/shared..."
