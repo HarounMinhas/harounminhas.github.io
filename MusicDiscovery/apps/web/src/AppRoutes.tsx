@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import type { Artist, ProviderId, ProviderMetadata, Track } from '@musicdiscovery/shared';
+import type { Artist, ProviderId, ProviderMetadata, Track, ServiceMetadata } from '@musicdiscovery/shared';
 
 import ArtistDetails from './components/ArtistDetails';
 import ArtistTabsBar, { type ArtistTabItem } from './components/ArtistTabsBar';
@@ -51,6 +51,7 @@ interface DetailProps {
   selectedArtist: Artist | null;
   topTracks: Track[];
   relatedArtists: Artist[];
+  serviceMetadata?: ServiceMetadata;
   onPreviewError: (message: string) => void;
   onOpenRelated: (artist: Artist) => void;
 }
@@ -174,6 +175,7 @@ function HomeRoute({ header, search, tabs, detail, toasts }: AppRoutesProps) {
                   status={detail.status}
                   topTracks={detail.topTracks}
                   relatedArtists={detail.relatedArtists}
+                  serviceMetadata={detail.serviceMetadata}
                   error={detail.error}
                   provider={detail.provider}
                   onPreviewError={detail.onPreviewError}
