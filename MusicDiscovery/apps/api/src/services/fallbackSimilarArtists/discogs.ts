@@ -3,6 +3,7 @@ import { fetchJson, HttpStatusError, HttpTimeoutError } from '../../utils/http.j
 import { normalizeArtistName } from './normalize.js';
 import { ProviderRateLimitError, createProviderLimiter, withProviderRateLimit } from './rateLimit.js';
 import type { FallbackSimilarArtist } from './types.js';
+import { getFallbackCache, getTTLForProvider } from '../../fallbackCache.js';
 
 const DISCOGS_BASE_URL = 'https://api.discogs.com';
 const DISCOGS_USER_AGENT = 'MusicDiscovery/1.0 (+https://harounminhas.github.io)';
@@ -58,6 +59,19 @@ export async function getSimilarArtistsFromDiscogs(
 ): Promise<FallbackSimilarArtist[]> {
   const trimmed = artistName.trim();
   if (!trimmed) return [];
+
+  const cache = await getFallbackCache();
+  const cacheKey = `discogs:similar:${normalizeArtistName(trimmed)}:${limit}`;
+  const cached = await cache.get(cacheKey);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached) as FallbackSimilarArtist[];
+      log.info({ cacheKey }, 'Discogs cache hit');
+      return parsed;
+    } catch {
+      log.warn({ cacheKey }, 'Invalid cached Discogs data; ignoring');
+    }
+  }
 
   try {
     const seed = await searchBestArtist(trimmed, log);
@@ -126,6 +140,10 @@ export async function getSimilarArtistsFromDiscogs(
       })
       .sort((a, b) => b.similarityScore - a.similarityScore)
       .slice(0, Math.min(Math.max(limit, 1), 25));
+
+    if (items.length > 0) {
+      await cache.set(cacheKey, JSON.stringify(items), getTTLForProvider('discogs'));
+    }
 
     return items;
   } catch (error) {

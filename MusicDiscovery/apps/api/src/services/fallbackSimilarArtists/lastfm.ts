@@ -4,6 +4,7 @@ import { fetchJson, HttpStatusError, HttpTimeoutError } from '../../utils/http.j
 import { normalizeArtistName } from './normalize.js';
 import { ProviderRateLimitError, createProviderLimiter, withProviderRateLimit } from './rateLimit.js';
 import type { FallbackSimilarArtist } from './types.js';
+import { getFallbackCache, getTTLForProvider } from '../../fallbackCache.js';
 
 const LASTFM_BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
 
@@ -36,6 +37,19 @@ export async function getSimilarArtistsFromLastFm(
 
   const trimmed = artistName.trim();
   if (!trimmed) return [];
+
+  const cache = await getFallbackCache();
+  const cacheKey = `lastfm:similar:${normalizeArtistName(trimmed)}:${limit}`;
+  const cached = await cache.get(cacheKey);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached) as FallbackSimilarArtist[];
+      log.info({ cacheKey }, 'Last.fm cache hit');
+      return parsed;
+    } catch {
+      log.warn({ cacheKey }, 'Invalid cached Last.fm data; ignoring');
+    }
+  }
 
   try {
     const url = new URL(LASTFM_BASE_URL);
@@ -84,6 +98,10 @@ export async function getSimilarArtistsFromLastFm(
       });
 
       if (results.length >= limit) break;
+    }
+
+    if (results.length > 0) {
+      await cache.set(cacheKey, JSON.stringify(results), getTTLForProvider('lastfm'));
     }
 
     return results;

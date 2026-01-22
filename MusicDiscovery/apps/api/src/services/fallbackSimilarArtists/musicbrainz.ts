@@ -4,6 +4,7 @@ import { getSmartRelatedConfig } from '../smartRelatedConfig.js';
 import { normalizeArtistName } from './normalize.js';
 import { ProviderRateLimitError, createProviderLimiter, withProviderRateLimit } from './rateLimit.js';
 import type { FallbackSimilarArtist } from './types.js';
+import { getFallbackCache, getTTLForProvider } from '../../fallbackCache.js';
 
 const MUSICBRAINZ_BASE_URL = 'https://musicbrainz.org/ws/2';
 
@@ -45,6 +46,19 @@ export async function getSimilarArtistsFromMusicBrainz(
 ): Promise<FallbackSimilarArtist[]> {
   const trimmed = artistName.trim();
   if (!trimmed) return [];
+
+  const cache = await getFallbackCache();
+  const cacheKey = `musicbrainz:similar:${normalizeArtistName(trimmed)}:${limit}`;
+  const cached = await cache.get(cacheKey);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached) as FallbackSimilarArtist[];
+      log.info({ cacheKey }, 'MusicBrainz cache hit');
+      return parsed;
+    } catch {
+      log.warn({ cacheKey }, 'Invalid cached MusicBrainz data; ignoring');
+    }
+  }
 
   try {
     const seed = await searchBestArtist(trimmed, log);
@@ -138,6 +152,10 @@ export async function getSimilarArtistsFromMusicBrainz(
       .filter((item) => item.similarityScore > 0)
       .sort((a, b) => b.similarityScore - a.similarityScore)
       .slice(0, Math.min(Math.max(limit, 1), 25));
+
+    if (scored.length > 0) {
+      await cache.set(cacheKey, JSON.stringify(scored), getTTLForProvider('musicbrainz'));
+    }
 
     return scored;
   } catch (error) {

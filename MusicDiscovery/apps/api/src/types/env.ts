@@ -35,7 +35,12 @@ export const EnvSchema = z.object({
     .min(1)
     .default('MusicDiscoverySmartRelated/1.0 (musicdiscovery.local; dev@musicdiscovery.local)'),
   SMART_RELATED_MUSICBRAINZ_RATE_LIMIT_MS: z.coerce.number().min(200).max(60000).default(1000),
-  LASTFM_API_KEY: z.string().min(1).optional()
+  LASTFM_API_KEY: z.string().min(1).optional(),
+  // Issue #89: Redis caching for fallback providers
+  REDIS_URL: z.string().url().optional(),
+  FALLBACK_LASTFM_TTL_SECONDS: z.coerce.number().min(60).default(3600),
+  FALLBACK_MUSICBRAINZ_TTL_SECONDS: z.coerce.number().min(60).default(7200),
+  FALLBACK_DISCOGS_TTL_SECONDS: z.coerce.number().min(60).default(7200)
 });
 
 export type Env = z.infer<typeof EnvSchema>;
