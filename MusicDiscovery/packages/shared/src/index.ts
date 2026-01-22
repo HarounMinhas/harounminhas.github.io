@@ -1,3 +1,8 @@
+import { z } from 'zod';
+
+import { PROVIDER_MODES } from './providers';
+import type { ProviderId, ProviderMetadata } from './providers';
+
 export interface Artist {
   id: string;
   name: string;
@@ -39,20 +44,10 @@ export interface RelatedArtistsResponse {
   serviceMetadata?: ServiceMetadata;
 }
 
-export type ProviderId = 'tokenless' | 'user-token';
-
-export interface ProviderMetadata {
-  id: ProviderId;
-  name: string;
-  description: string;
-}
-
 export interface ProviderListResponse {
   default: ProviderId;
   items: ProviderMetadata[];
 }
-
-import { z } from 'zod';
 
 export const ArtistSchema = z.object({
   id: z.string(),
@@ -66,12 +61,14 @@ export const ArtistSchema = z.object({
 export const TrackSchema = z.object({
   id: z.string(),
   name: z.string(),
-  artists: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string()
-    })
-  ).optional(),
+  artists: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string()
+      })
+    )
+    .optional(),
   durationMs: z.number(),
   previewUrl: z.string().optional(),
   previewProxyUrl: z.string().optional()
@@ -100,12 +97,23 @@ export const RelatedArtistsResponseSchema = z.object({
 });
 
 export const ProviderMetadataSchema = z.object({
-  id: z.enum(['tokenless', 'user-token']),
-  name: z.string(),
-  description: z.string()
+  id: z.enum(PROVIDER_MODES),
+  label: z.string(),
+  description: z.string(),
+  supportsRelated: z.boolean(),
+  supportsTopTracks: z.boolean()
 });
 
 export const ProviderListResponseSchema = z.object({
-  default: z.enum(['tokenless', 'user-token']),
+  default: z.enum(PROVIDER_MODES),
   items: z.array(ProviderMetadataSchema)
 });
+
+export {
+  PROVIDERS,
+  PROVIDER_MODES,
+  DEFAULT_PROVIDER_MODE,
+  isProviderId,
+  type ProviderId,
+  type ProviderMetadata
+} from './providers';

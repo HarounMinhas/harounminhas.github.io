@@ -18,8 +18,10 @@ const LOCKED_PROVIDER: ProviderId = 'tokenless';
 const LOCKED_PROVIDERS: ProviderMetadata[] = [
   {
     id: 'tokenless',
-    name: 'Deezer (tokenless)',
-    description: 'Deezer-first mode zonder login.'
+    label: 'Deezer',
+    description: 'Deezer-first mode zonder login.',
+    supportsRelated: true,
+    supportsTopTracks: true
   }
 ];
 
