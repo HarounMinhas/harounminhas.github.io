@@ -11,7 +11,8 @@ import {
   SearchArtistsResponseSchema,
   TopTracksResponseSchema,
   TrackSchema,
-  type Track
+  type Track,
+  type ServiceMetadata
 } from '@musicdiscovery/shared';
 import { getDefaultProviderMode, getProviderMetadata, resolveProvider } from '../providerRegistry.js';
 import type { Logger } from 'pino';
@@ -234,6 +235,14 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
     const limit = parseLimit(req.query.limit);
     const { mode, provider } = resolveProvider(req);
 
+    // Track service metadata for status labels
+    const serviceMetadata: ServiceMetadata = {
+      deezer: 'unused',
+      lastfm: 'unused',
+      musicbrainz: 'unused',
+      discogs: 'unused'
+    };
+
     const items = await withCache(
       `artist:${mode}:${req.params.id}:related:${limit}`,
       1000 * 60 * 60 * 24,
@@ -241,13 +250,20 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
     );
 
     if (items.length > 0) {
+      // Deezer primary API returned results
+      serviceMetadata.deezer = 'success';
       const labeled = items.map((item) => ({ ...item, uxLabel: 'audio-similarity-based' }));
-      const parsed = RelatedArtistsResponseSchema.parse({ items: labeled });
+      const parsed = RelatedArtistsResponseSchema.parse({ 
+        items: labeled, 
+        serviceMetadata 
+      });
       res.json(parsed);
       return;
     }
 
-    // Issue 2: deterministic fallback runs ONLY when the original provider returns 0 related artists.
+    // Deezer returned nothing - mark as empty and try fallback
+    serviceMetadata.deezer = 'empty';
+
     const log = getRequestLogger(req, { route: 'related', providerMode: mode, artistId: req.params.id });
 
     const artist = await withCache(
@@ -258,14 +274,41 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
 
     const queryName = String(artist?.name ?? '').trim();
     if (!queryName) {
-      const parsed = RelatedArtistsResponseSchema.parse({ items: [] });
+      const parsed = RelatedArtistsResponseSchema.parse({ 
+        items: [], 
+        serviceMetadata 
+      });
       res.json(parsed);
       return;
     }
 
     const fallback = await getDeterministicFallbackSimilarArtists({ log, query: queryName, limit });
+    
+    // Update service metadata based on fallback results
+    if (fallback.items.length > 0) {
+      // Determine which services returned results based on uxLabel
+      const sources = new Set(fallback.items.map(item => item.source));
+      
+      if (sources.has('lastfm')) serviceMetadata.lastfm = 'success';
+      else if (env.LASTFM_API_KEY) serviceMetadata.lastfm = 'empty';
+      
+      if (sources.has('musicbrainz')) serviceMetadata.musicbrainz = 'success';
+      else serviceMetadata.musicbrainz = 'empty';
+      
+      if (sources.has('discogs')) serviceMetadata.discogs = 'success';
+      else if (env.DISCOGS_TOKEN) serviceMetadata.discogs = 'empty';
+    } else {
+      // All fallback services returned empty
+      if (env.LASTFM_API_KEY) serviceMetadata.lastfm = 'empty';
+      serviceMetadata.musicbrainz = 'empty';
+      if (env.DISCOGS_TOKEN) serviceMetadata.discogs = 'empty';
+    }
+
     if (fallback.items.length === 0) {
-      const parsed = RelatedArtistsResponseSchema.parse({ items: [] });
+      const parsed = RelatedArtistsResponseSchema.parse({ 
+        items: [], 
+        serviceMetadata 
+      });
       res.json(parsed);
       return;
     }
@@ -288,7 +331,6 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
           seenIds.add(best.id);
           resolved.push({ ...best, uxLabel: candidate.uxLabel });
         } catch (error) {
-          // Never throw from fallback logic.
           log.warn({ err: error, candidate: candidate.name }, 'Failed to resolve fallback artist name (swallowed)');
         }
       },
@@ -296,7 +338,10 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
     );
 
     const finalItems = resolved.slice(0, limit);
-    const parsed = RelatedArtistsResponseSchema.parse({ items: finalItems });
+    const parsed = RelatedArtistsResponseSchema.parse({ 
+      items: finalItems, 
+      serviceMetadata 
+    });
     res.json(parsed);
   } catch (error) {
     next(error);
