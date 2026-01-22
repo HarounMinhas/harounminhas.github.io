@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
-import { PROVIDER_MODES } from './providers';
-import type { ProviderId, ProviderMetadata } from './providers';
+// NOTE: this package is built with tsup in a NodeNext/Node16 moduleResolution context.
+// Relative imports must include explicit file extensions so the DTS build succeeds.
+import { PROVIDER_MODES } from './providers.js';
+import type { ProviderId, ProviderMetadata } from './providers.js';
 
 export interface Artist {
   id: string;
@@ -116,4 +118,4 @@ export {
   isProviderId,
   type ProviderId,
   type ProviderMetadata
-} from './providers';
+} from './providers.js';
