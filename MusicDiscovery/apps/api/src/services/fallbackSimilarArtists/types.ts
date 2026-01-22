@@ -1,5 +1,3 @@
-import type { SmartRelatedStrategy } from './smartRelatedService.js';
-
 export type FallbackProvider = 'lastfm' | 'musicbrainz' | 'discogs';
 
 export interface FallbackSimilarArtist {
@@ -12,7 +10,7 @@ export interface FallbackSimilarArtist {
 }
 
 export interface FallbackResult {
-  strategy: SmartRelatedStrategy | 'deterministic-fallback';
+  strategy: 'deezer-related' | 'fallback-members-aggregation' | 'deterministic-fallback';
   items: FallbackSimilarArtist[];
   cacheHit: boolean;
 }

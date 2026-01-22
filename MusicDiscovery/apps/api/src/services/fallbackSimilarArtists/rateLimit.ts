@@ -16,7 +16,7 @@ interface ProviderLimiter {
   getMinIntervalMs(): number;
 }
 
-export function createProviderLimiter(provider: string, getMinIntervalMs: () => number): ProviderLimiter {
+export function createProviderLimiter(_provider: string, getMinIntervalMs: () => number): ProviderLimiter {
   let lastRequestAt = 0;
   let inFlight = false;
 

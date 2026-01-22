@@ -1,4 +1,4 @@
-import { createClient, type RedisClientType } from 'redis';
+import { createClient } from 'redis';
 import type { Logger } from 'pino';
 import { env } from './env.js';
 import { logger as appLogger } from './logger.js';
@@ -58,11 +58,11 @@ class InMemoryFallbackCache implements FallbackCache {
 }
 
 class RedisFallbackCache implements FallbackCache {
-  private client: RedisClientType;
+  private client: any;
   private log: Logger;
   private ready = false;
 
-  constructor(client: RedisClientType, log: Logger) {
+  constructor(client: any, log: Logger) {
     this.client = client;
     this.log = log;
   }
