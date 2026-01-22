@@ -1,91 +1,102 @@
-import {
-  ArtistSchema,
-  RelatedArtistsResponseSchema,
-  SearchArtistsResponseSchema,
-  TopTracksResponseSchema,
-  type Artist,
-  type ProviderId,
-  type Track,
-  type ServiceMetadata
+import type {
+  Artist,
+  ProviderId,
+  ProviderMetadata,
+  RelatedArtistsResponse,
+  Track
 } from '@musicdiscovery/shared';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+import type { ArtistDetailsPayload } from './cache/artistCache';
+import { getSelectedProvider } from './providerSelection';
 
-interface FetchArtistDetailsOptions {
-  topTrackLimit?: number;
-  relatedLimit?: number;
-}
+const apiPrefix = (import.meta.env.VITE_API_PREFIX ?? '/api').replace(/\/$/, '');
 
-export interface ArtistDetailsPayload {
-  artist: Artist;
-  topTracks: Track[];
-  relatedArtists: Artist[];
-  serviceMetadata?: ServiceMetadata;
-}
+async function request<T>(
+  path: string,
+  options: { includeProvider?: boolean; provider?: ProviderId } = {}
+): Promise<T> {
+  const url = new URL(path, 'http://placeholder.local');
 
-export async function searchArtists(
-  query: string,
-  provider: ProviderId,
-  limit = 10
-): Promise<Artist[]> {
-  const params = new URLSearchParams({
-    query,
-    provider,
-    limit: String(limit)
-  });
-  const res = await fetch(`${API_URL}/music/search?${params}`);
-  if (!res.ok) {
-    throw new Error(`Search failed: ${res.statusText}`);
+  if (options.includeProvider !== false) {
+    const provider = options.provider ?? getSelectedProvider();
+    url.searchParams.set('provider', provider);
   }
-  const data = await res.json();
-  const parsed = SearchArtistsResponseSchema.parse(data);
-  return parsed.items;
+
+  const pathname = `${url.pathname}${url.search}`;
+  const res = await fetch(`${apiPrefix}${pathname}`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `Request failed: ${res.status}`);
+  }
+
+  return res.json() as Promise<T>;
+}
+
+export async function getProviderCatalog(): Promise<{ default: ProviderId; items: ProviderMetadata[] }> {
+  return request('/providers', { includeProvider: false });
+}
+
+// Kept signature as (query, limit) so hooks can call searchArtists(trimmed, limit)
+export async function searchArtists(query: string, limit = 10, provider?: ProviderId): Promise<Artist[]> {
+  const data = await request<{ items: Artist[] }>(
+    `/music/search?query=${encodeURIComponent(query)}&limit=${limit}`,
+    { provider }
+  );
+  return data.items;
+}
+
+export async function getRelatedArtistsResponse(
+  id: string,
+  limit = 10,
+  provider?: ProviderId
+): Promise<RelatedArtistsResponse> {
+  return request<RelatedArtistsResponse>(
+    `/music/artists/${encodeURIComponent(id)}/related?limit=${limit}`,
+    { provider }
+  );
+}
+
+export async function getRelatedArtists(id: string, limit = 10, provider?: ProviderId): Promise<Artist[]> {
+  const data = await getRelatedArtistsResponse(id, limit, provider);
+  return data.items;
+}
+
+export async function getTopTracks(
+  id: string,
+  market?: string,
+  limit = 10,
+  provider?: ProviderId
+): Promise<Track[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (market) params.set('market', market);
+  const data = await request<{ items: Track[] }>(
+    `/music/artists/${encodeURIComponent(id)}/top-tracks?${params.toString()}`,
+    { provider }
+  );
+  return data.items;
+}
+
+export async function getTrack(id: string, provider?: ProviderId): Promise<Track> {
+  return request<Track>(`/music/tracks/${encodeURIComponent(id)}`, { provider });
+}
+
+export async function getArtist(id: string, provider?: ProviderId): Promise<Artist> {
+  return request<Artist>(`/music/artists/${encodeURIComponent(id)}`, { provider });
 }
 
 export async function fetchArtistDetails(
   artistId: string,
   provider: ProviderId,
-  options: FetchArtistDetailsOptions = {}
+  options: { topTrackLimit?: number; relatedLimit?: number } = {}
 ): Promise<ArtistDetailsPayload> {
   const { topTrackLimit = 5, relatedLimit = 8 } = options;
 
-  const artistParams = new URLSearchParams({ provider });
-  const topTracksParams = new URLSearchParams({
-    provider,
-    limit: String(topTrackLimit)
-  });
-  const relatedParams = new URLSearchParams({
-    provider,
-    limit: String(relatedLimit)
-  });
-
-  const [artistRes, topTracksRes, relatedRes] = await Promise.all([
-    fetch(`${API_URL}/music/artists/${encodeURIComponent(artistId)}?${artistParams}`),
-    fetch(
-      `${API_URL}/music/artists/${encodeURIComponent(artistId)}/top-tracks?${topTracksParams}`
-    ),
-    fetch(`${API_URL}/music/artists/${encodeURIComponent(artistId)}/related?${relatedParams}`)
+  const [artist, topTracks, relatedResponse] = await Promise.all([
+    getArtist(artistId, provider),
+    getTopTracks(artistId, undefined, topTrackLimit, provider),
+    getRelatedArtistsResponse(artistId, relatedLimit, provider)
   ]);
-
-  if (!artistRes.ok) {
-    throw new Error(`Failed to fetch artist: ${artistRes.statusText}`);
-  }
-  if (!topTracksRes.ok) {
-    throw new Error(`Failed to fetch top tracks: ${topTracksRes.statusText}`);
-  }
-  if (!relatedRes.ok) {
-    throw new Error(`Failed to fetch related artists: ${relatedRes.statusText}`);
-  }
-
-  const [artistData, topTracksData, relatedData] = await Promise.all([
-    artistRes.json(),
-    topTracksRes.json(),
-    relatedRes.json()
-  ]);
-
-  const artist = ArtistSchema.parse(artistData);
-  const topTracks = TopTracksResponseSchema.parse(topTracksData).items;
-  const relatedResponse = RelatedArtistsResponseSchema.parse(relatedData);
 
   return {
     artist,

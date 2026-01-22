@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { PROVIDERS, type ProviderId, type ProviderMetadata } from '@musicdiscovery/shared';
+import type { ProviderId, ProviderMetadata } from '@musicdiscovery/shared';
 
 export type ProviderStatus = 'loading' | 'ready' | 'error';
 
@@ -11,18 +11,26 @@ interface ProviderSelectionState {
   selectProvider: (next: ProviderId) => void;
 }
 
-// Locked provider selection: always use Deezer-first tokenless mode with iTunes links available.
+// Locked provider selection: always use Deezer-first tokenless mode.
 // This intentionally disables runtime switching and removes any persisted selection.
 const LOCKED_PROVIDER: ProviderId = 'tokenless';
 
+const LOCKED_PROVIDERS: ProviderMetadata[] = [
+  {
+    id: 'tokenless',
+    name: 'Deezer (tokenless)',
+    description: 'Deezer-first mode zonder login.'
+  }
+];
+
 export function useProviderSelection(): ProviderSelectionState {
-  const selectProvider = useCallback(() => {
+  const selectProvider = useCallback((_next: ProviderId) => {
     // no-op: provider selection removed
   }, []);
 
   return {
     provider: LOCKED_PROVIDER,
-    providers: PROVIDERS.filter((p) => p.id === 'tokenless' || p.id === 'itunes'),
+    providers: LOCKED_PROVIDERS,
     status: 'ready',
     error: null,
     selectProvider
