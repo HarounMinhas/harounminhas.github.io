@@ -111,6 +111,13 @@ export const ProviderListResponseSchema = z.object({
   items: z.array(ProviderMetadataSchema)
 });
 
+// Expose smart-related schema via the package root for API imports.
+export {
+  SmartRelatedResponseSchema,
+  SmartRelatedStrategySchema,
+  type SmartRelatedResponse
+} from './schemas.js';
+
 export {
   PROVIDERS,
   PROVIDER_MODES,
