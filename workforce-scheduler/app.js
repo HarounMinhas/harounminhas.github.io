@@ -199,15 +199,25 @@ function renderSchedule() {
         const slotKey = slotInfo.key;
         const slot = schedule[day.dateStr][slotKey];
         const employee = employees.find((item) => item.id === slot.employeeId);
+        const isEmpty = slot.status === 'empty';
 
         const slotCard = document.createElement('div');
         slotCard.className = `slot-card status-${slot.status}`;
         slotCard.dataset.date = day.dateStr;
         slotCard.dataset.slot = slotKey;
+        if (isEmpty) {
+          slotCard.classList.add('slot-empty');
+        }
 
         slotCard.innerHTML = `
           <div class="slot-header">${slotInfo.label}</div>
-          <div class="slot-employee">${employee ? employee.name : 'Empty slot'}</div>
+          <div class="slot-employee">
+            ${
+              isEmpty
+                ? '<span class="slot-add-icon">+</span><span class="slot-add-text">Add employee</span>'
+                : employee?.name || 'Unassigned'
+            }
+          </div>
           <div class="slot-meta">
             ${slot.coverForId ? `Covering ${getEmployeeName(slot.coverForId)} (leave)` : ''}
             ${slot.status === 'leave' && !slot.coverForId ? 'On leave' : ''}
@@ -222,6 +232,25 @@ function renderSchedule() {
         const select = slotCard.querySelector('.status-select');
         select.addEventListener('change', (event) => {
           updateSlotStatus(day.dateStr, slotKey, event.target.value);
+        });
+
+        slotCard.addEventListener('click', () => {
+          if (!isEmpty) {
+            return;
+          }
+          const selection = window.prompt(
+            `Assign employee to ${day.label} (${slotInfo.label}).\nType the name exactly as shown.`
+          );
+          if (!selection) {
+            return;
+          }
+          const chosen = employees.find(
+            (item) => item.name.toLowerCase() === selection.trim().toLowerCase()
+          );
+          if (!chosen) {
+            return;
+          }
+          assignEmployee(day.dateStr, slotKey, chosen.id, true);
         });
 
         slotCard.addEventListener('dragover', (event) => {
@@ -345,6 +374,18 @@ function autoSchedule() {
       const assigned = getAssignedEmployees(day.dateStr);
 
       slotConfig.forEach(({ key }) => {
+        const slot = schedule[day.dateStr][key];
+        if (slot.employeeId && slot.status === 'working' && isOnLeave(slot.employeeId, day.dateStr)) {
+          const removedId = slot.employeeId;
+          slot.employeeId = null;
+          slot.status = 'empty';
+          slot.coverForId = null;
+          slot.manual = false;
+          assigned.delete(removedId);
+        }
+      });
+
+      slotConfig.forEach(({ key }) => {
         const slotKey = key;
         const slot = schedule[day.dateStr][slotKey];
 
@@ -406,6 +447,15 @@ function addLeave(employeeId, startDate, endDate) {
           matchingSlot.status = 'leave';
           matchingSlot.coverForId = null;
           matchingSlot.manual = true;
+          slotConfig.forEach(({ key }) => {
+            const slot = schedule[dateStr][key];
+            if (slot.employeeId === employeeId && slot !== matchingSlot) {
+              slot.employeeId = null;
+              slot.status = 'empty';
+              slot.coverForId = null;
+              slot.manual = false;
+            }
+          });
         } else {
           const emptySlotKey = slotConfig.find(({ key }) => schedule[dateStr][key].employeeId === null);
           if (emptySlotKey) {
@@ -414,6 +464,17 @@ function addLeave(employeeId, startDate, endDate) {
             slot.status = 'leave';
             slot.coverForId = null;
             slot.manual = true;
+            slotConfig.forEach(({ key }) => {
+              if (key !== emptySlotKey.key) {
+                const otherSlot = schedule[dateStr][key];
+                if (otherSlot.employeeId === employeeId) {
+                  otherSlot.employeeId = null;
+                  otherSlot.status = 'empty';
+                  otherSlot.coverForId = null;
+                  otherSlot.manual = false;
+                }
+              }
+            });
           }
         }
       }
