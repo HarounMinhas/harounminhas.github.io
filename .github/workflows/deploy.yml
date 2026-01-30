@@ -77,6 +77,7 @@ jobs:
           cp -r build deploy/marieke
           cp -r phase10/dist deploy/phase10
           cp -r colorhunt deploy/colorhunt
+          cp -r workforce-scheduler deploy/workforce-scheduler
           cp -r regex-playground deploy/regex-playground
           cp -r zen-writer deploy/zen-writer
           cp portfolio-index.html deploy/index.html
