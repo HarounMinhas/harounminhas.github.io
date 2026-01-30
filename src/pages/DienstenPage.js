@@ -73,7 +73,7 @@ const DienstenPage = () => {
 
   return (
     <div>
-      <section className="section-padding">
+      <section className="section-padding" style={{ position: 'relative' }}>
         <Container>
           <Row className="justify-content-center text-center mb-5">
             <Col lg={8}>
@@ -97,10 +97,11 @@ const DienstenPage = () => {
             ))}
           </Row>
         </Container>
-        <SectionDivider color="var(--surface)" />
+        <SectionDivider position="bottom" color="var(--background)" />
       </section>
 
-      <section className="section-padding bg-white">
+      <section className="section-padding bg-white" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--surface)" />
         <Container>
           <Row className="g-4 align-items-stretch">
             <Col lg={6}>
@@ -167,10 +168,11 @@ const DienstenPage = () => {
             </Col>
           </Row>
         </Container>
-        <SectionDivider color="var(--background)" />
+        <SectionDivider position="bottom" color="var(--surface)" />
       </section>
 
-      <section className="section-padding">
+      <section className="section-padding" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--background)" />
         <Container>
           <Row>
             <Col>

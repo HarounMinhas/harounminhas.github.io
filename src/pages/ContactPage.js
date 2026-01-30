@@ -9,7 +9,7 @@ import SectionDivider from '../components/SectionDivider';
 const ContactPage = () => {
   return (
     <div>
-      <section className="section-padding">
+      <section className="section-padding" style={{ position: 'relative' }}>
         <Container>
           <Row className="gy-4 mb-5 align-items-stretch">
             <Col lg={6}>
@@ -74,10 +74,11 @@ const ContactPage = () => {
             </Col>
           </Row>
         </Container>
-        <SectionDivider color="var(--surface)" />
+        <SectionDivider position="bottom" color="var(--background)" />
       </section>
 
-      <section className="section-padding bg-white">
+      <section className="section-padding bg-white" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--surface)" />
         <Container>
           <Row>
             <Col>
