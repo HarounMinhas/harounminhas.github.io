@@ -16,6 +16,11 @@ const contractLimits = {
   '4/5': 8
 };
 
+const slotConfig = Array.from({ length: 10 }, (_, index) => ({
+  key: `slot-${index + 1}`,
+  label: `Slot ${index + 1}`
+}));
+
 const weeks = [];
 const schedule = {};
 const leaves = new Map();
@@ -27,6 +32,10 @@ const leaveForm = document.getElementById('leaveForm');
 const leaveList = document.getElementById('leaveList');
 const autoFillButton = document.getElementById('autoFill');
 const resetButton = document.getElementById('resetSchedule');
+const collapseAllButton = document.getElementById('collapseAll');
+const expandAllButton = document.getElementById('expandAll');
+const leaveModalElement = document.getElementById('leaveManagerModal');
+const leaveModal = leaveModalElement && window.bootstrap ? new bootstrap.Modal(leaveModalElement) : null;
 
 function formatDate(date) {
   return date.toLocaleDateString('en-GB', {
@@ -73,10 +82,10 @@ function buildWeeks() {
     };
 
     currentWeek.days.push(dayInfo);
-    schedule[dateStr] = {
-      AM: { status: 'empty', employeeId: null, manual: false, coverForId: null },
-      PM: { status: 'empty', employeeId: null, manual: false, coverForId: null }
-    };
+    schedule[dateStr] = slotConfig.reduce((acc, slot) => {
+      acc[slot.key] = { status: 'empty', employeeId: null, manual: false, coverForId: null };
+      return acc;
+    }, {});
   }
 }
 
@@ -137,16 +146,44 @@ function renderSchedule() {
   weekContainer.innerHTML = '';
 
   weeks.forEach((week) => {
+    const collapseId = `week-${week.id}`;
+
     const weekCard = document.createElement('div');
     weekCard.className = 'week-card';
+
+    const weekHeader = document.createElement('div');
+    weekHeader.className = 'week-header';
 
     const weekTitle = document.createElement('div');
     weekTitle.className = 'week-title';
     weekTitle.textContent = `${week.label} · ${week.days[0].label} - ${week.days[week.days.length - 1].label}`;
-    weekCard.appendChild(weekTitle);
+
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'btn btn-sm btn-outline-primary week-toggle';
+    toggleButton.type = 'button';
+    toggleButton.textContent = 'Collapse';
+    toggleButton.setAttribute('data-bs-toggle', 'collapse');
+    toggleButton.setAttribute('data-bs-target', `#${collapseId}`);
+    toggleButton.setAttribute('aria-expanded', 'true');
+    toggleButton.setAttribute('aria-controls', collapseId);
+
+    weekHeader.appendChild(weekTitle);
+    weekHeader.appendChild(toggleButton);
+    weekCard.appendChild(weekHeader);
 
     const grid = document.createElement('div');
-    grid.className = 'week-grid';
+    grid.className = 'week-grid collapse show';
+    grid.id = collapseId;
+
+    grid.addEventListener('shown.bs.collapse', () => {
+      toggleButton.textContent = 'Collapse';
+      toggleButton.setAttribute('aria-expanded', 'true');
+    });
+
+    grid.addEventListener('hidden.bs.collapse', () => {
+      toggleButton.textContent = 'Expand';
+      toggleButton.setAttribute('aria-expanded', 'false');
+    });
 
     week.days.forEach((day) => {
       const dayCard = document.createElement('div');
@@ -158,7 +195,8 @@ function renderSchedule() {
 
       dayCard.appendChild(header);
 
-      ['AM', 'PM'].forEach((slotKey) => {
+      slotConfig.forEach((slotInfo) => {
+        const slotKey = slotInfo.key;
         const slot = schedule[day.dateStr][slotKey];
         const employee = employees.find((item) => item.id === slot.employeeId);
 
@@ -168,7 +206,7 @@ function renderSchedule() {
         slotCard.dataset.slot = slotKey;
 
         slotCard.innerHTML = `
-          <div class="slot-header">${slotKey}</div>
+          <div class="slot-header">${slotInfo.label}</div>
           <div class="slot-employee">${employee ? employee.name : 'Empty slot'}</div>
           <div class="slot-meta">
             ${slot.coverForId ? `Covering ${getEmployeeName(slot.coverForId)} (leave)` : ''}
@@ -239,7 +277,20 @@ function updateSlotStatus(dateStr, slotKey, status) {
   renderSchedule();
 }
 
+function clearEmployeeFromDay(dateStr, employeeId) {
+  slotConfig.forEach(({ key }) => {
+    const slot = schedule[dateStr][key];
+    if (slot.employeeId === employeeId) {
+      slot.employeeId = null;
+      slot.status = 'empty';
+      slot.manual = false;
+      slot.coverForId = null;
+    }
+  });
+}
+
 function assignEmployee(dateStr, slotKey, employeeId, manual) {
+  clearEmployeeFromDay(dateStr, employeeId);
   const slot = schedule[dateStr][slotKey];
   slot.employeeId = employeeId;
   slot.status = 'working';
@@ -258,7 +309,8 @@ function getWeekCounts(week) {
   employees.forEach((employee) => counts.set(employee.id, 0));
 
   week.days.forEach((day) => {
-    ['AM', 'PM'].forEach((slotKey) => {
+    slotConfig.forEach(({ key }) => {
+      const slotKey = key;
       const slot = schedule[day.dateStr][slotKey];
       if (slot.status === 'working' && slot.employeeId) {
         counts.set(slot.employeeId, counts.get(slot.employeeId) + 1);
@@ -274,12 +326,26 @@ function isOnLeave(employeeId, dateStr) {
   return dates ? dates.has(dateStr) : false;
 }
 
+function getAssignedEmployees(dateStr) {
+  const assigned = new Set();
+  slotConfig.forEach(({ key }) => {
+    const slot = schedule[dateStr][key];
+    if (slot.employeeId) {
+      assigned.add(slot.employeeId);
+    }
+  });
+  return assigned;
+}
+
 function autoSchedule() {
   weeks.forEach((week) => {
     const counts = getWeekCounts(week);
 
     week.days.forEach((day) => {
-      ['AM', 'PM'].forEach((slotKey) => {
+      const assigned = getAssignedEmployees(day.dateStr);
+
+      slotConfig.forEach(({ key }) => {
+        const slotKey = key;
         const slot = schedule[day.dateStr][slotKey];
 
         if (slot.status === 'working') {
@@ -295,6 +361,7 @@ function autoSchedule() {
         }
 
         const candidates = employees
+          .filter((employee) => !assigned.has(employee.id))
           .filter((employee) => !isOnLeave(employee.id, day.dateStr))
           .filter((employee) => counts.get(employee.id) < contractLimits[employee.contract])
           .sort((a, b) => counts.get(a.id) - counts.get(b.id) || a.id - b.id);
@@ -308,6 +375,7 @@ function autoSchedule() {
         slot.status = 'working';
         slot.manual = false;
         counts.set(chosen.id, counts.get(chosen.id) + 1);
+        assigned.add(chosen.id);
       });
     });
   });
@@ -330,15 +398,24 @@ function addLeave(employeeId, startDate, endDate) {
       leaveDates.add(dateStr);
 
       if (schedule[dateStr]) {
-        ['AM', 'PM'].forEach((slotKey) => {
-          const slot = schedule[dateStr][slotKey];
-          if (!slot.employeeId || slot.employeeId === employeeId) {
+        const matchingSlot = slotConfig
+          .map(({ key }) => schedule[dateStr][key])
+          .find((slot) => slot.employeeId === employeeId);
+
+        if (matchingSlot) {
+          matchingSlot.status = 'leave';
+          matchingSlot.coverForId = null;
+          matchingSlot.manual = true;
+        } else {
+          const emptySlotKey = slotConfig.find(({ key }) => schedule[dateStr][key].employeeId === null);
+          if (emptySlotKey) {
+            const slot = schedule[dateStr][emptySlotKey.key];
             slot.employeeId = employeeId;
             slot.status = 'leave';
             slot.coverForId = null;
             slot.manual = true;
           }
-        });
+        }
       }
     }
     current.setDate(current.getDate() + 1);
@@ -350,8 +427,8 @@ function addLeave(employeeId, startDate, endDate) {
 
 function resetSchedule() {
   Object.keys(schedule).forEach((dateStr) => {
-    ['AM', 'PM'].forEach((slotKey) => {
-      schedule[dateStr][slotKey] = {
+    slotConfig.forEach(({ key }) => {
+      schedule[dateStr][key] = {
         status: 'empty',
         employeeId: null,
         manual: false,
@@ -376,10 +453,36 @@ leaveForm.addEventListener('submit', (event) => {
 
   addLeave(employeeId, startDate, endDate);
   leaveForm.reset();
+  if (leaveModal) {
+    leaveModal.hide();
+  }
 });
 
 autoFillButton.addEventListener('click', autoSchedule);
 resetButton.addEventListener('click', resetSchedule);
+if (collapseAllButton) {
+  collapseAllButton.addEventListener('click', () => {
+    if (!window.bootstrap) {
+      return;
+    }
+    document.querySelectorAll('.week-grid').forEach((grid) => {
+      const collapse = bootstrap.Collapse.getOrCreateInstance(grid, { toggle: false });
+      collapse.hide();
+    });
+  });
+}
+
+if (expandAllButton) {
+  expandAllButton.addEventListener('click', () => {
+    if (!window.bootstrap) {
+      return;
+    }
+    document.querySelectorAll('.week-grid').forEach((grid) => {
+      const collapse = bootstrap.Collapse.getOrCreateInstance(grid, { toggle: false });
+      collapse.show();
+    });
+  });
+}
 
 buildWeeks();
 renderEmployees();
