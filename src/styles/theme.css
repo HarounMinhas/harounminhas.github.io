@@ -673,12 +673,15 @@ html.accessibility-high-contrast textarea:focus {
   background: linear-gradient(120deg, rgba(255, 255, 255, 0.9), rgba(50, 142, 110, 0.05));
 }
 
-/* SVG section dividers */
+/* SVG section dividers - overlapping wave transitions */
 .section-divider {
   display: block;
   width: 100%;
   line-height: 0;
-  margin-bottom: -1px;
+  height: var(--divider-height);
+  overflow: hidden;
+  pointer-events: none;
+  position: relative;
 }
 
 .section-divider svg {
@@ -687,6 +690,13 @@ html.accessibility-high-contrast textarea:focus {
   height: var(--divider-height);
 }
 
+/* Bottom divider: overlaps into the next section */
+.section-divider--bottom {
+  margin-bottom: calc(var(--divider-height) * -1);
+}
+
+/* Top divider: rotated wave, overlaps from previous section */
 .section-divider--top {
   transform: rotate(180deg);
+  margin-top: calc(var(--divider-height) * -1);
 }

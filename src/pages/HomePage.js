@@ -10,7 +10,7 @@ import SectionDivider from '../components/SectionDivider';
 const HomePage = () => {
   return (
     <div>
-      <section className="hero-section">
+      <section className="hero-section" style={{ position: 'relative' }}>
         <Container>
           <Row className="align-items-center g-4">
             <Col lg={7} className="text-center text-lg-start">
@@ -30,10 +30,11 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
-        <SectionDivider color="var(--surface)" />
+        <SectionDivider position="bottom" color="linear-gradient(135deg, rgba(50, 142, 110, 0.08), rgba(144, 198, 124, 0.08))" />
       </section>
 
-      <section className="section-padding contact-cta-section">
+      <section className="section-padding contact-cta-section" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--surface)" />
         <Container>
           <div className="contact-cta-highlight">
             <Row className="align-items-center gy-4">
@@ -55,10 +56,11 @@ const HomePage = () => {
             </Row>
           </div>
         </Container>
-        <SectionDivider color="var(--background)" />
+        <SectionDivider position="bottom" color="var(--surface)" />
       </section>
 
-      <section className="section-padding">
+      <section className="section-padding" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--background)" />
         <Container>
           <Row className="align-items-center g-4">
             <Col lg={6} className="text-center text-lg-start">
@@ -79,10 +81,11 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
-        <SectionDivider color="var(--surface)" />
+        <SectionDivider position="bottom" color="var(--background)" />
       </section>
 
-      <section className="section-padding bg-white">
+      <section className="section-padding bg-white" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--surface)" />
         <Container>
           <Row className="g-4">
             <Col md={6}>
@@ -114,10 +117,11 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
-        <SectionDivider color="var(--background)" />
+        <SectionDivider position="bottom" color="var(--surface)" />
       </section>
 
-      <section className="section-padding">
+      <section className="section-padding" style={{ position: 'relative' }}>
+        <SectionDivider position="top" color="var(--background)" />
         <Container>
           <h2 className="h3 text-center mb-5">Specialisaties</h2>
           <Row className="g-4">
@@ -157,10 +161,11 @@ const HomePage = () => {
             ))}
           </Row>
         </Container>
-        <SectionDivider color="var(--soft-background)" />
+        <SectionDivider position="bottom" color="var(--background)" />
       </section>
 
-      <section className="section-padding" style={{ backgroundColor: 'var(--soft-background)' }}>
+      <section className="section-padding" style={{ backgroundColor: 'var(--soft-background)', position: 'relative' }}>
+        <SectionDivider position="top" color="var(--soft-background)" />
         <Container className="text-center">
           <h2 className="h3">Heb je vragen of wil je een afspraak maken?</h2>
           <p className="lead text-muted mb-4">Neem gerust contact op voor een eerste gesprek en ontdek hoe ik kan helpen.</p>
