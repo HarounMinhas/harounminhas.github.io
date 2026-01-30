@@ -7,6 +7,11 @@
   --accent: #90c67c;
   --text-dark: #1c352d;
   --text-muted: #4f6f64;
+
+  /* Shared surface colors (used by the SVG section dividers) */
+  --surface: #ffffff;
+  --soft-background: #eef6f1;
+  --divider-height: 56px;
 }
 
 body {
@@ -666,4 +671,22 @@ html.accessibility-high-contrast textarea:focus {
 
 .serene-band {
   background: linear-gradient(120deg, rgba(255, 255, 255, 0.9), rgba(50, 142, 110, 0.05));
+}
+
+/* SVG section dividers */
+.section-divider {
+  display: block;
+  width: 100%;
+  line-height: 0;
+  margin-bottom: -1px;
+}
+
+.section-divider svg {
+  display: block;
+  width: 100%;
+  height: var(--divider-height);
+}
+
+.section-divider--top {
+  transform: rotate(180deg);
 }

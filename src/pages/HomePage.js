@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import SectionDivider from '../components/SectionDivider';
 
 /**
  * Renders the main landing page for the speech therapy practice.
@@ -29,6 +30,7 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
+        <SectionDivider color="var(--surface)" />
       </section>
 
       <section className="section-padding contact-cta-section">
@@ -53,6 +55,7 @@ const HomePage = () => {
             </Row>
           </div>
         </Container>
+        <SectionDivider color="var(--background)" />
       </section>
 
       <section className="section-padding">
@@ -76,6 +79,7 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
+        <SectionDivider color="var(--surface)" />
       </section>
 
       <section className="section-padding bg-white">
@@ -110,6 +114,7 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
+        <SectionDivider color="var(--background)" />
       </section>
 
       <section className="section-padding">
@@ -152,9 +157,10 @@ const HomePage = () => {
             ))}
           </Row>
         </Container>
+        <SectionDivider color="var(--soft-background)" />
       </section>
 
-      <section className="section-padding" style={{ backgroundColor: '#eef6f1' }}>
+      <section className="section-padding" style={{ backgroundColor: 'var(--soft-background)' }}>
         <Container className="text-center">
           <h2 className="h3">Heb je vragen of wil je een afspraak maken?</h2>
           <p className="lead text-muted mb-4">Neem gerust contact op voor een eerste gesprek en ontdek hoe ik kan helpen.</p>

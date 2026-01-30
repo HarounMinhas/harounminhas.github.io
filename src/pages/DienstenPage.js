@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, Table } from 'react-bootstrap';
+import SectionDivider from '../components/SectionDivider';
 
 /**
  * Renders the services page with specializations, target groups, procedure, and pricing.
@@ -71,134 +72,146 @@ const DienstenPage = () => {
   ];
 
   return (
-    <section className="section-padding">
-      <Container>
-        <Row className="justify-content-center text-center mb-5">
-          <Col lg={8}>
-            <h1 className="display-5 mb-3">Diensten</h1>
-            <p className="lead text-muted">
-              De praktijk richt zich op zowel volwassenen als kinderen en heeft bijzondere expertise in slikproblemen en neurologische aandoeningen.
-            </p>
-          </Col>
-        </Row>
+    <div>
+      <section className="section-padding">
+        <Container>
+          <Row className="justify-content-center text-center mb-5">
+            <Col lg={8}>
+              <h1 className="display-5 mb-3">Diensten</h1>
+              <p className="lead text-muted">
+                De praktijk richt zich op zowel volwassenen als kinderen en heeft bijzondere expertise in slikproblemen en neurologische aandoeningen.
+              </p>
+            </Col>
+          </Row>
 
-        <Row className="g-4">
-          {specialisaties.map((item) => (
-            <Col md={6} key={item.id} id={item.id}>
+          <Row className="g-4">
+            {specialisaties.map((item) => (
+              <Col md={6} key={item.id} id={item.id}>
+                <Card className="border-0 shadow-sm h-100">
+                  <Card.Body className="p-4">
+                    <h2 className="h4">{item.title}</h2>
+                    <p className="mb-0">{item.content}</p>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+        <SectionDivider color="var(--surface)" />
+      </section>
+
+      <section className="section-padding bg-white">
+        <Container>
+          <Row className="g-4 align-items-stretch">
+            <Col lg={6}>
               <Card className="border-0 shadow-sm h-100">
-                <Card.Body className="p-4">
-                  <h2 className="h4">{item.title}</h2>
-                  <p className="mb-0">{item.content}</p>
+                <Card.Body className="p-4 p-lg-5">
+                  <h2 className="h4">Doelgroepen</h2>
+                  <Row className="g-4">
+                    <Col sm={6}>
+                      <h3 className="h5">Volwassenen</h3>
+                      <ul className="ps-3 mb-0">
+                        <li>Slikproblemen</li>
+                        <li>Ziekte van Parkinson en neurodegeneratieve stoornissen</li>
+                        <li>Slik- en spraakproblemen na hoofd-halsoncologie</li>
+                        <li>Mimetherapie</li>
+                        <li>Dysartrie</li>
+                        <li>Afasie</li>
+                        <li>Manuele facilitatie</li>
+                      </ul>
+                    </Col>
+                    <Col sm={6}>
+                      <h3 className="h5">Kinderen</h3>
+                      <ul className="ps-3 mb-0">
+                        <li>Leerproblemen: lezen, spelling, rekenen</li>
+                        <li>Oromyofunctionele stoornissen i.f.v. orthodontie</li>
+                        <li>Taalproblemen</li>
+                        <li>Articulatieproblemen</li>
+                      </ul>
+                    </Col>
+                  </Row>
                 </Card.Body>
               </Card>
             </Col>
-          ))}
-        </Row>
 
-        <Row className="g-4 align-items-stretch mt-5">
-          <Col lg={6}>
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4 p-lg-5">
-                <h2 className="h4">Doelgroepen</h2>
-                <Row className="g-4">
-                  <Col sm={6}>
-                    <h3 className="h5">Volwassenen</h3>
-                    <ul className="ps-3 mb-0">
-                      <li>Slikproblemen</li>
-                      <li>Ziekte van Parkinson en neurodegeneratieve stoornissen</li>
-                      <li>Slik- en spraakproblemen na hoofd-halsoncologie</li>
-                      <li>Mimetherapie</li>
-                      <li>Dysartrie</li>
-                      <li>Afasie</li>
-                      <li>Manuele facilitatie</li>
-                    </ul>
-                  </Col>
-                  <Col sm={6}>
-                    <h3 className="h5">Kinderen</h3>
-                    <ul className="ps-3 mb-0">
-                      <li>Leerproblemen: lezen, spelling, rekenen</li>
-                      <li>Oromyofunctionele stoornissen i.f.v. orthodontie</li>
-                      <li>Taalproblemen</li>
-                      <li>Articulatieproblemen</li>
-                    </ul>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col lg={6}>
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4 p-lg-5">
-                <h2 className="h4">Procedure: aanmelding en opstart therapie</h2>
-                <div className="d-flex mb-3">
-                  <span className="step-number">1</span>
-                  <div>
-                    <h3 className="h6">Contact opnemen</h3>
-                    <p className="mb-0">
-                      Neem contact op via <a href="tel:+32123456789">0123/456789</a>, via e-mail naar <a href="mailto:info@example-logopedie.be">info@example-logopedie.be</a> of via het contactformulier. Formuleer kort je hulpvraag en we plannen de eerste afspraak in.
-                    </p>
+            <Col lg={6}>
+              <Card className="border-0 shadow-sm h-100">
+                <Card.Body className="p-4 p-lg-5">
+                  <h2 className="h4">Procedure: aanmelding en opstart therapie</h2>
+                  <div className="d-flex mb-3">
+                    <span className="step-number">1</span>
+                    <div>
+                      <h3 className="h6">Contact opnemen</h3>
+                      <p className="mb-0">
+                        Neem contact op via <a href="tel:+32123456789">0123/456789</a>, via e-mail naar <a href="mailto:info@example-logopedie.be">info@example-logopedie.be</a> of via het contactformulier. Formuleer kort je hulpvraag en we plannen de eerste afspraak in.
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="d-flex">
-                  <span className="step-number">2</span>
-                  <div>
-                    <h3 className="h6">RIZIV-aanvraagprocedure</h3>
-                    <ol className="ps-3 mb-0">
-                      <li>Je ontvangt een verwijsbrief en voorschrift voor logopedisch onderzoek voor de arts-specialist.</li>
-                      <li>De nodige testen worden afgenomen, resultaten geanalyseerd en het verslag opgesteld.</li>
-                      <li>In een tweede gesprek bespreken we de onderzoeksresultaten.</li>
-                      <li>Je bezorgt het verslag aan de arts-specialist en vraagt een voorschrift voor de behandeling.</li>
-                      <li>Het voorschrift wordt aan de logopediste bezorgd.</li>
-                      <li>De documenten worden doorgegeven aan de mutualiteit.</li>
-                      <li>Daarna kan de therapie van start gaan.</li>
-                    </ol>
+                  <div className="d-flex">
+                    <span className="step-number">2</span>
+                    <div>
+                      <h3 className="h6">RIZIV-aanvraagprocedure</h3>
+                      <ol className="ps-3 mb-0">
+                        <li>Je ontvangt een verwijsbrief en voorschrift voor logopedisch onderzoek voor de arts-specialist.</li>
+                        <li>De nodige testen worden afgenomen, resultaten geanalyseerd en het verslag opgesteld.</li>
+                        <li>In een tweede gesprek bespreken we de onderzoeksresultaten.</li>
+                        <li>Je bezorgt het verslag aan de arts-specialist en vraagt een voorschrift voor de behandeling.</li>
+                        <li>Het voorschrift wordt aan de logopediste bezorgd.</li>
+                        <li>De documenten worden doorgegeven aan de mutualiteit.</li>
+                        <li>Daarna kan de therapie van start gaan.</li>
+                      </ol>
+                    </div>
                   </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+        <SectionDivider color="var(--background)" />
+      </section>
 
-        <Row className="mt-5">
-          <Col>
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-4 p-lg-5">
-                <h2 className="h4">Tarieven en terugbetaling</h2>
-                <p className="text-muted">Als geconventioneerd logopedist volg ik de tarieven die bepaald zijn door het RIZIV.</p>
-                <div className="table-responsive">
-                  <Table bordered hover className="mb-4">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Prestatie</th>
-                        <th>Honorarium</th>
-                        <th>Terugbetaling (gewone)</th>
-                        <th>Remgeld (gewone)</th>
-                        <th>Terugbetaling (verhoogd)</th>
-                        <th>Remgeld (verhoogd)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tarieven.map((row) => (
-                        <tr key={row.prestatie}>
-                          <td>{row.prestatie}</td>
-                          <td>{row.honorarium}</td>
-                          <td>{row.terugbetaling}</td>
-                          <td>{row.remgeld}</td>
-                          <td>{row.terugbetalingVerhoogd}</td>
-                          <td>{row.remgeldVerhoogd}</td>
+      <section className="section-padding">
+        <Container>
+          <Row>
+            <Col>
+              <Card className="border-0 shadow-sm">
+                <Card.Body className="p-4 p-lg-5">
+                  <h2 className="h4">Tarieven en terugbetaling</h2>
+                  <p className="text-muted">Als geconventioneerd logopedist volg ik de tarieven die bepaald zijn door het RIZIV.</p>
+                  <div className="table-responsive">
+                    <Table bordered hover className="mb-4">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Prestatie</th>
+                          <th>Honorarium</th>
+                          <th>Terugbetaling (gewone)</th>
+                          <th>Remgeld (gewone)</th>
+                          <th>Terugbetaling (verhoogd)</th>
+                          <th>Remgeld (verhoogd)</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-                <p className="mb-0">Voor huisbezoeken wordt een verplaatsingsvergoeding aangerekend.</p>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </section>
+                      </thead>
+                      <tbody>
+                        {tarieven.map((row) => (
+                          <tr key={row.prestatie}>
+                            <td>{row.prestatie}</td>
+                            <td>{row.honorarium}</td>
+                            <td>{row.terugbetaling}</td>
+                            <td>{row.remgeld}</td>
+                            <td>{row.terugbetalingVerhoogd}</td>
+                            <td>{row.remgeldVerhoogd}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                  <p className="mb-0">Voor huisbezoeken wordt een verplaatsingsvergoeding aangerekend.</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+    </div>
   );
 };
 
