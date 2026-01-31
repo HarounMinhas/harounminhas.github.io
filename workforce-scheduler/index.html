@@ -44,34 +44,63 @@
     </header>
 
     <main class="container pb-5">
-      <section class="controls-grid">
-        <div class="card shadow-sm">
+      <section class="controls-stack">
+        <div id="leaveOverviewBar" class="card shadow-sm leave-overview d-none">
           <div class="card-body">
-            <h2 class="h5">Employee Sidebar</h2>
-            <p class="text-muted small">
-              Drag employees onto a slot. Dropping assigns the employee as <strong>Working</strong>.
-            </p>
-            <div id="employeeList" class="employee-list"></div>
+            <div class="leave-overview-header">
+              <div>
+                <h2 class="h5 mb-1">Leave Overview</h2>
+                <p class="text-muted small mb-0">
+                  Open the leave manager to add leave. The overview stays visible in the bar below.
+                </p>
+              </div>
+              <button
+                id="leaveOverviewToggle"
+                class="btn btn-sm btn-outline-primary"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#leaveOverviewCollapse"
+                aria-expanded="true"
+                aria-controls="leaveOverviewCollapse"
+              >
+                Collapse
+              </button>
+            </div>
+            <div id="leaveOverviewCollapse" class="collapse show mt-3">
+              <div class="leave-overview-body">
+                <div class="leave-summary">
+                  <h3 class="h6 text-uppercase">Active Leave</h3>
+                  <ul id="leaveList" class="list-unstyled"></ul>
+                </div>
+                <button
+                  class="btn btn-outline-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#leaveManagerModal"
+                >
+                  Open Leave Manager
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h2 class="h5">Leave Overview</h2>
-            <p class="text-muted small">
-              Open the leave manager to add leave. The scheduler will avoid employees on leave and try
-              to cover leave slots automatically.
-            </p>
-            <button
-              class="btn btn-outline-primary mb-3"
-              data-bs-toggle="modal"
-              data-bs-target="#leaveManagerModal"
-            >
-              Open Leave Manager
-            </button>
-            <div class="leave-summary">
-              <h3 class="h6 text-uppercase">Active Leave</h3>
-              <ul id="leaveList" class="list-unstyled"></ul>
+        <div class="employee-panels">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="h5">Employees</h2>
+              <p class="text-muted small">
+                Select an employee to review details, remaining capacity, and manage leave.
+              </p>
+              <div id="employeeList" class="employee-table"></div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="h5">Employee Details</h2>
+              <div id="employeeDetails" class="employee-details empty">
+                Select an employee from the table to see their schedule details and leave manager.
+              </div>
             </div>
           </div>
         </div>
@@ -81,7 +110,7 @@
         <div class="calendar-header">
           <div>
             <h2 class="h4">March 2026 Schedule</h2>
-            <p class="text-muted small mb-0">5 weeks &middot; Monday to Friday &middot; 10 slots per day</p>
+            <p class="text-muted small mb-0">5 weeks &middot; Monday to Friday &middot; Morning + afternoon slots</p>
           </div>
           <div class="calendar-actions">
             <div class="btn-group btn-group-sm" role="group" aria-label="Collapse controls">
@@ -94,7 +123,6 @@
             </div>
             <div class="legend">
               <span class="legend-item status-working">Working</span>
-              <span class="legend-item status-leave">Leave</span>
               <span class="legend-item status-empty">Empty</span>
             </div>
           </div>
@@ -122,8 +150,8 @@
         <form id="leaveForm" class="leave-form">
           <div class="modal-body">
             <p class="text-muted small mb-3">
-              Add leave for a day or range. The scheduler will avoid employees on leave and try to cover
-              leave slots automatically.
+              Add leave for a day or range. The scheduler will avoid employees on leave and keep their
+              half-day slots unavailable.
             </p>
             <label class="form-label" for="leaveEmployee">Employee</label>
             <select id="leaveEmployee" class="form-select" required></select>
@@ -137,6 +165,10 @@
                 <label class="form-label" for="leaveEnd">End date</label>
                 <input id="leaveEnd" type="date" class="form-control" required />
               </div>
+            </div>
+            <div class="leave-manager-overview mt-3">
+              <h3 class="h6 text-uppercase">Current Leave Overview</h3>
+              <ul id="leaveManagerList" class="list-unstyled mb-0"></ul>
             </div>
           </div>
           <div class="modal-footer">

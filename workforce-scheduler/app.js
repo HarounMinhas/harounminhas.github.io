@@ -16,10 +16,10 @@ const contractLimits = {
   '4/5': 8
 };
 
-const slotConfig = Array.from({ length: 10 }, (_, index) => ({
-  key: `slot-${index + 1}`,
-  label: `Slot ${index + 1}`
-}));
+const slotConfig = [
+  { key: 'morning', label: 'Morning' },
+  { key: 'afternoon', label: 'Afternoon' }
+];
 
 const weeks = [];
 const schedule = {};
@@ -27,15 +27,21 @@ const leaves = new Map();
 
 const weekContainer = document.getElementById('weekContainer');
 const employeeList = document.getElementById('employeeList');
+const employeeDetails = document.getElementById('employeeDetails');
 const leaveEmployeeSelect = document.getElementById('leaveEmployee');
 const leaveForm = document.getElementById('leaveForm');
 const leaveList = document.getElementById('leaveList');
+const leaveManagerList = document.getElementById('leaveManagerList');
 const autoFillButton = document.getElementById('autoFill');
 const resetButton = document.getElementById('resetSchedule');
 const collapseAllButton = document.getElementById('collapseAll');
 const expandAllButton = document.getElementById('expandAll');
+const leaveOverviewBar = document.getElementById('leaveOverviewBar');
+const leaveOverviewToggle = document.getElementById('leaveOverviewToggle');
 const leaveModalElement = document.getElementById('leaveManagerModal');
 const leaveModal = leaveModalElement && window.bootstrap ? new bootstrap.Modal(leaveModalElement) : null;
+
+let selectedEmployeeId = null;
 
 function formatDate(date) {
   return date.toLocaleDateString('en-GB', {
@@ -89,26 +95,58 @@ function buildWeeks() {
   }
 }
 
+function getSortedEmployees() {
+  return [...employees].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function getMonthlyCapacity(employee) {
+  return contractLimits[employee.contract] * weeks.length;
+}
+
+function getTotalAssignments(employeeId) {
+  return Object.keys(schedule).reduce((total, dateStr) => {
+    const daySlots = schedule[dateStr];
+    const dayCount = slotConfig.reduce((count, { key }) => {
+      const slot = daySlots[key];
+      if (slot.status === 'working' && slot.employeeId === employeeId) {
+        return count + 1;
+      }
+      return count;
+    }, 0);
+    return total + dayCount;
+  }, 0);
+}
+
 function renderEmployees() {
   employeeList.innerHTML = '';
   leaveEmployeeSelect.innerHTML = '';
 
-  employees.forEach((employee) => {
-    const card = document.createElement('div');
-    card.className = 'employee-card';
-    card.draggable = true;
+  getSortedEmployees().forEach((employee) => {
+    const totalAssigned = getTotalAssignments(employee.id);
+    const capacity = getMonthlyCapacity(employee);
+    const remaining = capacity - totalAssigned;
+
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'employee-cell';
     card.dataset.employeeId = employee.id;
+    if (selectedEmployeeId === employee.id) {
+      card.classList.add('active');
+    }
 
     card.innerHTML = `
-      <div>
-        <div class="employee-name">${employee.name}</div>
-        <div class="employee-contract">${employee.contract}</div>
+      <div class="employee-name">${employee.name}</div>
+      <div class="employee-contract">${employee.contract}</div>
+      <div class="employee-meta">
+        <span>${remaining} remaining</span>
+        <span>${totalAssigned}/${capacity} slots</span>
       </div>
-      <span class="badge bg-light text-dark">${contractLimits[employee.contract]} slots</span>
     `;
 
-    card.addEventListener('dragstart', (event) => {
-      event.dataTransfer.setData('text/plain', employee.id.toString());
+    card.addEventListener('click', () => {
+      selectedEmployeeId = employee.id;
+      renderEmployees();
+      renderEmployeeDetails();
     });
 
     employeeList.appendChild(card);
@@ -120,12 +158,49 @@ function renderEmployees() {
   });
 }
 
+function getLeaveRanges(datesSet) {
+  if (!datesSet || datesSet.size === 0) {
+    return [];
+  }
+
+  const sortedDates = Array.from(datesSet).sort();
+  const ranges = [];
+  let rangeStart = sortedDates[0];
+  let rangeEnd = sortedDates[0];
+
+  const toDate = (dateStr) => new Date(`${dateStr}T00:00:00`);
+
+  for (let index = 1; index < sortedDates.length; index += 1) {
+    const current = sortedDates[index];
+    const previousDate = toDate(rangeEnd);
+    previousDate.setDate(previousDate.getDate() + 1);
+    const expectedNext = toISODate(previousDate);
+
+    if (current === expectedNext) {
+      rangeEnd = current;
+    } else {
+      ranges.push({ start: rangeStart, end: rangeEnd });
+      rangeStart = current;
+      rangeEnd = current;
+    }
+  }
+
+  ranges.push({ start: rangeStart, end: rangeEnd });
+  return ranges;
+}
+
 function renderLeaves() {
-  leaveList.innerHTML = '';
+  const lists = [leaveList, leaveManagerList].filter(Boolean);
+  lists.forEach((list) => {
+    list.innerHTML = '';
+  });
+
   const entries = Array.from(leaves.entries());
 
   if (entries.length === 0) {
-    leaveList.innerHTML = '<li class="text-muted">No leave registered yet.</li>';
+    lists.forEach((list) => {
+      list.innerHTML = '<li class="text-muted">No leave registered yet.</li>';
+    });
     return;
   }
 
@@ -135,10 +210,157 @@ function renderLeaves() {
       return;
     }
 
-    const sortedDates = Array.from(dates).sort();
-    const li = document.createElement('li');
-    li.textContent = `${employee.name}: ${sortedDates[0]} → ${sortedDates[sortedDates.length - 1]} (${sortedDates.length} day(s))`;
-    leaveList.appendChild(li);
+    const ranges = getLeaveRanges(dates);
+    ranges.forEach((range) => {
+      const startLabel = range.start;
+      const endLabel = range.end;
+      const totalDays =
+        (new Date(`${endLabel}T00:00:00`) - new Date(`${startLabel}T00:00:00`)) /
+          (1000 * 60 * 60 * 24) +
+        1;
+      const li = document.createElement('li');
+      li.textContent = `${employee.name}: ${startLabel} → ${endLabel} (${totalDays} day(s))`;
+      lists.forEach((list) => list.appendChild(li.cloneNode(true)));
+    });
+  });
+}
+
+function renderEmployeeDetails() {
+  if (!employeeDetails) {
+    return;
+  }
+
+  if (!selectedEmployeeId) {
+    employeeDetails.classList.add('empty');
+    employeeDetails.textContent =
+      'Select an employee from the table to see their schedule details and leave manager.';
+    return;
+  }
+
+  const employee = employees.find((item) => item.id === selectedEmployeeId);
+  if (!employee) {
+    employeeDetails.classList.add('empty');
+    employeeDetails.textContent =
+      'Select an employee from the table to see their schedule details and leave manager.';
+    return;
+  }
+
+  employeeDetails.classList.remove('empty');
+
+  const totalAssigned = getTotalAssignments(employee.id);
+  const capacity = getMonthlyCapacity(employee);
+  const remaining = capacity - totalAssigned;
+  const weeklySummaries = weeks.map((week) => {
+    const weekCounts = getWeekCounts(week);
+    const count = weekCounts.get(employee.id) || 0;
+    return { label: week.label, count };
+  });
+
+  const ranges = getLeaveRanges(leaves.get(employee.id));
+  const leaveListHtml =
+    ranges.length === 0
+      ? '<li class="text-muted">No leave registered yet.</li>'
+      : ranges
+          .map((range) => {
+            const totalDays =
+              (new Date(`${range.end}T00:00:00`) - new Date(`${range.start}T00:00:00`)) /
+                (1000 * 60 * 60 * 24) +
+              1;
+            return `
+              <li class="leave-range-item">
+                <span>${range.start} → ${range.end} (${totalDays} day(s))</span>
+                <button class="btn btn-sm btn-outline-danger" data-remove-start="${range.start}" data-remove-end="${range.end}">
+                  Remove
+                </button>
+              </li>
+            `;
+          })
+          .join('');
+
+  employeeDetails.innerHTML = `
+    <div class="employee-detail-header">
+      <div>
+        <h3 class="h6 mb-1">${employee.name}</h3>
+        <p class="text-muted small mb-0">${employee.contract} contract</p>
+      </div>
+      <span class="badge bg-light text-dark">${remaining} remaining</span>
+    </div>
+    <div class="employee-metrics">
+      <div><strong>${totalAssigned}</strong> scheduled slots</div>
+      <div><strong>${capacity}</strong> monthly capacity</div>
+    </div>
+    <div class="employee-weekly">
+      <h4 class="h6 text-uppercase">Weekly slots</h4>
+      <ul class="list-unstyled mb-0">
+        ${weeklySummaries
+          .map(
+            (summary) =>
+              `<li>${summary.label}: ${summary.count}/${contractLimits[employee.contract]} slots</li>`
+          )
+          .join('')}
+      </ul>
+    </div>
+    <div class="employee-leave-panel">
+      <h4 class="h6 text-uppercase">Leave manager</h4>
+      <form id="employeeLeaveForm" class="employee-leave-form">
+        <div class="row g-2">
+          <div class="col-sm-6">
+            <label class="form-label small" for="employeeLeaveStart">Start date</label>
+            <input id="employeeLeaveStart" type="date" class="form-control" required />
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small" for="employeeLeaveEnd">End date</label>
+            <input id="employeeLeaveEnd" type="date" class="form-control" required />
+          </div>
+        </div>
+        <div class="employee-leave-actions">
+          <button class="btn btn-sm btn-danger" type="button" data-action="add">Add leave</button>
+          <button class="btn btn-sm btn-outline-secondary" type="button" data-action="remove">
+            Remove leave
+          </button>
+        </div>
+      </form>
+      <div class="employee-leave-overview">
+        <h5 class="h6 text-uppercase">Leave overview</h5>
+        <ul class="list-unstyled">${leaveListHtml}</ul>
+      </div>
+    </div>
+  `;
+
+  const leaveFormEl = employeeDetails.querySelector('#employeeLeaveForm');
+  const startInput = employeeDetails.querySelector('#employeeLeaveStart');
+  const endInput = employeeDetails.querySelector('#employeeLeaveEnd');
+
+  if (leaveFormEl && startInput && endInput) {
+    leaveFormEl.addEventListener('click', (event) => {
+      const action = event.target?.dataset?.action;
+      if (!action) {
+        return;
+      }
+      const startDate = startInput.value;
+      const endDate = endInput.value;
+      if (!startDate || !endDate) {
+        return;
+      }
+      if (action === 'add') {
+        addLeave(employee.id, startDate, endDate);
+      }
+      if (action === 'remove') {
+        removeLeaveRange(employee.id, startDate, endDate);
+      }
+      startInput.value = '';
+      endInput.value = '';
+    });
+  }
+
+  employeeDetails.querySelectorAll('[data-remove-start]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const startDate = button.dataset.removeStart;
+      const endDate = button.dataset.removeEnd;
+      if (startDate && endDate) {
+        removeLeaveRange(employee.id, startDate, endDate);
+      }
+    });
   });
 }
 
@@ -209,62 +431,88 @@ function renderSchedule() {
           slotCard.classList.add('slot-empty');
         }
 
-        slotCard.innerHTML = `
-          <div class="slot-header">${slotInfo.label}</div>
-          <div class="slot-employee">
-            ${
-              isEmpty
-                ? '<span class="slot-add-icon">+</span><span class="slot-add-text">Add employee</span>'
-                : employee?.name || 'Unassigned'
+        const header = document.createElement('div');
+        header.className = 'slot-header';
+        header.textContent = slotInfo.label;
+        slotCard.appendChild(header);
+
+        const employeeLabel = document.createElement('div');
+        employeeLabel.className = 'slot-employee';
+
+        if (isEmpty) {
+          const addIcon = document.createElement('span');
+          addIcon.className = 'slot-add-icon';
+          addIcon.textContent = '+';
+          const addText = document.createElement('span');
+          addText.className = 'slot-add-text';
+          addText.textContent = 'Add employee';
+          employeeLabel.appendChild(addIcon);
+          employeeLabel.appendChild(addText);
+
+          const assignPanel = document.createElement('div');
+          assignPanel.className = 'slot-assign-panel';
+
+          const select = document.createElement('select');
+          select.className = 'form-select form-select-sm';
+
+          const availableEmployees = getAvailableEmployees(day.dateStr, week);
+          if (availableEmployees.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No available employees';
+            select.appendChild(option);
+            select.disabled = true;
+          } else {
+            availableEmployees.forEach((candidate) => {
+              const option = document.createElement('option');
+              option.value = candidate.id;
+              option.textContent = `${candidate.name} (${candidate.remaining} remaining)`;
+              select.appendChild(option);
+            });
+          }
+
+          const assignButton = document.createElement('button');
+          assignButton.type = 'button';
+          assignButton.className = 'btn btn-sm btn-primary';
+          assignButton.textContent = 'Assign';
+          assignButton.disabled = availableEmployees.length === 0;
+
+          assignButton.addEventListener('click', () => {
+            const employeeId = Number(select.value);
+            if (!employeeId) {
+              return;
             }
-          </div>
-          <div class="slot-meta">
-            ${slot.coverForId ? `Covering ${getEmployeeName(slot.coverForId)} (leave)` : ''}
-            ${slot.status === 'leave' && !slot.coverForId ? 'On leave' : ''}
-          </div>
-          <select class="status-select">
-            <option value="working" ${slot.status === 'working' ? 'selected' : ''}>Working</option>
-            <option value="leave" ${slot.status === 'leave' ? 'selected' : ''}>Leave</option>
-            <option value="empty" ${slot.status === 'empty' ? 'selected' : ''}>Empty</option>
-          </select>
-        `;
+            assignEmployee(day.dateStr, slotKey, employeeId, true);
+          });
 
-        const select = slotCard.querySelector('.status-select');
-        select.addEventListener('change', (event) => {
-          updateSlotStatus(day.dateStr, slotKey, event.target.value);
-        });
+          assignPanel.appendChild(select);
+          assignPanel.appendChild(assignButton);
 
-        slotCard.addEventListener('click', () => {
-          if (!isEmpty) {
-            return;
-          }
-          const selection = window.prompt(
-            `Assign employee to ${day.label} (${slotInfo.label}).\nType the name exactly as shown.`
-          );
-          if (!selection) {
-            return;
-          }
-          const chosen = employees.find(
-            (item) => item.name.toLowerCase() === selection.trim().toLowerCase()
-          );
-          if (!chosen) {
-            return;
-          }
-          assignEmployee(day.dateStr, slotKey, chosen.id, true);
-        });
+          const toggleButton = document.createElement('button');
+          toggleButton.type = 'button';
+          toggleButton.className = 'btn btn-sm btn-outline-secondary slot-add-button';
+          toggleButton.textContent = 'Add employee';
+          toggleButton.addEventListener('click', () => {
+            assignPanel.classList.toggle('show');
+          });
 
-        slotCard.addEventListener('dragover', (event) => {
-          event.preventDefault();
-        });
+          slotCard.appendChild(employeeLabel);
+          slotCard.appendChild(toggleButton);
+          slotCard.appendChild(assignPanel);
+        } else {
+          employeeLabel.textContent = employee?.name || 'Unassigned';
 
-        slotCard.addEventListener('drop', (event) => {
-          event.preventDefault();
-          const employeeId = Number(event.dataTransfer.getData('text/plain'));
-          if (!employeeId) {
-            return;
-          }
-          assignEmployee(day.dateStr, slotKey, employeeId, true);
-        });
+          const removeButton = document.createElement('button');
+          removeButton.type = 'button';
+          removeButton.className = 'btn btn-sm btn-outline-danger slot-remove-button';
+          removeButton.textContent = 'Remove';
+          removeButton.addEventListener('click', () => {
+            clearSlot(day.dateStr, slotKey);
+          });
+
+          slotCard.appendChild(employeeLabel);
+          slotCard.appendChild(removeButton);
+        }
 
         dayCard.appendChild(slotCard);
       });
@@ -275,51 +523,32 @@ function renderSchedule() {
     weekCard.appendChild(grid);
     weekContainer.appendChild(weekCard);
   });
+
+  renderEmployees();
+  renderEmployeeDetails();
 }
 
-function updateSlotStatus(dateStr, slotKey, status) {
+function clearSlot(dateStr, slotKey) {
   const slot = schedule[dateStr][slotKey];
-
-  if (status === 'empty') {
-    slot.status = 'empty';
-    slot.employeeId = null;
-    slot.coverForId = null;
-    slot.manual = true;
-  } else if (status === 'working') {
-    if (slot.employeeId) {
-      slot.status = 'working';
-      slot.coverForId = null;
-      slot.manual = true;
-    } else {
-      slot.status = 'empty';
-    }
-  } else if (status === 'leave') {
-    if (slot.employeeId) {
-      slot.status = 'leave';
-      slot.coverForId = null;
-      slot.manual = true;
-    } else {
-      slot.status = 'empty';
-    }
-  }
-
+  slot.employeeId = null;
+  slot.status = 'empty';
+  slot.manual = false;
+  slot.coverForId = null;
   renderSchedule();
 }
 
-function clearEmployeeFromDay(dateStr, employeeId) {
-  slotConfig.forEach(({ key }) => {
-    const slot = schedule[dateStr][key];
-    if (slot.employeeId === employeeId) {
-      slot.employeeId = null;
-      slot.status = 'empty';
-      slot.manual = false;
-      slot.coverForId = null;
-    }
-  });
-}
-
 function assignEmployee(dateStr, slotKey, employeeId, manual) {
-  clearEmployeeFromDay(dateStr, employeeId);
+  if (isOnLeave(employeeId, dateStr)) {
+    return;
+  }
+  const week = getWeekForDate(dateStr);
+  if (week) {
+    const weekCounts = getWeekCounts(week);
+    const employee = employees.find((item) => item.id === employeeId);
+    if (employee && weekCounts.get(employeeId) >= contractLimits[employee.contract]) {
+      return;
+    }
+  }
   const slot = schedule[dateStr][slotKey];
   slot.employeeId = employeeId;
   slot.status = 'working';
@@ -350,20 +579,28 @@ function getWeekCounts(week) {
   return counts;
 }
 
+function getWeekForDate(dateStr) {
+  return weeks.find((week) => week.days.some((day) => day.dateStr === dateStr)) || null;
+}
+
+function getAvailableEmployees(dateStr, week) {
+  const weekCounts = week ? getWeekCounts(week) : new Map();
+  return getSortedEmployees()
+    .filter((employee) => !isOnLeave(employee.id, dateStr))
+    .filter((employee) =>
+      week ? weekCounts.get(employee.id) < contractLimits[employee.contract] : true
+    )
+    .map((employee) => {
+      const remaining = week
+        ? contractLimits[employee.contract] - (weekCounts.get(employee.id) || 0)
+        : contractLimits[employee.contract];
+      return { ...employee, remaining };
+    });
+}
+
 function isOnLeave(employeeId, dateStr) {
   const dates = leaves.get(employeeId);
   return dates ? dates.has(dateStr) : false;
-}
-
-function getAssignedEmployees(dateStr) {
-  const assigned = new Set();
-  slotConfig.forEach(({ key }) => {
-    const slot = schedule[dateStr][key];
-    if (slot.employeeId) {
-      assigned.add(slot.employeeId);
-    }
-  });
-  return assigned;
 }
 
 function autoSchedule() {
@@ -371,8 +608,6 @@ function autoSchedule() {
     const counts = getWeekCounts(week);
 
     week.days.forEach((day) => {
-      const assigned = getAssignedEmployees(day.dateStr);
-
       slotConfig.forEach(({ key }) => {
         const slot = schedule[day.dateStr][key];
         if (slot.employeeId && slot.status === 'working' && isOnLeave(slot.employeeId, day.dateStr)) {
@@ -381,7 +616,6 @@ function autoSchedule() {
           slot.status = 'empty';
           slot.coverForId = null;
           slot.manual = false;
-          assigned.delete(removedId);
         }
       });
 
@@ -393,16 +627,7 @@ function autoSchedule() {
           return;
         }
 
-        if (slot.status === 'leave' && slot.employeeId) {
-          slot.coverForId = slot.employeeId;
-        }
-
-        if (slot.status !== 'empty' && slot.status !== 'leave') {
-          return;
-        }
-
         const candidates = employees
-          .filter((employee) => !assigned.has(employee.id))
           .filter((employee) => !isOnLeave(employee.id, day.dateStr))
           .filter((employee) => counts.get(employee.id) < contractLimits[employee.contract])
           .sort((a, b) => counts.get(a.id) - counts.get(b.id) || a.id - b.id);
@@ -416,7 +641,6 @@ function autoSchedule() {
         slot.status = 'working';
         slot.manual = false;
         counts.set(chosen.id, counts.get(chosen.id) + 1);
-        assigned.add(chosen.id);
       });
     });
   });
@@ -439,50 +663,47 @@ function addLeave(employeeId, startDate, endDate) {
       leaveDates.add(dateStr);
 
       if (schedule[dateStr]) {
-        const matchingSlot = slotConfig
-          .map(({ key }) => schedule[dateStr][key])
-          .find((slot) => slot.employeeId === employeeId);
-
-        if (matchingSlot) {
-          matchingSlot.status = 'leave';
-          matchingSlot.coverForId = null;
-          matchingSlot.manual = true;
-          slotConfig.forEach(({ key }) => {
-            const slot = schedule[dateStr][key];
-            if (slot.employeeId === employeeId && slot !== matchingSlot) {
-              slot.employeeId = null;
-              slot.status = 'empty';
-              slot.coverForId = null;
-              slot.manual = false;
-            }
-          });
-        } else {
-          const emptySlotKey = slotConfig.find(({ key }) => schedule[dateStr][key].employeeId === null);
-          if (emptySlotKey) {
-            const slot = schedule[dateStr][emptySlotKey.key];
-            slot.employeeId = employeeId;
-            slot.status = 'leave';
+        slotConfig.forEach(({ key }) => {
+          const slot = schedule[dateStr][key];
+          if (slot.employeeId === employeeId) {
+            slot.employeeId = null;
+            slot.status = 'empty';
             slot.coverForId = null;
-            slot.manual = true;
-            slotConfig.forEach(({ key }) => {
-              if (key !== emptySlotKey.key) {
-                const otherSlot = schedule[dateStr][key];
-                if (otherSlot.employeeId === employeeId) {
-                  otherSlot.employeeId = null;
-                  otherSlot.status = 'empty';
-                  otherSlot.coverForId = null;
-                  otherSlot.manual = false;
-                }
-              }
-            });
+            slot.manual = false;
           }
-        }
+        });
       }
     }
     current.setDate(current.getDate() + 1);
   }
 
   renderLeaves();
+  renderEmployeeDetails();
+  renderSchedule();
+}
+
+function removeLeaveRange(employeeId, startDate, endDate) {
+  const leaveDates = leaves.get(employeeId);
+  if (!leaveDates) {
+    return;
+  }
+
+  const current = new Date(startDate);
+  const end = new Date(endDate);
+
+  while (current <= end) {
+    if (isWeekday(current)) {
+      leaveDates.delete(toISODate(current));
+    }
+    current.setDate(current.getDate() + 1);
+  }
+
+  if (leaveDates.size === 0) {
+    leaves.delete(employeeId);
+  }
+
+  renderLeaves();
+  renderEmployeeDetails();
   renderSchedule();
 }
 
@@ -497,9 +718,9 @@ function resetSchedule() {
       };
     });
   });
-  leaves.clear();
-  renderLeaves();
   renderSchedule();
+  renderEmployees();
+  renderEmployeeDetails();
 }
 
 leaveForm.addEventListener('submit', (event) => {
@@ -516,6 +737,9 @@ leaveForm.addEventListener('submit', (event) => {
   leaveForm.reset();
   if (leaveModal) {
     leaveModal.hide();
+  }
+  if (leaveOverviewBar) {
+    leaveOverviewBar.classList.remove('d-none');
   }
 });
 
@@ -543,6 +767,26 @@ if (expandAllButton) {
       collapse.show();
     });
   });
+}
+
+if (leaveModalElement && leaveOverviewBar) {
+  leaveModalElement.addEventListener('shown.bs.modal', () => {
+    leaveOverviewBar.classList.remove('d-none');
+  });
+}
+
+if (leaveOverviewToggle) {
+  const leaveOverviewCollapse = document.getElementById('leaveOverviewCollapse');
+  if (leaveOverviewCollapse) {
+    leaveOverviewCollapse.addEventListener('shown.bs.collapse', () => {
+      leaveOverviewToggle.textContent = 'Collapse';
+      leaveOverviewToggle.setAttribute('aria-expanded', 'true');
+    });
+    leaveOverviewCollapse.addEventListener('hidden.bs.collapse', () => {
+      leaveOverviewToggle.textContent = 'Expand';
+      leaveOverviewToggle.setAttribute('aria-expanded', 'false');
+    });
+  }
 }
 
 buildWeeks();

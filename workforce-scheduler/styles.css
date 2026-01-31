@@ -59,30 +59,60 @@ body {
   gap: 0.75rem;
 }
 
-.controls-grid {
+.controls-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.leave-overview {
+  width: 100%;
+}
+
+.leave-overview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.leave-overview-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.employee-panels {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-.employee-list {
+.employee-table {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.75rem;
 }
 
-.employee-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  background: var(--surface-muted);
-  cursor: grab;
+.employee-cell {
   border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem;
+  text-align: left;
+  background: var(--surface-muted);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.employee-card:active {
-  cursor: grabbing;
+.employee-cell:hover {
+  border-color: var(--accent-2);
+  transform: translateY(-1px);
+}
+
+.employee-cell.active {
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+  background: #e0e7ff;
 }
 
 .employee-name {
@@ -94,6 +124,65 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #475569;
+}
+
+.employee-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #475569;
+  margin-top: 0.5rem;
+}
+
+.employee-details {
+  display: grid;
+  gap: 1rem;
+}
+
+.employee-details.empty {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.employee-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.employee-metrics {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.employee-weekly ul li {
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+  font-size: 0.85rem;
+}
+
+.employee-leave-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.employee-leave-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.leave-range-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+  font-size: 0.85rem;
 }
 
 .leave-form {
@@ -235,10 +324,9 @@ body {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  justify-content: center;
+  justify-content: flex-start;
   font-weight: 600;
   color: #64748b;
-  padding: 0.35rem 0;
 }
 
 .slot-add-icon {
@@ -266,17 +354,25 @@ body {
   font-weight: 600;
 }
 
-.slot-meta {
-  font-size: 0.75rem;
-  color: #64748b;
+.slot-add-button {
+  width: 100%;
+  margin-top: 0.35rem;
 }
 
-.status-select {
+.slot-assign-panel {
+  display: none;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.slot-assign-panel.show {
+  display: grid;
+}
+
+.slot-remove-button {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid #cbd5f5;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.85rem;
+  margin-top: 0.35rem;
 }
 
 .modal-backdrop {
