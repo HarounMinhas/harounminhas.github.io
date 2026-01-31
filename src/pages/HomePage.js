@@ -30,7 +30,7 @@ const HomePage = () => {
             </Col>
           </Row>
         </Container>
-        <SectionDivider position="bottom" color="linear-gradient(135deg, rgba(50, 142, 110, 0.08), rgba(144, 198, 124, 0.08))" />
+        <SectionDivider position="bottom" color="#e8f1ec" />
       </section>
 
       <section className="section-padding contact-cta-section" style={{ position: 'relative' }}>
