@@ -323,15 +323,34 @@ body {
 
 .day-header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
   font-weight: 600;
   font-size: 0.9rem;
   color: #1e293b;
   gap: 0.5rem;
 }
 
+.day-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.day-label {
+  white-space: nowrap;
+}
+
+.day-date {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
 .day-drop-zone {
+  align-self: flex-start;
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
