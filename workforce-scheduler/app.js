@@ -124,6 +124,12 @@ function saveStorage(data) {
   localStorage.setItem(storageKey, JSON.stringify(data));
 }
 
+function saveSelectedMonthKey(monthKey) {
+  const data = loadStorage();
+  data.selectedMonthKey = monthKey;
+  saveStorage(data);
+}
+
 function saveCurrentMonthData() {
   const data = loadStorage();
   const monthKey = getMonthKey(currentMonth.year, currentMonth.monthIndex);
@@ -1047,6 +1053,7 @@ function handleMonthChange(value) {
     saveCurrentMonthData();
   }
   currentMonth = { year, monthIndex };
+  saveSelectedMonthKey(getMonthKey(year, monthIndex));
   initializeMonth(year, monthIndex);
   hasInitialized = true;
 }
