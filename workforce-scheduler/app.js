@@ -162,35 +162,71 @@ function renderEmployees() {
   });
 }
 
-function getLeaveRanges(datesSet) {
-  if (!datesSet || datesSet.size === 0) {
+function normalizeLeaveRange(startDate, endDate) {
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  if (start <= end) {
+    return { start: toISODate(start), end: toISODate(end) };
+  }
+  return { start: toISODate(end), end: toISODate(start) };
+}
+
+function addDaysToISO(dateStr, days) {
+  const date = new Date(`${dateStr}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return toISODate(date);
+}
+
+function mergeLeaveRanges(ranges) {
+  if (!ranges || ranges.length === 0) {
     return [];
   }
 
-  const sortedDates = Array.from(datesSet).sort();
-  const ranges = [];
-  let rangeStart = sortedDates[0];
-  let rangeEnd = sortedDates[0];
-
-  const toDate = (dateStr) => new Date(`${dateStr}T00:00:00`);
-
-  for (let index = 1; index < sortedDates.length; index += 1) {
-    const current = sortedDates[index];
-    const previousDate = toDate(rangeEnd);
-    previousDate.setDate(previousDate.getDate() + 1);
-    const expectedNext = toISODate(previousDate);
-
-    if (current === expectedNext) {
-      rangeEnd = current;
-    } else {
-      ranges.push({ start: rangeStart, end: rangeEnd });
-      rangeStart = current;
-      rangeEnd = current;
+  const sorted = [...ranges].sort((a, b) => a.start.localeCompare(b.start));
+  return sorted.reduce((merged, range) => {
+    if (merged.length === 0) {
+      merged.push({ ...range });
+      return merged;
     }
-  }
+    const last = merged[merged.length - 1];
+    const nextDayAfterLast = addDaysToISO(last.end, 1);
+    if (range.start <= nextDayAfterLast) {
+      if (range.end > last.end) {
+        last.end = range.end;
+      }
+    } else {
+      merged.push({ ...range });
+    }
+    return merged;
+  }, []);
+}
 
-  ranges.push({ start: rangeStart, end: rangeEnd });
-  return ranges;
+function getLeaveRangesForEmployee(employeeId) {
+  return leaves.get(employeeId) || [];
+}
+
+function countWeekdaysInRange(startDate, endDate) {
+  let total = 0;
+  const current = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  while (current <= end) {
+    if (isWeekday(current)) {
+      total += 1;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  return total;
+}
+
+function forEachLeaveDay(startDate, endDate, callback) {
+  const current = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  while (current <= end) {
+    if (isWeekday(current)) {
+      callback(toISODate(current));
+    }
+    current.setDate(current.getDate() + 1);
+  }
 }
 
 function renderLeaves() {
@@ -208,20 +244,16 @@ function renderLeaves() {
     return;
   }
 
-  entries.forEach(([employeeId, dates]) => {
+  entries.forEach(([employeeId, ranges]) => {
     const employee = employees.find((item) => item.id === employeeId);
-    if (!employee || dates.size === 0) {
+    if (!employee || !ranges || ranges.length === 0) {
       return;
     }
 
-    const ranges = getLeaveRanges(dates);
     ranges.forEach((range) => {
       const startLabel = range.start;
       const endLabel = range.end;
-      const totalDays =
-        (new Date(`${endLabel}T00:00:00`) - new Date(`${startLabel}T00:00:00`)) /
-          (1000 * 60 * 60 * 24) +
-        1;
+      const totalDays = countWeekdaysInRange(startLabel, endLabel);
       const li = document.createElement('li');
       li.textContent = `${employee.name}: ${startLabel} → ${endLabel} (${totalDays} day(s))`;
       lists.forEach((list) => list.appendChild(li.cloneNode(true)));
@@ -260,16 +292,13 @@ function renderEmployeeDetails() {
     return { label: week.label, count };
   });
 
-  const ranges = getLeaveRanges(leaves.get(employee.id));
+  const ranges = getLeaveRangesForEmployee(employee.id);
   const leaveListHtml =
     ranges.length === 0
       ? '<li class="text-muted">No leave registered yet.</li>'
       : ranges
           .map((range) => {
-            const totalDays =
-              (new Date(`${range.end}T00:00:00`) - new Date(`${range.start}T00:00:00`)) /
-                (1000 * 60 * 60 * 24) +
-              1;
+            const totalDays = countWeekdaysInRange(range.start, range.end);
             return `
               <li class="leave-range-item">
                 <span>${range.start} → ${range.end} (${totalDays} day(s))</span>
@@ -653,8 +682,11 @@ function getAvailableEmployees(dateStr, slotKey, week) {
 }
 
 function isOnLeave(employeeId, dateStr) {
-  const dates = leaves.get(employeeId);
-  return dates ? dates.has(dateStr) : false;
+  const ranges = leaves.get(employeeId);
+  if (!ranges || ranges.length === 0) {
+    return false;
+  }
+  return ranges.some((range) => dateStr >= range.start && dateStr <= range.end);
 }
 
 function autoSchedule() {
@@ -724,30 +756,21 @@ function autoSchedule() {
 }
 
 function addLeave(employeeId, startDate, endDate) {
-  if (!leaves.has(employeeId)) {
-    leaves.set(employeeId, new Set());
-  }
+  const normalizedRange = normalizeLeaveRange(startDate, endDate);
+  const existing = leaves.get(employeeId) || [];
+  const merged = mergeLeaveRanges([...existing, normalizedRange]);
+  leaves.set(employeeId, merged);
 
-  const leaveDates = leaves.get(employeeId);
-  const current = new Date(startDate);
-  const end = new Date(endDate);
-
-  while (current <= end) {
-    if (isWeekday(current)) {
-      const dateStr = toISODate(current);
-      leaveDates.add(dateStr);
-
-      if (schedule[dateStr]) {
-        slotConfig.forEach(({ key }) => {
-          const slot = schedule[dateStr][key];
-          slot.assignments = slot.assignments.filter(
-            (assignment) => assignment.employeeId !== employeeId
-          );
-        });
-      }
+  forEachLeaveDay(normalizedRange.start, normalizedRange.end, (dateStr) => {
+    if (schedule[dateStr]) {
+      slotConfig.forEach(({ key }) => {
+        const slot = schedule[dateStr][key];
+        slot.assignments = slot.assignments.filter(
+          (assignment) => assignment.employeeId !== employeeId
+        );
+      });
     }
-    current.setDate(current.getDate() + 1);
-  }
+  });
 
   renderLeaves();
   renderEmployeeDetails();
@@ -755,23 +778,20 @@ function addLeave(employeeId, startDate, endDate) {
 }
 
 function removeLeaveRange(employeeId, startDate, endDate) {
-  const leaveDates = leaves.get(employeeId);
-  if (!leaveDates) {
+  const ranges = leaves.get(employeeId);
+  if (!ranges) {
     return;
   }
 
-  const current = new Date(startDate);
-  const end = new Date(endDate);
+  const normalizedRange = normalizeLeaveRange(startDate, endDate);
+  const remaining = ranges.filter(
+    (range) => range.start !== normalizedRange.start || range.end !== normalizedRange.end
+  );
 
-  while (current <= end) {
-    if (isWeekday(current)) {
-      leaveDates.delete(toISODate(current));
-    }
-    current.setDate(current.getDate() + 1);
-  }
-
-  if (leaveDates.size === 0) {
+  if (remaining.length === 0) {
     leaves.delete(employeeId);
+  } else {
+    leaves.set(employeeId, remaining);
   }
 
   renderLeaves();
