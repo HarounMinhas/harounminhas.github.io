@@ -89,7 +89,8 @@
             <div class="card-body">
               <h2 class="h5">Employees</h2>
               <p class="text-muted small">
-                Select an employee to review details, remaining capacity, and manage leave.
+                Select an employee to review details, remaining capacity, and manage leave. Drag a
+                name onto a morning, afternoon, or full-day drop zone to assign them.
               </p>
               <div id="employeeList" class="employee-table"></div>
             </div>
@@ -127,6 +128,7 @@
             </div>
           </div>
         </div>
+        <div id="scheduleNotice" class="alert alert-warning d-none" role="alert"></div>
 
         <div id="weekContainer" class="week-container"></div>
       </section>
@@ -159,11 +161,11 @@
             <div class="row g-3">
               <div class="col-sm-6">
                 <label class="form-label" for="leaveStart">Start date</label>
-                <input id="leaveStart" type="date" class="form-control" required />
+                <input id="leaveStart" name="leaveStart" type="date" class="form-control" required />
               </div>
               <div class="col-sm-6">
                 <label class="form-label" for="leaveEnd">End date</label>
-                <input id="leaveEnd" type="date" class="form-control" required />
+                <input id="leaveEnd" name="leaveEnd" type="date" class="form-control" required />
               </div>
             </div>
             <div class="leave-manager-overview mt-3">

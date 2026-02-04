@@ -38,6 +38,7 @@ const collapseAllButton = document.getElementById('collapseAll');
 const expandAllButton = document.getElementById('expandAll');
 const leaveOverviewBar = document.getElementById('leaveOverviewBar');
 const leaveOverviewToggle = document.getElementById('leaveOverviewToggle');
+const scheduleNotice = document.getElementById('scheduleNotice');
 const leaveModalElement = document.getElementById('leaveManagerModal');
 const leaveModal = leaveModalElement && window.bootstrap ? new bootstrap.Modal(leaveModalElement) : null;
 
@@ -89,7 +90,7 @@ function buildWeeks() {
 
     currentWeek.days.push(dayInfo);
     schedule[dateStr] = slotConfig.reduce((acc, slot) => {
-      acc[slot.key] = { status: 'empty', employeeId: null, manual: false, coverForId: null };
+      acc[slot.key] = { assignments: [] };
       return acc;
     }, {});
   }
@@ -108,10 +109,7 @@ function getTotalAssignments(employeeId) {
     const daySlots = schedule[dateStr];
     const dayCount = slotConfig.reduce((count, { key }) => {
       const slot = daySlots[key];
-      if (slot.status === 'working' && slot.employeeId === employeeId) {
-        return count + 1;
-      }
-      return count;
+      return count + slot.assignments.filter((assignment) => assignment.employeeId === employeeId).length;
     }, 0);
     return total + dayCount;
   }, 0);
@@ -128,8 +126,9 @@ function renderEmployees() {
 
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = 'employee-cell';
+    card.className = 'employee-cell draggable-employee';
     card.dataset.employeeId = employee.id;
+    card.setAttribute('draggable', 'true');
     if (selectedEmployeeId === employee.id) {
       card.classList.add('active');
     }
@@ -147,6 +146,11 @@ function renderEmployees() {
       selectedEmployeeId = employee.id;
       renderEmployees();
       renderEmployeeDetails();
+    });
+
+    card.addEventListener('dragstart', (event) => {
+      event.dataTransfer.setData('text/plain', String(employee.id));
+      event.dataTransfer.effectAllowed = 'copy';
     });
 
     employeeList.appendChild(card);
@@ -413,18 +417,47 @@ function renderSchedule() {
 
       const header = document.createElement('div');
       header.className = 'day-header';
-      header.innerHTML = `<span>${day.label}</span><span class="text-muted">${day.dateStr}</span>`;
+      header.innerHTML = `
+        <span>${day.label}</span>
+        <span class="text-muted">${day.dateStr}</span>
+        <span class="day-drop-zone" data-date="${day.dateStr}" data-slot="full-day">
+          Full day drop
+        </span>
+      `;
 
       dayCard.appendChild(header);
+
+      const dayDropZone = header.querySelector('.day-drop-zone');
+      if (dayDropZone) {
+        setupDropZone(dayDropZone, (employeeId) => {
+          const weekForDay = getWeekForDate(day.dateStr);
+          const morningError = getAssignmentError(day.dateStr, 'morning', employeeId, weekForDay);
+          const afternoonError = getAssignmentError(day.dateStr, 'afternoon', employeeId, weekForDay);
+          if (morningError || afternoonError) {
+            showNotice(morningError || afternoonError, 'warning');
+            return;
+          }
+          const morningAssigned = assignEmployee(day.dateStr, 'morning', employeeId, true, {
+            skipRender: true
+          });
+          const afternoonAssigned = assignEmployee(day.dateStr, 'afternoon', employeeId, true, {
+            skipRender: true
+          });
+          if (!morningAssigned || !afternoonAssigned) {
+            showNotice('Unable to assign full day due to conflicts or leave.', 'warning');
+          }
+          renderSchedule();
+        });
+      }
 
       slotConfig.forEach((slotInfo) => {
         const slotKey = slotInfo.key;
         const slot = schedule[day.dateStr][slotKey];
-        const employee = employees.find((item) => item.id === slot.employeeId);
-        const isEmpty = slot.status === 'empty';
+        const assignments = slot.assignments;
+        const isEmpty = assignments.length === 0;
 
         const slotCard = document.createElement('div');
-        slotCard.className = `slot-card status-${slot.status}`;
+        slotCard.className = `slot-card status-${isEmpty ? 'empty' : 'working'}`;
         slotCard.dataset.date = day.dateStr;
         slotCard.dataset.slot = slotKey;
         if (isEmpty) {
@@ -448,71 +481,89 @@ function renderSchedule() {
           addText.textContent = 'Add employee';
           employeeLabel.appendChild(addIcon);
           employeeLabel.appendChild(addText);
-
-          const assignPanel = document.createElement('div');
-          assignPanel.className = 'slot-assign-panel';
-
-          const select = document.createElement('select');
-          select.className = 'form-select form-select-sm';
-
-          const availableEmployees = getAvailableEmployees(day.dateStr, week);
-          if (availableEmployees.length === 0) {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'No available employees';
-            select.appendChild(option);
-            select.disabled = true;
-          } else {
-            availableEmployees.forEach((candidate) => {
-              const option = document.createElement('option');
-              option.value = candidate.id;
-              option.textContent = `${candidate.name} (${candidate.remaining} remaining)`;
-              select.appendChild(option);
-            });
-          }
-
-          const assignButton = document.createElement('button');
-          assignButton.type = 'button';
-          assignButton.className = 'btn btn-sm btn-primary';
-          assignButton.textContent = 'Assign';
-          assignButton.disabled = availableEmployees.length === 0;
-
-          assignButton.addEventListener('click', () => {
-            const employeeId = Number(select.value);
-            if (!employeeId) {
-              return;
-            }
-            assignEmployee(day.dateStr, slotKey, employeeId, true);
-          });
-
-          assignPanel.appendChild(select);
-          assignPanel.appendChild(assignButton);
-
-          const toggleButton = document.createElement('button');
-          toggleButton.type = 'button';
-          toggleButton.className = 'btn btn-sm btn-outline-secondary slot-add-button';
-          toggleButton.textContent = 'Add employee';
-          toggleButton.addEventListener('click', () => {
-            assignPanel.classList.toggle('show');
-          });
-
-          slotCard.appendChild(employeeLabel);
-          slotCard.appendChild(toggleButton);
-          slotCard.appendChild(assignPanel);
         } else {
-          employeeLabel.textContent = employee?.name || 'Unassigned';
-
-          const removeButton = document.createElement('button');
-          removeButton.type = 'button';
-          removeButton.className = 'btn btn-sm btn-outline-danger slot-remove-button';
-          removeButton.textContent = 'Remove';
-          removeButton.addEventListener('click', () => {
-            clearSlot(day.dateStr, slotKey);
+          const list = document.createElement('div');
+          list.className = 'slot-employee-list';
+          assignments.forEach((assignment) => {
+            const employee = employees.find((item) => item.id === assignment.employeeId);
+            const chip = document.createElement('div');
+            chip.className = 'slot-employee-chip';
+            const name = document.createElement('span');
+            name.textContent = employee?.name || 'Unassigned';
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-sm btn-outline-danger';
+            removeButton.textContent = 'Remove';
+            removeButton.addEventListener('click', () => {
+              removeAssignment(day.dateStr, slotKey, assignment.employeeId);
+            });
+            chip.appendChild(name);
+            chip.appendChild(removeButton);
+            list.appendChild(chip);
           });
-
-          slotCard.appendChild(employeeLabel);
-          slotCard.appendChild(removeButton);
+          employeeLabel.appendChild(list);
         }
+
+        const assignPanel = document.createElement('div');
+        assignPanel.className = 'slot-assign-panel';
+
+        const select = document.createElement('select');
+        select.className = 'form-select form-select-sm';
+
+        const availableEmployees = getAvailableEmployees(day.dateStr, slotKey, week);
+        if (availableEmployees.length === 0) {
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'No available employees';
+          select.appendChild(option);
+          select.disabled = true;
+        } else {
+          availableEmployees.forEach((candidate) => {
+            const option = document.createElement('option');
+            option.value = candidate.id;
+            option.textContent = `${candidate.name} (${candidate.remaining} remaining)`;
+            select.appendChild(option);
+          });
+        }
+
+        const assignButton = document.createElement('button');
+        assignButton.type = 'button';
+        assignButton.className = 'btn btn-sm btn-primary';
+        assignButton.textContent = 'Assign';
+        assignButton.disabled = availableEmployees.length === 0;
+
+        assignButton.addEventListener('click', () => {
+          const employeeId = Number(select.value);
+          if (!employeeId) {
+            return;
+          }
+          const wasAssigned = assignEmployee(day.dateStr, slotKey, employeeId, true);
+          if (!wasAssigned) {
+            showNotice(getAssignmentError(day.dateStr, slotKey, employeeId), 'warning');
+          }
+        });
+
+        assignPanel.appendChild(select);
+        assignPanel.appendChild(assignButton);
+
+        const toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.className = 'btn btn-sm btn-outline-secondary slot-add-button';
+        toggleButton.textContent = 'Add employee';
+        toggleButton.addEventListener('click', () => {
+          assignPanel.classList.toggle('show');
+        });
+
+        slotCard.appendChild(employeeLabel);
+        slotCard.appendChild(toggleButton);
+        slotCard.appendChild(assignPanel);
+
+        setupDropZone(slotCard, (employeeId) => {
+          const assigned = assignEmployee(day.dateStr, slotKey, employeeId, true);
+          if (!assigned) {
+            showNotice(getAssignmentError(day.dateStr, slotKey, employeeId), 'warning');
+          }
+        });
 
         dayCard.appendChild(slotCard);
       });
@@ -529,31 +580,26 @@ function renderSchedule() {
 }
 
 function clearSlot(dateStr, slotKey) {
-  const slot = schedule[dateStr][slotKey];
-  slot.employeeId = null;
-  slot.status = 'empty';
-  slot.manual = false;
-  slot.coverForId = null;
+  schedule[dateStr][slotKey].assignments = [];
   renderSchedule();
 }
 
-function assignEmployee(dateStr, slotKey, employeeId, manual) {
-  if (isOnLeave(employeeId, dateStr)) {
-    return;
-  }
+function assignEmployee(dateStr, slotKey, employeeId, manual, options = {}) {
   const week = getWeekForDate(dateStr);
-  if (week) {
-    const weekCounts = getWeekCounts(week);
-    const employee = employees.find((item) => item.id === employeeId);
-    if (employee && weekCounts.get(employeeId) >= contractLimits[employee.contract]) {
-      return;
-    }
+  const error = getAssignmentError(dateStr, slotKey, employeeId, week);
+  if (error) {
+    return false;
   }
+  schedule[dateStr][slotKey].assignments.push({ employeeId, manual });
+  if (!options.skipRender) {
+    renderSchedule();
+  }
+  return true;
+}
+
+function removeAssignment(dateStr, slotKey, employeeId) {
   const slot = schedule[dateStr][slotKey];
-  slot.employeeId = employeeId;
-  slot.status = 'working';
-  slot.manual = manual;
-  slot.coverForId = null;
+  slot.assignments = slot.assignments.filter((assignment) => assignment.employeeId !== employeeId);
   renderSchedule();
 }
 
@@ -570,9 +616,12 @@ function getWeekCounts(week) {
     slotConfig.forEach(({ key }) => {
       const slotKey = key;
       const slot = schedule[day.dateStr][slotKey];
-      if (slot.status === 'working' && slot.employeeId) {
-        counts.set(slot.employeeId, counts.get(slot.employeeId) + 1);
-      }
+      slot.assignments.forEach((assignment) => {
+        counts.set(
+          assignment.employeeId,
+          (counts.get(assignment.employeeId) || 0) + 1
+        );
+      });
     });
   });
 
@@ -583,12 +632,17 @@ function getWeekForDate(dateStr) {
   return weeks.find((week) => week.days.some((day) => day.dateStr === dateStr)) || null;
 }
 
-function getAvailableEmployees(dateStr, week) {
+function getAvailableEmployees(dateStr, slotKey, week) {
   const weekCounts = week ? getWeekCounts(week) : new Map();
+  const slotAssignments = schedule[dateStr][slotKey].assignments;
   return getSortedEmployees()
     .filter((employee) => !isOnLeave(employee.id, dateStr))
     .filter((employee) =>
       week ? weekCounts.get(employee.id) < contractLimits[employee.contract] : true
+    )
+    .filter(
+      (employee) =>
+        !slotAssignments.some((assignment) => assignment.employeeId === employee.id)
     )
     .map((employee) => {
       const remaining = week
@@ -610,39 +664,60 @@ function autoSchedule() {
     week.days.forEach((day) => {
       slotConfig.forEach(({ key }) => {
         const slot = schedule[day.dateStr][key];
-        if (slot.employeeId && slot.status === 'working' && isOnLeave(slot.employeeId, day.dateStr)) {
-          const removedId = slot.employeeId;
-          slot.employeeId = null;
-          slot.status = 'empty';
-          slot.coverForId = null;
-          slot.manual = false;
-        }
-      });
-
-      slotConfig.forEach(({ key }) => {
-        const slotKey = key;
-        const slot = schedule[day.dateStr][slotKey];
-
-        if (slot.status === 'working') {
-          return;
-        }
-
-        const candidates = employees
-          .filter((employee) => !isOnLeave(employee.id, day.dateStr))
-          .filter((employee) => counts.get(employee.id) < contractLimits[employee.contract])
-          .sort((a, b) => counts.get(a.id) - counts.get(b.id) || a.id - b.id);
-
-        if (candidates.length === 0) {
-          return;
-        }
-
-        const chosen = candidates[0];
-        slot.employeeId = chosen.id;
-        slot.status = 'working';
-        slot.manual = false;
-        counts.set(chosen.id, counts.get(chosen.id) + 1);
+        slot.assignments = slot.assignments.filter(
+          (assignment) => !isOnLeave(assignment.employeeId, day.dateStr)
+        );
       });
     });
+
+    const weekSlots = week.days.flatMap((day) =>
+      slotConfig.map(({ key }) => ({ dateStr: day.dateStr, slotKey: key }))
+    );
+
+    let progress = true;
+    while (progress) {
+      progress = false;
+      const sortedEmployees = getSortedEmployees().sort((a, b) => {
+        const weekDiff = counts.get(a.id) - counts.get(b.id);
+        if (weekDiff !== 0) {
+          return weekDiff;
+        }
+        return getTotalAssignments(a.id) - getTotalAssignments(b.id);
+      });
+
+      sortedEmployees.forEach((employee) => {
+        if (counts.get(employee.id) >= contractLimits[employee.contract]) {
+          return;
+        }
+
+        const availableSlots = weekSlots
+          .filter((slotInfo) => !isOnLeave(employee.id, slotInfo.dateStr))
+          .filter(
+            (slotInfo) =>
+              !schedule[slotInfo.dateStr][slotInfo.slotKey].assignments.some(
+                (assignment) => assignment.employeeId === employee.id
+              )
+          )
+          .sort((a, b) => {
+            const aCount = schedule[a.dateStr][a.slotKey].assignments.length;
+            const bCount = schedule[b.dateStr][b.slotKey].assignments.length;
+            return aCount - bCount || a.dateStr.localeCompare(b.dateStr);
+          });
+
+        if (availableSlots.length === 0) {
+          return;
+        }
+
+        const chosenSlot = availableSlots[0];
+        const assigned = assignEmployee(chosenSlot.dateStr, chosenSlot.slotKey, employee.id, false, {
+          skipRender: true
+        });
+        if (assigned) {
+          counts.set(employee.id, counts.get(employee.id) + 1);
+          progress = true;
+        }
+      });
+    }
   });
 
   renderSchedule();
@@ -665,12 +740,9 @@ function addLeave(employeeId, startDate, endDate) {
       if (schedule[dateStr]) {
         slotConfig.forEach(({ key }) => {
           const slot = schedule[dateStr][key];
-          if (slot.employeeId === employeeId) {
-            slot.employeeId = null;
-            slot.status = 'empty';
-            slot.coverForId = null;
-            slot.manual = false;
-          }
+          slot.assignments = slot.assignments.filter(
+            (assignment) => assignment.employeeId !== employeeId
+          );
         });
       }
     }
@@ -711,10 +783,7 @@ function resetSchedule() {
   Object.keys(schedule).forEach((dateStr) => {
     slotConfig.forEach(({ key }) => {
       schedule[dateStr][key] = {
-        status: 'empty',
-        employeeId: null,
-        manual: false,
-        coverForId: null
+        assignments: []
       };
     });
   });
@@ -726,8 +795,8 @@ function resetSchedule() {
 leaveForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const employeeId = Number(leaveEmployeeSelect.value);
-  const startDate = leaveForm.leaveStart.value;
-  const endDate = leaveForm.leaveEnd.value;
+  const startDate = leaveForm.querySelector('#leaveStart')?.value;
+  const endDate = leaveForm.querySelector('#leaveEnd')?.value;
 
   if (!employeeId || !startDate || !endDate) {
     return;
@@ -793,3 +862,58 @@ buildWeeks();
 renderEmployees();
 renderLeaves();
 renderSchedule();
+
+function getAssignmentError(dateStr, slotKey, employeeId, week = null) {
+  if (isOnLeave(employeeId, dateStr)) {
+    return `${getEmployeeName(employeeId)} is on leave on ${dateStr}.`;
+  }
+  const slotAssignments = schedule[dateStr][slotKey].assignments;
+  if (slotAssignments.some((assignment) => assignment.employeeId === employeeId)) {
+    return `${getEmployeeName(employeeId)} is already booked for this ${slotKey}.`;
+  }
+  const targetWeek = week || getWeekForDate(dateStr);
+  if (targetWeek) {
+    const weekCounts = getWeekCounts(targetWeek);
+    const employee = employees.find((item) => item.id === employeeId);
+    if (employee && weekCounts.get(employeeId) >= contractLimits[employee.contract]) {
+      return `${getEmployeeName(employeeId)} has reached the weekly limit.`;
+    }
+  }
+  return null;
+}
+
+function showNotice(message, type = 'warning') {
+  if (!scheduleNotice || !message) {
+    return;
+  }
+  scheduleNotice.classList.remove('d-none', 'alert-warning', 'alert-danger', 'alert-success');
+  scheduleNotice.classList.add(`alert-${type}`);
+  scheduleNotice.textContent = message;
+  window.clearTimeout(showNotice.timer);
+  showNotice.timer = window.setTimeout(() => {
+    scheduleNotice.classList.add('d-none');
+  }, 4000);
+}
+
+function setupDropZone(element, handler) {
+  element.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    element.classList.add('drop-active');
+  });
+  element.addEventListener('dragleave', () => {
+    element.classList.remove('drop-active');
+  });
+  element.addEventListener('drop', (event) => {
+    event.preventDefault();
+    element.classList.remove('drop-active');
+    const employeeId = Number(event.dataTransfer.getData('text/plain'));
+    if (!employeeId) {
+      return;
+    }
+    handler(employeeId);
+  });
+}
+
+document.addEventListener('dragend', () => {
+  document.querySelectorAll('.drop-active').forEach((node) => node.classList.remove('drop-active'));
+});
