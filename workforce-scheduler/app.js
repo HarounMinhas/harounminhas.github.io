@@ -583,8 +583,8 @@ function renderSchedule() {
       const header = document.createElement('div');
       header.className = 'day-header';
       header.innerHTML = `
-        <span>${day.label}</span>
-        <span class="text-muted">${day.dateStr}</span>
+        <span class="day-label">${day.label}</span>
+        <span class="day-date text-muted">${day.dateStr}</span>
         <span class="day-drop-zone" data-date="${day.dateStr}" data-slot="full-day">
           Full day drop
         </span>
@@ -741,8 +741,8 @@ function renderSchedule() {
       placeholder.className = 'day-card day-placeholder';
       placeholder.innerHTML = `
         <div class="day-header">
-          <span class="text-muted">No day</span>
-          <span class="text-muted">--</span>
+          <span class="day-label text-muted">No day</span>
+          <span class="day-date text-muted">--</span>
           <span class="day-drop-zone day-drop-disabled">Unavailable</span>
         </div>
       `;
