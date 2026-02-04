@@ -104,6 +104,14 @@ body {
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
+.draggable-employee {
+  cursor: grab;
+}
+
+.draggable-employee:active {
+  cursor: grabbing;
+}
+
 .employee-cell:hover {
   border-color: var(--accent-2);
   transform: translateY(-1px);
@@ -295,6 +303,24 @@ body {
   font-weight: 600;
   font-size: 0.9rem;
   color: #1e293b;
+  gap: 0.5rem;
+}
+
+.day-drop-zone {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.4rem;
+  border-radius: 999px;
+  border: 1px dashed #cbd5f5;
+  color: #475569;
+  background: #f8fafc;
+}
+
+.drop-active {
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .slot-card {
@@ -352,6 +378,23 @@ body {
 
 .slot-employee {
   font-weight: 600;
+}
+
+.slot-employee-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.slot-employee-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  font-size: 0.85rem;
 }
 
 .slot-add-button {
