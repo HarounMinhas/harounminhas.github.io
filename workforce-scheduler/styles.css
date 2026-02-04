@@ -235,6 +235,12 @@ body {
   align-items: center;
 }
 
+.month-selector {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
 .legend {
   display: flex;
   gap: 0.5rem;
@@ -292,7 +298,7 @@ body {
 .week-grid {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
 }
 
 .day-card {
@@ -302,6 +308,17 @@ body {
   border: 1px solid #e2e8f0;
   display: grid;
   gap: 0.5rem;
+}
+
+.day-card.day-placeholder {
+  background: #f8fafc;
+  border-style: dashed;
+  color: #94a3b8;
+}
+
+.day-drop-zone.day-drop-disabled {
+  opacity: 0.5;
+  border-style: dashed;
 }
 
 .day-header {
