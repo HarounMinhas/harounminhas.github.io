@@ -204,6 +204,14 @@ body {
   font-size: 0.9rem;
 }
 
+.leave-summary ul,
+.leave-manager-overview ul,
+.employee-leave-overview ul {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
 .calendar {
   background: #ffffff;
   padding: 1.5rem;
