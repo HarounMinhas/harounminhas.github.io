@@ -83,7 +83,12 @@ const TRANSLATIONS = {
         'widget.closeTitle': 'Sluiten',
         'widget.placeholder': 'Plak ColorHunt link...',
         'widget.hint': 'Plak een link om automatisch toe te voegen. Duplicaten lichten op.',
-        'widget.empty': 'Nog geen palettes.'
+        'widget.empty': 'Nog geen palettes.',
+        'widget.selectFromWebsite': 'Selecteer van website',
+        'modal.title': 'Selecteer palettes van ColorHunt',
+        'modal.loading': 'Palettes laden...',
+        'modal.empty': 'Geen palettes gevonden.',
+        'modal.error': 'Kon palettes niet laden.'
     },
     en: {
         'lang.aria': 'Choose language',
@@ -164,7 +169,12 @@ const TRANSLATIONS = {
         'widget.closeTitle': 'Close',
         'widget.placeholder': 'Paste ColorHunt link...',
         'widget.hint': 'Paste a link to auto-add. Duplicates will flash.',
-        'widget.empty': 'No palettes yet.'
+        'widget.empty': 'No palettes yet.',
+        'widget.selectFromWebsite': 'Select from website',
+        'modal.title': 'Select palettes from ColorHunt',
+        'modal.loading': 'Loading palettes...',
+        'modal.empty': 'No palettes found.',
+        'modal.error': 'Unable to load palettes.'
     }
 };
 
@@ -253,6 +263,8 @@ function applyLang(lang) {
         const btnLang = btn.getAttribute('data-lang');
         btn.classList.toggle('active', btnLang === lang);
     });
+
+    refreshPaletteModalStatus();
 }
 
 function initLanguageSwitcher() {
@@ -285,6 +297,9 @@ let palettes = [];
 let highlightedId = null; // Palette ID currently being highlighted (duplicate detection)
 let activePaletteId = null; // Currently applied palette ID
 let highlightTimer = null; // Debounce timer for highlight animation
+let paletteModalStatusKey = null;
+let paletteModalLoaded = false;
+let paletteModalPalettes = [];
 
 // DOM Elements
 const widgetToggle = document.getElementById('widgetToggle');
@@ -293,6 +308,10 @@ const widgetClose = document.getElementById('widgetClose');
 const paletteUrlInput = document.getElementById('paletteUrl');
 const paletteList = document.getElementById('paletteList');
 const emptyState = document.getElementById('emptyState');
+const openPaletteModalBtn = document.getElementById('openPaletteModal');
+const paletteModal = document.getElementById('paletteModal');
+const paletteModalStatus = document.getElementById('paletteModalStatus');
+const paletteModalList = document.getElementById('paletteModalList');
 
 // Default palettes loaded on initialization
 const defaultPalettes = [
@@ -334,6 +353,18 @@ document.addEventListener('click', (e) => {
 widgetContent.addEventListener('click', (e) => {
     e.stopPropagation();
 });
+
+if (openPaletteModalBtn) {
+    openPaletteModalBtn.addEventListener('click', async () => {
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(paletteModal);
+        modalInstance.show();
+        if (!paletteModalLoaded) {
+            await loadPaletteModal();
+        } else {
+            renderPaletteModal(paletteModalPalettes);
+        }
+    });
+}
 
 /**
  * Extracts hex color codes from ColorHunt palette URL.
@@ -529,6 +560,149 @@ function addPalette(url, colors) {
         renderPalettes();
         return true;
     }
+}
+
+function getColorKey(colors) {
+    return colors.join('-');
+}
+
+function isPaletteAdded(colors) {
+    const colorKey = getColorKey(colors);
+    return palettes.some(palette => palette.colorKey === colorKey);
+}
+
+function setPaletteModalStatus(key, isError = false) {
+    paletteModalStatusKey = key;
+    if (!key) {
+        paletteModalStatus.textContent = '';
+    } else {
+        paletteModalStatus.textContent = t(key);
+    }
+    paletteModalStatus.classList.toggle('error', isError);
+}
+
+function refreshPaletteModalStatus() {
+    if (!paletteModalStatusKey) return;
+    paletteModalStatus.textContent = t(paletteModalStatusKey);
+}
+
+function parsePaletteColorsFromHref(href) {
+    if (!href) return null;
+    const match = href.match(/palette\/([a-fA-F0-9]{12,})/);
+    if (!match || !match[1]) return null;
+    const hexString = match[1];
+    const colors = hexString.match(/.{1,6}/g);
+    if (!colors || colors.length < 4) return null;
+    return {
+        colors: colors.slice(0, 4).map(color => `#${color.toUpperCase()}`),
+        url: `https://colorhunt.co/palette/${hexString}`
+    };
+}
+
+function extractPalettesFromHtml(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const scope = doc.querySelector('.page') || doc;
+    const paletteLinks = Array.from(scope.querySelectorAll('a[href*="/palette/"]'));
+    const unique = new Map();
+
+    paletteLinks.forEach((link) => {
+        const data = parsePaletteColorsFromHref(link.getAttribute('href'));
+        if (!data) return;
+        const key = getColorKey(data.colors);
+        if (!unique.has(key)) {
+            unique.set(key, data);
+        }
+    });
+
+    return Array.from(unique.values());
+}
+
+async function fetchPaletteHtml() {
+    const urls = [
+        'https://colorhunt.co/',
+        'https://r.jina.ai/http://colorhunt.co/'
+    ];
+
+    for (const url of urls) {
+        try {
+            const response = await fetch(url, { mode: 'cors' });
+            if (!response.ok) continue;
+            const text = await response.text();
+            if (text && text.length > 0) {
+                return text;
+            }
+        } catch (error) {
+            // try next URL
+        }
+    }
+    return null;
+}
+
+function createModalPaletteCard(palette) {
+    const card = document.createElement('div');
+    card.className = 'palette-modal-card';
+    card.dataset.colorKey = getColorKey(palette.colors);
+
+    const preview = document.createElement('div');
+    preview.className = 'palette-modal-preview';
+
+    palette.colors.forEach((color) => {
+        const block = document.createElement('div');
+        block.className = 'palette-modal-color';
+        block.style.backgroundColor = color;
+        preview.appendChild(block);
+    });
+
+    const codes = document.createElement('div');
+    codes.className = 'palette-modal-codes';
+    codes.textContent = palette.colors.join(', ');
+
+    card.appendChild(preview);
+    card.appendChild(codes);
+
+    card.addEventListener('click', () => {
+        addPalette(palette.url, palette.colors);
+        updateModalCardState(card, palette.colors);
+    });
+
+    updateModalCardState(card, palette.colors);
+
+    return card;
+}
+
+function updateModalCardState(card, colors) {
+    card.classList.toggle('added', isPaletteAdded(colors));
+}
+
+function renderPaletteModal(palettesToRender) {
+    paletteModalList.innerHTML = '';
+
+    if (palettesToRender.length === 0) {
+        setPaletteModalStatus('modal.empty');
+        return;
+    }
+
+    setPaletteModalStatus('');
+
+    palettesToRender.forEach((palette) => {
+        paletteModalList.appendChild(createModalPaletteCard(palette));
+    });
+}
+
+async function loadPaletteModal() {
+    setPaletteModalStatus('modal.loading');
+    paletteModalList.innerHTML = '';
+
+    const html = await fetchPaletteHtml();
+    if (!html) {
+        setPaletteModalStatus('modal.error', true);
+        return;
+    }
+
+    paletteModalPalettes = extractPalettesFromHtml(html);
+    renderPaletteModal(paletteModalPalettes);
+    paletteModalLoaded = true;
 }
 
 /**
