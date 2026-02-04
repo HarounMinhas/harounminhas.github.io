@@ -322,9 +322,9 @@ body {
 }
 
 .day-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   font-weight: 600;
   font-size: 0.9rem;
   color: #1e293b;
@@ -340,10 +340,25 @@ body {
   font-weight: 500;
 }
 
+.day-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.day-label {
+  white-space: nowrap;
+}
+
+.day-date {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
 .day-drop-zone {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  justify-self: end;
+  align-self: flex-start;
+  flex-shrink: 0;
   white-space: nowrap;
   font-size: 0.7rem;
   text-transform: uppercase;
