@@ -34,6 +34,9 @@
                 >
                 <p class="input-hint" data-i18n="widget.hint">Plak een link om automatisch toe te voegen. Duplicaten lichten op.</p>
             </div>
+            <button id="openPaletteModal" class="btn btn-outline-primary btn-sm w-100 mb-3" type="button" data-i18n="widget.selectFromWebsite">
+                Selecteer van website
+            </button>
 
             <!-- Palette List -->
             <div id="paletteList" class="palette-list">
@@ -42,6 +45,22 @@
 
             <div id="emptyState" class="empty-state" style="display: none;" data-i18n="widget.empty">
                 Nog geen palettes.
+            </div>
+        </div>
+    </div>
+
+    <!-- Palette Modal -->
+    <div class="modal fade" id="paletteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-i18n="modal.title">Selecteer palettes van ColorHunt</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="paletteModalStatus" class="palette-modal-status" data-i18n="modal.loading">Palettes laden...</p>
+                    <div id="paletteModalList" class="palette-modal-list"></div>
+                </div>
             </div>
         </div>
     </div>

@@ -259,6 +259,74 @@ body {
     padding: 20px;
 }
 
+/* Palette Modal */
+.palette-modal-status {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.palette-modal-status.error {
+    color: #d9534f;
+}
+
+.palette-modal-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.palette-modal-card {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.palette-modal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    border-color: #ddd;
+}
+
+.palette-modal-card.added {
+    border-color: #198754;
+    box-shadow: 0 2px 8px rgba(25, 135, 84, 0.2);
+}
+
+.palette-modal-card.added::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: #198754;
+    font-weight: bold;
+}
+
+.palette-modal-preview {
+    display: flex;
+    height: 40px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.palette-modal-color {
+    flex: 1;
+}
+
+.palette-modal-codes {
+    font-size: 11px;
+    color: #555;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Hero Section */
 .hero-section {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
