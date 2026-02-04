@@ -328,7 +328,16 @@ body {
   font-weight: 600;
   font-size: 0.9rem;
   color: #1e293b;
-  gap: 0.5rem;
+  gap: 0.25rem 0.5rem;
+}
+
+.day-label {
+  grid-column: 1;
+}
+
+.day-date {
+  grid-column: 1;
+  font-weight: 500;
 }
 
 .day-meta {
