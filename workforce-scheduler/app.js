@@ -25,6 +25,12 @@ const weeks = [];
 const schedule = {};
 const leaves = new Map();
 
+const storageKey = 'workforceSchedulerData';
+const defaultMonth = { year: 2026, monthIndex: 2 };
+const minMonthKey = `${defaultMonth.year}-${String(defaultMonth.monthIndex + 1).padStart(2, '0')}`;
+let currentMonth = { ...defaultMonth };
+let hasInitialized = false;
+
 const weekContainer = document.getElementById('weekContainer');
 const employeeList = document.getElementById('employeeList');
 const employeeDetails = document.getElementById('employeeDetails');
@@ -38,6 +44,10 @@ const collapseAllButton = document.getElementById('collapseAll');
 const expandAllButton = document.getElementById('expandAll');
 const leaveOverviewBar = document.getElementById('leaveOverviewBar');
 const leaveOverviewToggle = document.getElementById('leaveOverviewToggle');
+const monthSelect = document.getElementById('monthSelect');
+const heroMonthLabel = document.getElementById('heroMonthLabel');
+const calendarMonthTitle = document.getElementById('calendarMonthTitle');
+const calendarMeta = document.getElementById('calendarMeta');
 const scheduleNotice = document.getElementById('scheduleNotice');
 const leaveModalElement = document.getElementById('leaveManagerModal');
 const leaveModal = leaveModalElement && window.bootstrap ? new bootstrap.Modal(leaveModalElement) : null;
@@ -53,7 +63,10 @@ function formatDate(date) {
 }
 
 function toISODate(date) {
-  return date.toISOString().split('T')[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function isWeekday(date) {
@@ -61,12 +74,11 @@ function isWeekday(date) {
   return day >= 1 && day <= 5;
 }
 
-function buildWeeks() {
-  const year = 2026;
-  const monthIndex = 2; // March
+function buildWeeks(year, monthIndex) {
   let currentWeek = null;
+  const totalDays = new Date(year, monthIndex + 1, 0).getDate();
 
-  for (let day = 1; day <= 31; day += 1) {
+  for (let day = 1; day <= totalDays; day += 1) {
     const date = new Date(year, monthIndex, day);
     if (!isWeekday(date)) {
       continue;
@@ -96,12 +108,135 @@ function buildWeeks() {
   }
 }
 
+function getMonthKey(year, monthIndex) {
+  return `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+}
+
+function loadStorage() {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey)) || { months: {}, selectedMonthKey: null };
+  } catch (error) {
+    return { months: {}, selectedMonthKey: null };
+  }
+}
+
+function saveStorage(data) {
+  localStorage.setItem(storageKey, JSON.stringify(data));
+}
+
+function saveSelectedMonthKey(monthKey) {
+  const data = loadStorage();
+  data.selectedMonthKey = monthKey;
+  saveStorage(data);
+}
+
+function saveCurrentMonthData() {
+  const data = loadStorage();
+  const monthKey = getMonthKey(currentMonth.year, currentMonth.monthIndex);
+  const leaveEntries = {};
+  leaves.forEach((ranges, employeeId) => {
+    leaveEntries[employeeId] = ranges;
+  });
+  data.months[monthKey] = {
+    schedule,
+    leaves: leaveEntries
+  };
+  data.selectedMonthKey = monthKey;
+  saveStorage(data);
+}
+
+function loadMonthData(year, monthIndex) {
+  const data = loadStorage();
+  const monthKey = getMonthKey(year, monthIndex);
+  return data.months?.[monthKey] || null;
+}
+
+function initializeMonth(year, monthIndex) {
+  weeks.length = 0;
+  Object.keys(schedule).forEach((dateStr) => {
+    delete schedule[dateStr];
+  });
+  leaves.clear();
+
+  buildWeeks(year, monthIndex);
+  const monthData = loadMonthData(year, monthIndex);
+  if (monthData?.schedule) {
+    Object.entries(monthData.schedule).forEach(([dateStr, slots]) => {
+      if (!schedule[dateStr]) {
+        return;
+      }
+      slotConfig.forEach(({ key }) => {
+        if (slots[key]?.assignments) {
+          schedule[dateStr][key].assignments = slots[key].assignments;
+        }
+      });
+    });
+  }
+
+  if (monthData?.leaves) {
+    Object.entries(monthData.leaves).forEach(([employeeId, ranges]) => {
+      leaves.set(Number(employeeId), ranges);
+    });
+  }
+
+  updateMonthUI(year, monthIndex);
+  renderLeaves();
+  renderSchedule();
+}
+
+function getMonthLabel(year, monthIndex) {
+  return new Date(year, monthIndex, 1).toLocaleDateString('en-GB', {
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+function updateMonthUI(year, monthIndex) {
+  const monthLabel = getMonthLabel(year, monthIndex);
+  if (heroMonthLabel) {
+    heroMonthLabel.textContent = `${monthLabel} Demo`;
+  }
+  if (calendarMonthTitle) {
+    calendarMonthTitle.textContent = `${monthLabel} Schedule`;
+  }
+  if (calendarMeta) {
+    calendarMeta.textContent = `${weeks.length} weeks · Monday to Friday · Morning + afternoon slots`;
+  }
+  const firstDay = toISODate(new Date(year, monthIndex, 1));
+  const lastDay = toISODate(new Date(year, monthIndex + 1, 0));
+  ['leaveStart', 'leaveEnd', 'employeeLeaveStart', 'employeeLeaveEnd'].forEach((id) => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.min = firstDay;
+      input.max = lastDay;
+    }
+  });
+}
+
+function applyMonthBoundsToInputs(startInput, endInput) {
+  if (!startInput || !endInput) {
+    return;
+  }
+  const firstDay = toISODate(new Date(currentMonth.year, currentMonth.monthIndex, 1));
+  const lastDay = toISODate(new Date(currentMonth.year, currentMonth.monthIndex + 1, 0));
+  startInput.min = firstDay;
+  startInput.max = lastDay;
+  endInput.min = firstDay;
+  endInput.max = lastDay;
+}
+
 function getSortedEmployees() {
   return [...employees].sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function getWeeklyLimit(employee, week) {
+  const base = contractLimits[employee.contract];
+  const scaled = (base / 5) * week.days.length;
+  return Math.round(scaled);
+}
+
 function getMonthlyCapacity(employee) {
-  return contractLimits[employee.contract] * weeks.length;
+  return weeks.reduce((total, week) => total + getWeeklyLimit(employee, week), 0);
 }
 
 function getTotalAssignments(employeeId) {
@@ -289,7 +424,7 @@ function renderEmployeeDetails() {
   const weeklySummaries = weeks.map((week) => {
     const weekCounts = getWeekCounts(week);
     const count = weekCounts.get(employee.id) || 0;
-    return { label: week.label, count };
+    return { label: week.label, count, limit: getWeeklyLimit(employee, week) };
   });
 
   const ranges = getLeaveRangesForEmployee(employee.id);
@@ -328,7 +463,7 @@ function renderEmployeeDetails() {
         ${weeklySummaries
           .map(
             (summary) =>
-              `<li>${summary.label}: ${summary.count}/${contractLimits[employee.contract]} slots</li>`
+              `<li>${summary.label}: ${summary.count}/${summary.limit} slots</li>`
           )
           .join('')}
       </ul>
@@ -365,6 +500,7 @@ function renderEmployeeDetails() {
   const endInput = employeeDetails.querySelector('#employeeLeaveEnd');
 
   if (leaveFormEl && startInput && endInput) {
+    applyMonthBoundsToInputs(startInput, endInput);
     leaveFormEl.addEventListener('click', (event) => {
       const action = event.target?.dataset?.action;
       if (!action) {
@@ -600,6 +736,19 @@ function renderSchedule() {
       grid.appendChild(dayCard);
     });
 
+    for (let i = week.days.length; i < 5; i += 1) {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'day-card day-placeholder';
+      placeholder.innerHTML = `
+        <div class="day-header">
+          <span class="text-muted">No day</span>
+          <span class="text-muted">--</span>
+          <span class="day-drop-zone day-drop-disabled">Unavailable</span>
+        </div>
+      `;
+      grid.appendChild(placeholder);
+    }
+
     weekCard.appendChild(grid);
     weekContainer.appendChild(weekCard);
   });
@@ -623,6 +772,7 @@ function assignEmployee(dateStr, slotKey, employeeId, manual, options = {}) {
   if (!options.skipRender) {
     renderSchedule();
   }
+  saveCurrentMonthData();
   return true;
 }
 
@@ -630,6 +780,7 @@ function removeAssignment(dateStr, slotKey, employeeId) {
   const slot = schedule[dateStr][slotKey];
   slot.assignments = slot.assignments.filter((assignment) => assignment.employeeId !== employeeId);
   renderSchedule();
+  saveCurrentMonthData();
 }
 
 function getEmployeeName(employeeId) {
@@ -667,7 +818,7 @@ function getAvailableEmployees(dateStr, slotKey, week) {
   return getSortedEmployees()
     .filter((employee) => !isOnLeave(employee.id, dateStr))
     .filter((employee) =>
-      week ? weekCounts.get(employee.id) < contractLimits[employee.contract] : true
+      week ? weekCounts.get(employee.id) < getWeeklyLimit(employee, week) : true
     )
     .filter(
       (employee) =>
@@ -675,7 +826,7 @@ function getAvailableEmployees(dateStr, slotKey, week) {
     )
     .map((employee) => {
       const remaining = week
-        ? contractLimits[employee.contract] - (weekCounts.get(employee.id) || 0)
+        ? getWeeklyLimit(employee, week) - (weekCounts.get(employee.id) || 0)
         : contractLimits[employee.contract];
       return { ...employee, remaining };
     });
@@ -718,7 +869,7 @@ function autoSchedule() {
       });
 
       sortedEmployees.forEach((employee) => {
-        if (counts.get(employee.id) >= contractLimits[employee.contract]) {
+        if (counts.get(employee.id) >= getWeeklyLimit(employee, week)) {
           return;
         }
 
@@ -753,6 +904,7 @@ function autoSchedule() {
   });
 
   renderSchedule();
+  saveCurrentMonthData();
 }
 
 function addLeave(employeeId, startDate, endDate) {
@@ -775,6 +927,7 @@ function addLeave(employeeId, startDate, endDate) {
   renderLeaves();
   renderEmployeeDetails();
   renderSchedule();
+  saveCurrentMonthData();
 }
 
 function removeLeaveRange(employeeId, startDate, endDate) {
@@ -797,6 +950,7 @@ function removeLeaveRange(employeeId, startDate, endDate) {
   renderLeaves();
   renderEmployeeDetails();
   renderSchedule();
+  saveCurrentMonthData();
 }
 
 function resetSchedule() {
@@ -810,6 +964,7 @@ function resetSchedule() {
   renderSchedule();
   renderEmployees();
   renderEmployeeDetails();
+  saveCurrentMonthData();
 }
 
 leaveForm.addEventListener('submit', (event) => {
@@ -878,7 +1033,43 @@ if (leaveOverviewToggle) {
   }
 }
 
-buildWeeks();
+function handleMonthChange(value) {
+  if (!value) {
+    return;
+  }
+  if (value < minMonthKey) {
+    if (monthSelect) {
+      monthSelect.value = minMonthKey;
+    }
+    value = minMonthKey;
+  }
+  const [yearStr, monthStr] = value.split('-');
+  const year = Number(yearStr);
+  const monthIndex = Number(monthStr) - 1;
+  if (Number.isNaN(year) || Number.isNaN(monthIndex)) {
+    return;
+  }
+  if (hasInitialized) {
+    saveCurrentMonthData();
+  }
+  currentMonth = { year, monthIndex };
+  saveSelectedMonthKey(getMonthKey(year, monthIndex));
+  initializeMonth(year, monthIndex);
+  hasInitialized = true;
+}
+
+if (monthSelect) {
+  monthSelect.min = minMonthKey;
+  const data = loadStorage();
+  const initialKey = data.selectedMonthKey || minMonthKey;
+  monthSelect.value = initialKey < minMonthKey ? minMonthKey : initialKey;
+  monthSelect.addEventListener('change', (event) => handleMonthChange(event.target.value));
+  handleMonthChange(monthSelect.value);
+} else {
+  initializeMonth(currentMonth.year, currentMonth.monthIndex);
+  hasInitialized = true;
+}
+
 renderEmployees();
 renderLeaves();
 renderSchedule();
@@ -895,7 +1086,7 @@ function getAssignmentError(dateStr, slotKey, employeeId, week = null) {
   if (targetWeek) {
     const weekCounts = getWeekCounts(targetWeek);
     const employee = employees.find((item) => item.id === employeeId);
-    if (employee && weekCounts.get(employeeId) >= contractLimits[employee.contract]) {
+    if (employee && weekCounts.get(employeeId) >= getWeeklyLimit(employee, targetWeek)) {
       return `${getEmployeeName(employeeId)} has reached the weekly limit.`;
     }
   }

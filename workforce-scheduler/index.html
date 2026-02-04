@@ -18,7 +18,7 @@
   <div class="app">
     <header class="hero">
       <div class="container">
-        <p class="eyebrow">March 2026 Demo</p>
+        <p class="eyebrow" id="heroMonthLabel">March 2026 Demo</p>
         <h1>Workforce Planning Scheduler</h1>
         <p class="lead">
           Combine manual drag &amp; drop planning with a smart auto-scheduling algorithm.
@@ -110,10 +110,16 @@
       <section class="calendar mt-4">
         <div class="calendar-header">
           <div>
-            <h2 class="h4">March 2026 Schedule</h2>
-            <p class="text-muted small mb-0">5 weeks &middot; Monday to Friday &middot; Morning + afternoon slots</p>
+            <h2 class="h4" id="calendarMonthTitle">March 2026 Schedule</h2>
+            <p class="text-muted small mb-0" id="calendarMeta">
+              5 weeks &middot; Monday to Friday &middot; Morning + afternoon slots
+            </p>
           </div>
           <div class="calendar-actions">
+            <div class="month-selector">
+              <label class="form-label small mb-1" for="monthSelect">Select month</label>
+              <input id="monthSelect" class="form-control form-control-sm" type="month" />
+            </div>
             <div class="btn-group btn-group-sm" role="group" aria-label="Collapse controls">
               <button id="collapseAll" class="btn btn-outline-secondary" type="button">
                 Collapse all
