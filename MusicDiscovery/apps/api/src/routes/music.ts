@@ -252,7 +252,7 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
     if (items.length > 0) {
       // Deezer primary API returned results
       serviceMetadata.deezer = 'success';
-      const labeled = items.map((item) => ({ ...item, uxLabel: 'audio-similarity-based' }));
+      const labeled = items.map((item) => ({ ...item, uxLabel: 'audio-similarity-based', uxSource: 'deezer' }));
       const parsed = RelatedArtistsResponseSchema.parse({ 
         items: labeled, 
         serviceMetadata 
@@ -313,7 +313,7 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
       return;
     }
 
-    const resolved: { id: string; name: string; imageUrl?: string; genres?: string[]; popularity?: number; uxLabel?: string }[] = [];
+    const resolved: { id: string; name: string; imageUrl?: string; genres?: string[]; popularity?: number; uxLabel?: string; uxSource?: string }[] = [];
     const seenIds = new Set<string>();
 
     await mapWithConcurrency(
@@ -329,7 +329,7 @@ router.get('/music/artists/:id/related', async (req, res, next) => {
 
           if (seenIds.has(best.id)) return;
           seenIds.add(best.id);
-          resolved.push({ ...best, uxLabel: candidate.uxLabel });
+          resolved.push({ ...best, uxLabel: candidate.uxLabel, uxSource: candidate.source });
         } catch (error) {
           log.warn({ err: error, candidate: candidate.name }, 'Failed to resolve fallback artist name (swallowed)');
         }

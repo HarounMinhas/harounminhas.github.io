@@ -12,6 +12,7 @@ export interface Artist {
   genres?: string[];
   popularity?: number;
   uxLabel?: string;
+  uxSource?: string;
 }
 
 export interface Track {
@@ -57,7 +58,8 @@ export const ArtistSchema = z.object({
   imageUrl: z.string().optional(),
   genres: z.array(z.string()).optional(),
   popularity: z.number().optional(),
-  uxLabel: z.string().optional()
+  uxLabel: z.string().optional(),
+  uxSource: z.string().optional()
 });
 
 export const TrackSchema = z.object({
