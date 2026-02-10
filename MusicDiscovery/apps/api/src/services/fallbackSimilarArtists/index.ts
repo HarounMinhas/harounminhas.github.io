@@ -18,34 +18,53 @@ export async function getDeterministicFallbackSimilarArtists(
   try {
     log.info({ query, limit }, 'deterministic fallback pipeline invoked');
 
-    // 1) Last.fm
-    const lastfm = await getSimilarArtistsFromLastFm(query, limit, log);
-    if (lastfm.length > 0) {
-      return { strategy: 'deterministic-fallback', items: reweightByConfidence(lastfm, 'lastfm'), cacheHit: false };
-    }
+    const [lastfm, musicbrainz, discogs] = await Promise.all([
+      getSimilarArtistsFromLastFm(query, limit, log),
+      getSimilarArtistsFromMusicBrainz(query, limit, log),
+      getSimilarArtistsFromDiscogs(query, limit, log)
+    ]);
 
-    // 2) MusicBrainz
-    const musicbrainz = await getSimilarArtistsFromMusicBrainz(query, limit, log);
-    if (musicbrainz.length > 0) {
-      return {
-        strategy: 'deterministic-fallback',
-        items: reweightByConfidence(musicbrainz, 'musicbrainz'),
-        cacheHit: false
-      };
-    }
+    const combined = combineAndRankCandidates([
+      ...reweightByConfidence(lastfm, 'lastfm'),
+      ...reweightByConfidence(musicbrainz, 'musicbrainz'),
+      ...reweightByConfidence(discogs, 'discogs')
+    ]);
 
-    // 3) Discogs
-    const discogs = await getSimilarArtistsFromDiscogs(query, limit, log);
-    if (discogs.length > 0) {
-      return { strategy: 'deterministic-fallback', items: reweightByConfidence(discogs, 'discogs'), cacheHit: false };
-    }
-
-    return { strategy: 'deterministic-fallback', items: [], cacheHit: false };
+    return {
+      strategy: 'deterministic-fallback',
+      items: combined.slice(0, Math.min(Math.max(limit, 1), 25)),
+      cacheHit: false
+    };
   } catch (error) {
     // Never throw from fallback logic.
     log.warn({ err: error }, 'deterministic fallback pipeline failed (swallowed)');
     return { strategy: 'deterministic-fallback', items: [], cacheHit: false };
   }
+}
+
+function combineAndRankCandidates(items: FallbackSimilarArtist[]): FallbackSimilarArtist[] {
+  const byName = new Map<string, FallbackSimilarArtist>();
+
+  for (const item of items) {
+    const key = item.normalizedName;
+    const existing = byName.get(key);
+    if (!existing) {
+      byName.set(key, item);
+      continue;
+    }
+
+    const stronger = item.similarityScore >= existing.similarityScore ? item : existing;
+    const weaker = stronger === item ? existing : item;
+
+    byName.set(key, {
+      ...stronger,
+      // Fuse confidence/similarity from both matches while preserving dominant provider metadata.
+      similarityScore: clamp01(stronger.similarityScore + weaker.similarityScore * 0.2),
+      confidenceScore: clamp01(Math.max(stronger.confidenceScore, weaker.confidenceScore))
+    });
+  }
+
+  return Array.from(byName.values()).sort((a, b) => b.similarityScore - a.similarityScore);
 }
 
 function reweightByConfidence(items: FallbackSimilarArtist[], provider: FallbackProvider): FallbackSimilarArtist[] {
