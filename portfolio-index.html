@@ -1589,18 +1589,50 @@
                 }
             }
         }
+
+        const MUSIC_DISCOVERY_HEALTH_URL = 'https://harounminhas-github-io.onrender.com/api/health';
+        const MUSIC_DISCOVERY_WARMUP_TIMEOUT_MS = 4000;
+        let hasWarmedMusicDiscoveryServer = false;
+
+        function warmupMusicDiscoveryServer() {
+            if (hasWarmedMusicDiscoveryServer) {
+                return;
+            }
+
+            hasWarmedMusicDiscoveryServer = true;
+
+            const controller = new AbortController();
+            const timeoutId = window.setTimeout(() => controller.abort(), MUSIC_DISCOVERY_WARMUP_TIMEOUT_MS);
+
+            fetch(MUSIC_DISCOVERY_HEALTH_URL, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'no-store',
+                keepalive: true,
+                signal: controller.signal
+            })
+                .catch(() => {
+                    // Silent fail: MusicDiscovery retries its own warm-up when opened.
+                })
+                .finally(() => {
+                    window.clearTimeout(timeoutId);
+                });
+        }
+
+        function initializePortfolioPage() {
+            warmupMusicDiscoveryServer();
+            window.__themeDriftManager = new ThemeDriftManager();
+            new ScrollIndicatorManager();
+            initLanguageSwitcher();
+        }
         
         // Initialize on DOMContentLoaded
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                window.__themeDriftManager = new ThemeDriftManager();
-                new ScrollIndicatorManager();
-                initLanguageSwitcher();
+                initializePortfolioPage();
             });
         } else {
-            window.__themeDriftManager = new ThemeDriftManager();
-            new ScrollIndicatorManager();
-            initLanguageSwitcher();
+            initializePortfolioPage();
         }
     </script>
 </body>
