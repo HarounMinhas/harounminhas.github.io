@@ -1606,9 +1606,8 @@
 
             fetch(MUSIC_DISCOVERY_HEALTH_URL, {
                 method: 'GET',
-                mode: 'no-cors',
+                mode: 'cors',
                 cache: 'no-store',
-                keepalive: true,
                 signal: controller.signal
             })
                 .catch(() => {
