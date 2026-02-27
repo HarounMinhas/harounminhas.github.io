@@ -27,19 +27,17 @@ The Marieke frontend is located in `src/` and runs on React (Create React App). 
 
 ## Deployment
 
-GitHub Pages is automatically updated via GitHub Actions when pushing to the `main` branch.
+This repository is used as a **GitHub Pages hosting repository**.
 
-### Deployment Flow
+### MusicDiscovery deployment source of truth
 
-1. Workflow installs Node 20 and npm dependencies (`npm ci`)
-2. Executes type checking (`npm run type-check`)
-3. Builds React application (`npm run build`)
-4. Organizes files:
-   - React build output to `/marieke/`
-   - Portfolio landing page to `/` (root)
-5. Deploys all content to GitHub Pages
+`/MusicDiscovery/` is automatically generated and deployed from the external repository: `HarounMinhas/MusicDiscovery`.
 
-The workflow configuration is located at `.github/workflows/deploy.yml`.
+Do **not** manually edit files inside `MusicDiscovery/` in this repository, because those changes will be overwritten by the external deployment process.
+
+### Remaining hosting behavior
+
+Other static content in this repository (portfolio root and subfolders) remains hosted through GitHub Pages from this repo.
 
 ### Local Preview
 
