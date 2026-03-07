@@ -1,0 +1,79 @@
+name: Deploy portfolio site
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout portfolio repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies if package.json exists
+        run: |
+          if [ -f package.json ]; then
+            pnpm install --frozen-lockfile || pnpm install
+          else
+            echo "No root package.json found - skipping install."
+          fi
+
+      - name: Build portfolio if package.json exists
+        run: |
+          rm -rf deploy
+          mkdir -p deploy
+
+          if [ -f package.json ]; then
+            echo "Root package.json found - trying portfolio build..."
+            pnpm run build || true
+          fi
+
+          # Kies hier de juiste bron voor je portfolio-site:
+          # 1) als je build output in dist staat
+          if [ -d dist ]; then
+            cp -R dist/* deploy/
+          # 2) als je site gewoon uit root-bestanden bestaat
+          else
+            echo "No dist folder found - copying static root files."
+            shopt -s extglob dotglob
+            cp -R !(deploy|.git|.github|node_modules) deploy/ || true
+          fi
+
+          # Zorg dat MusicDiscovery behouden blijft
+          if [ -d MusicDiscovery ]; then
+            mkdir -p deploy/MusicDiscovery
+            cp -R MusicDiscovery/* deploy/MusicDiscovery/
+          fi
+
+          touch deploy/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./deploy
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
