@@ -23,35 +23,21 @@ jobs:
       - name: Checkout portfolio repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile || pnpm install
-
-      - name: Build portfolio
-        run: pnpm run build
-
       - name: Prepare deployment folder
         run: |
           rm -rf deploy
           mkdir -p deploy
 
-          # CRA output staat in build/
-          cp -R build/* deploy/
+          # Portfolio homepage
+          cp portfolio-index.html deploy/index.html
 
-          # MusicDiscovery submap behouden
-          if [ -d "MusicDiscovery" ]; then
-            mkdir -p deploy/MusicDiscovery
-            cp -R MusicDiscovery/* deploy/MusicDiscovery/
-          fi
+          # Statische projectmappen meenemen als ze bestaan
+          for dir in MusicDiscovery workforce-scheduler regex-playground zen-writer colorhunt phase10; do
+            if [ -d "$dir" ]; then
+              mkdir -p "deploy/$dir"
+              cp -R "$dir/"* "deploy/$dir/" || true
+            fi
+          done
 
           touch deploy/.nojekyll
 
