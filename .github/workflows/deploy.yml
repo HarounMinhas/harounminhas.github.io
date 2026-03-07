@@ -33,42 +33,30 @@ jobs:
         with:
           version: 9
 
-      - name: Install dependencies if package.json exists
-        run: |
-          if [ -f package.json ]; then
-            pnpm install --frozen-lockfile || pnpm install
-          else
-            echo "No root package.json found - skipping install."
-          fi
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
 
-      - name: Build portfolio if package.json exists
+      - name: Build portfolio
+        run: pnpm run build
+
+      - name: Prepare deployment folder
         run: |
           rm -rf deploy
           mkdir -p deploy
 
-          if [ -f package.json ]; then
-            echo "Root package.json found - trying portfolio build..."
-            pnpm run build || true
-          fi
+          # CRA output staat in build/
+          cp -R build/* deploy/
 
-          # Kies hier de juiste bron voor je portfolio-site:
-          # 1) als je build output in dist staat
-          if [ -d dist ]; then
-            cp -R dist/* deploy/
-          # 2) als je site gewoon uit root-bestanden bestaat
-          else
-            echo "No dist folder found - copying static root files."
-            shopt -s extglob dotglob
-            cp -R !(deploy|.git|.github|node_modules) deploy/ || true
-          fi
-
-          # Zorg dat MusicDiscovery behouden blijft
-          if [ -d MusicDiscovery ]; then
+          # MusicDiscovery submap behouden
+          if [ -d "MusicDiscovery" ]; then
             mkdir -p deploy/MusicDiscovery
             cp -R MusicDiscovery/* deploy/MusicDiscovery/
           fi
 
           touch deploy/.nojekyll
+
+          echo "Deployment structure:"
+          find deploy -maxdepth 2 -type f | sort | head -200
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
