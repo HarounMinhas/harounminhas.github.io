@@ -23,6 +23,22 @@ jobs:
       - name: Checkout portfolio repo
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Build Phase10
+        run: |
+          cd phase10
+          pnpm install --frozen-lockfile || pnpm install
+          pnpm run build
+
       - name: Prepare deployment folder
         run: |
           rm -rf deploy
@@ -31,18 +47,24 @@ jobs:
           # Portfolio homepage
           cp portfolio-index.html deploy/index.html
 
-          # Statische projectmappen meenemen als ze bestaan
-          for dir in MusicDiscovery workforce-scheduler regex-playground zen-writer colorhunt phase10; do
+          # Statische projectmappen
+          for dir in MusicDiscovery workforce-scheduler regex-playground zen-writer colorhunt; do
             if [ -d "$dir" ]; then
               mkdir -p "deploy/$dir"
               cp -R "$dir/"* "deploy/$dir/" || true
             fi
           done
 
+          # Phase10: neem build output, niet de broncode
+          if [ -d "phase10/dist" ]; then
+            mkdir -p deploy/phase10
+            cp -R phase10/dist/* deploy/phase10/
+          fi
+
           touch deploy/.nojekyll
 
           echo "Deployment structure:"
-          find deploy -maxdepth 2 -type f | sort | head -200
+          find deploy -maxdepth 3 -type f | sort | head -300
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
