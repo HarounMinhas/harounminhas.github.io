@@ -68,12 +68,12 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
   };
 
   return (
-    <div>
+    <div className="setup-shell">
       <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
         {t('setup.subtitle')}
       </p>
 
-      <div className="card" style={{ maxWidth: '500px', margin: '0 auto' }}>
+      <div className="card setup-card" style={{ maxWidth: '500px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit} className="mb-3">
           <div className="form-group">
             <label className="form-label">{t('setup.label.playerName')}</label>
@@ -114,7 +114,8 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
                     className="flex align-center justify-between"
                     style={{
                       padding: '1rem',
-                      background: 'var(--dark-light)',
+                      background: 'var(--glass-elevated)',
+                      border: '1px solid var(--glass-border)',
                       borderRadius: '0.5rem',
                     }}
                   >
@@ -129,7 +130,7 @@ export function PlayerSetup({ onStartGame }: PlayerSetupProps) {
               </div>
             </div>
 
-            <button className="btn btn-primary" onClick={handleStartGame} style={{ width: '100%', fontSize: '1.2rem' }}>
+            <button className="btn btn-primary" onClick={handleStartGame} style={{ width: '100%', fontSize: '1.1rem', marginTop: '0.5rem' }}>
               {t('setup.btn.startGame')}
             </button>
           </>

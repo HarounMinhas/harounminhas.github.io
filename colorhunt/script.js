@@ -16,7 +16,9 @@ const TRANSLATIONS = {
         'nav.utilities': 'Utilities',
 
         'hero.lead': 'Test Bootstrap componenten met ColorHunt color palettes',
-        'hero.cta': 'Klik op 🎨 rechtsboven om palettes te importeren en toe te passen',
+        'hero.cta': 'Gebruik de widget rechtsboven om palettes te importeren en toe te passen.',
+        'hero.helperNl': '🇧🇪 Gebruik de 🎨-widget om kleurenpaletten direct uit ColorHunt te testen op alle componenten hieronder.',
+        'hero.helperEn': '🇬🇧 Use the 🎨 widget to test ColorHunt palettes instantly across all components below.',
 
         'section.typography': 'Typografie',
         'typography.lead': 'Dit is een lead paragraph die opvalt.',
@@ -84,7 +86,9 @@ const TRANSLATIONS = {
         'widget.placeholder': 'Plak ColorHunt link...',
         'widget.hint': 'Plak een link om automatisch toe te voegen. Duplicaten lichten op.',
         'widget.empty': 'Nog geen palettes.',
-        'widget.selectFromWebsite': 'Selecteer van website',
+        'widget.selectFromWebsiteDisabled': 'Selecteer van website (binnenkort)',
+        'widget.spotlightTitle': '⬆️ Widget hier rechtsboven',
+        'widget.spotlightSubtitle': 'Gebruik deze widget om snel ColorHunt-kleurenpaletten te testen / Use this widget to quickly test ColorHunt color palettes.',
         'modal.title': 'Selecteer palettes van ColorHunt',
         'modal.loading': 'Palettes laden...',
         'modal.empty': 'Geen palettes gevonden.',
@@ -102,7 +106,9 @@ const TRANSLATIONS = {
         'nav.utilities': 'Utilities',
 
         'hero.lead': 'Test Bootstrap components with ColorHunt color palettes',
-        'hero.cta': 'Click 🎨 in the top-right to import and apply palettes',
+        'hero.cta': 'Use the top-right widget to import and apply palettes.',
+        'hero.helperNl': '🇧🇪 Gebruik de 🎨-widget om kleurenpaletten direct uit ColorHunt te testen op alle componenten hieronder.',
+        'hero.helperEn': '🇬🇧 Use the 🎨 widget to test ColorHunt palettes instantly across all components below.',
 
         'section.typography': 'Typography',
         'typography.lead': 'This is a standout lead paragraph.',
@@ -170,7 +176,9 @@ const TRANSLATIONS = {
         'widget.placeholder': 'Paste ColorHunt link...',
         'widget.hint': 'Paste a link to auto-add. Duplicates will flash.',
         'widget.empty': 'No palettes yet.',
-        'widget.selectFromWebsite': 'Select from website',
+        'widget.selectFromWebsiteDisabled': 'Select from website (coming soon)',
+        'widget.spotlightTitle': '⬆️ Widget in the top-right',
+        'widget.spotlightSubtitle': 'Gebruik deze widget om snel ColorHunt-kleurenpaletten te testen / Use this widget to quickly test ColorHunt color palettes.',
         'modal.title': 'Select palettes from ColorHunt',
         'modal.loading': 'Loading palettes...',
         'modal.empty': 'No palettes found.',
@@ -320,6 +328,10 @@ const defaultPalettes = [
         colors: ['#5A9CB5', '#FACE68', '#FAAC68', '#FA6868']
     },
     {
+        url: 'https://colorhunt.co/palette/ff5a5aff8b5affa95affd45a',
+        colors: ['#FF5A5A', '#FF8B5A', '#FFA95A', '#FFD45A']
+    },
+    {
         url: 'https://colorhunt.co/palette/22283100adb5393e46eeeeee',
         colors: ['#222831', '#00ADB5', '#393E46', '#EEEEEE']
     },
@@ -354,7 +366,7 @@ widgetContent.addEventListener('click', (e) => {
     e.stopPropagation();
 });
 
-if (openPaletteModalBtn) {
+if (openPaletteModalBtn && !openPaletteModalBtn.disabled) {
     openPaletteModalBtn.addEventListener('click', async () => {
         const modalInstance = bootstrap.Modal.getOrCreateInstance(paletteModal);
         modalInstance.show();
