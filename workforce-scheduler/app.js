@@ -597,23 +597,7 @@ function renderSchedule() {
       const dayDropZone = header.querySelector('.day-drop-zone');
       if (dayDropZone) {
         setupDropZone(dayDropZone, (employeeId) => {
-          const weekForDay = getWeekForDate(day.dateStr);
-          const morningError = getAssignmentError(day.dateStr, 'morning', employeeId, weekForDay);
-          const afternoonError = getAssignmentError(day.dateStr, 'afternoon', employeeId, weekForDay);
-          if (morningError || afternoonError) {
-            showNotice(morningError || afternoonError, 'warning');
-            return;
-          }
-          const morningAssigned = assignEmployee(day.dateStr, 'morning', employeeId, true, {
-            skipRender: true
-          });
-          const afternoonAssigned = assignEmployee(day.dateStr, 'afternoon', employeeId, true, {
-            skipRender: true
-          });
-          if (!morningAssigned || !afternoonAssigned) {
-            showNotice('Unable to assign full day due to conflicts or leave.', 'warning');
-          }
-          renderSchedule();
+          assignEmployeeToFullDay(day.dateStr, employeeId);
         });
       }
 
@@ -764,6 +748,55 @@ function renderSchedule() {
 function clearSlot(dateStr, slotKey) {
   schedule[dateStr][slotKey].assignments = [];
   renderSchedule();
+}
+
+function assignEmployeeToFullDay(dateStr, employeeId) {
+  const weekForDay = getWeekForDate(dateStr);
+  const slotKeys = ['morning', 'afternoon'];
+  const bookedSlots = [];
+  const blockingErrors = [];
+  let hasAssignedAnySlot = false;
+
+  slotKeys.forEach((slotKey) => {
+    const slotAssignments = schedule[dateStr][slotKey].assignments;
+    const alreadyBooked = slotAssignments.some((assignment) => assignment.employeeId === employeeId);
+
+    if (alreadyBooked) {
+      bookedSlots.push(slotKey);
+      return;
+    }
+
+    const assigned = assignEmployee(dateStr, slotKey, employeeId, true, {
+      skipRender: true
+    });
+
+    if (assigned) {
+      hasAssignedAnySlot = true;
+      return;
+    }
+
+    const error = getAssignmentError(dateStr, slotKey, employeeId, weekForDay);
+    if (error) {
+      blockingErrors.push(error);
+    }
+  });
+
+  if (hasAssignedAnySlot) {
+    renderSchedule();
+    return;
+  }
+
+  if (bookedSlots.length === slotKeys.length) {
+    showNotice(`${getEmployeeName(employeeId)} is already booked for the full day.`, 'warning');
+    return;
+  }
+
+  if (blockingErrors.length > 0) {
+    showNotice(blockingErrors[0], 'warning');
+    return;
+  }
+
+  showNotice('Unable to assign full day due to conflicts or leave.', 'warning');
 }
 
 function assignEmployee(dateStr, slotKey, employeeId, manual, options = {}) {
