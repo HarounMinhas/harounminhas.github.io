@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useGraphStore } from '../store/graphStore';
-import { Api } from '../lib/api';
+import { Api, API_BASE } from '../lib/api';
 
 export default function Library() {
   const { token } = useAuth();
@@ -27,31 +27,38 @@ export default function Library() {
       return;
     }
 
-    const tracks = await Api.getTopTracks(node.artistId, import.meta.env.VITE_DEFAULT_MARKET);
-    const ids = tracks.slice(0, 10).map((track: any) => track.id);
-    if (!ids.length) {
-      setMessage('Geen tracks beschikbaar om te exporteren.');
-      return;
-    }
-
-    const response = await fetch(`${import.meta.env.VITE_API_BASE || 'http://localhost:8080/api'}/export/spotify-playlist`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: playlistName, trackIds: ids, isPublic: false }),
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (response.ok) {
-      setMessage('Playlist aangemaakt! We openen Spotify in een nieuw tabblad.');
-      if (data.externalUrl) {
-        window.open(data.externalUrl as string, '_blank');
+    try {
+      const tracks = await Api.getTopTracks(node.artistId, import.meta.env.VITE_DEFAULT_MARKET);
+      const ids = tracks.slice(0, 10).map((track: any) => track.id);
+      if (!ids.length) {
+        setMessage('Geen tracks beschikbaar om te exporteren.');
+        return;
       }
-    } else {
-      setMessage(data.error?.message ?? 'Export mislukt');
+
+      const response = await fetch(`${API_BASE}/export/spotify-playlist`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: playlistName, trackIds: ids, isPublic: false }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        setMessage('Playlist aangemaakt! We openen Spotify in een nieuw tabblad.');
+        if (data.externalUrl) {
+          window.open(data.externalUrl as string, '_blank');
+        }
+      } else {
+        console.error('[MusicDiscovery] playlist export failed', { status: response.status, data });
+        setMessage(data.error?.message ?? 'Export mislukt');
+      }
+    } catch (error) {
+      console.error('[MusicDiscovery] playlist export failed with unexpected error', error);
+      setMessage('Export mislukt door een netwerkfout. Probeer opnieuw.');
     }
   };
 
@@ -59,7 +66,7 @@ export default function Library() {
     <div style={{ padding: 24 }}>
       <h2>Library</h2>
       <p>Login met Spotify om playlists te exporteren vanuit je huidige graaf.</p>
-      <a className="btn primary" href={`${import.meta.env.VITE_API_BASE || 'http://localhost:8080/api'}/auth/spotify/login`}>
+      <a className="btn primary" href={`${API_BASE}/auth/spotify/login`}>
         Login met Spotify
       </a>
 

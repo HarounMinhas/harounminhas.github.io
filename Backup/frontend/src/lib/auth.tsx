@@ -27,10 +27,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    Api.anonymousAuth().then((response) => {
-      setToken(response.token);
-      localStorage.setItem('token', response.token);
-    });
+    Api.anonymousAuth()
+      .then((response) => {
+        setToken(response.token);
+        localStorage.setItem('token', response.token);
+      })
+      .catch((error) => {
+        console.error('[MusicDiscovery] anonymous auth failed', error);
+      });
   }, []);
 
   return <AuthContext.Provider value={{ token, setToken }}>{children}</AuthContext.Provider>;
