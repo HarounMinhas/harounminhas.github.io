@@ -31,8 +31,8 @@ body {
 
 /* Color Widget Styles */
 .color-widget {
-    position: absolute;
-    top: 20px;
+    position: fixed;
+    top: calc(var(--navbar-height, 72px) + 12px);
     right: 20px;
     z-index: 9999;
 }
@@ -341,8 +341,8 @@ body {
 
 
 .widget-spotlight {
-    position: absolute;
-    top: 88px;
+    position: fixed;
+    top: calc(var(--navbar-height, 72px) + 74px);
     right: 86px;
     max-width: 320px;
     padding: 12px 14px;
@@ -609,6 +609,7 @@ html {
 .palette-list::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 3px;
+}
 
 .palette-list::-webkit-scrollbar-thumb:hover {
     background: #999;
@@ -625,7 +626,7 @@ html {
     }
     
     .color-widget {
-        top: 10px;
+        top: calc(var(--navbar-height, 64px) + 8px);
         right: 10px;
     }
     
@@ -640,9 +641,11 @@ html {
     }
 
     .widget-spotlight {
-        position: static;
-        margin: 12px auto 0;
-        max-width: calc(100% - 20px);
+        position: fixed;
+        top: calc(var(--navbar-height, 64px) + 64px);
+        right: 10px;
+        max-width: min(300px, calc(100vw - 20px));
+        margin: 0;
     }
 
     .widget-spotlight::after {
