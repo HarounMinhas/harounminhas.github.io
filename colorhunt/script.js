@@ -320,6 +320,8 @@ const openPaletteModalBtn = document.getElementById('openPaletteModal');
 const paletteModal = document.getElementById('paletteModal');
 const paletteModalStatus = document.getElementById('paletteModalStatus');
 const paletteModalList = document.getElementById('paletteModalList');
+const backButton = document.getElementById('backButton');
+const widgetArrowHint = document.getElementById('widgetArrowHint');
 
 // Default palettes loaded on initialization
 const defaultPalettes = [
@@ -338,8 +340,40 @@ const defaultPalettes = [
     {
         url: 'https://colorhunt.co/palette/06283d1363df47b5ffdff6ff',
         colors: ['#06283D', '#1363DF', '#47B5FF', '#DFF6FF']
+    },
+    {
+        url: 'https://colorhunt.co/palette/211c6a59b4c374e291ffe6e6',
+        colors: ['#211C6A', '#59B4C3', '#74E291', '#FFE6E6']
+    },
+    {
+        url: 'https://colorhunt.co/palette/fc4100ffc55a00215e2c4e80',
+        colors: ['#FC4100', '#FFC55A', '#00215E', '#2C4E80']
+    },
+    {
+        url: 'https://colorhunt.co/palette/0f10351d267d5c2fc2fef9f2',
+        colors: ['#0F1035', '#1D267D', '#5C2FC2', '#FEF9F2']
     }
 ];
+
+
+if (backButton) {
+    backButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.history.length > 1) {
+            window.history.back();
+            return;
+        }
+        window.location.href = 'https://harounminhas.be';
+    });
+}
+
+if (widgetArrowHint) {
+    widgetArrowHint.addEventListener('click', (e) => {
+        e.stopPropagation();
+        widgetContent.classList.add('active');
+        paletteUrlInput.focus();
+    });
+}
 
 // Widget toggle handlers
 widgetToggle.addEventListener('click', (e) => {

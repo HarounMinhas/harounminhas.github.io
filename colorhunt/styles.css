@@ -340,43 +340,40 @@ body {
 }
 
 
-.widget-spotlight {
-    position: fixed;
-    top: calc(var(--navbar-height, 72px) + 74px);
-    right: 86px;
-    max-width: 320px;
-    padding: 12px 14px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(var(--color-primary-rgb), 0.28);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
-    z-index: 1100;
-}
-
-.widget-spotlight::after {
-    content: '';
+.widget-arrow-hint {
     position: absolute;
-    top: -14px;
-    right: 24px;
-    width: 18px;
-    height: 18px;
-    border-left: 3px solid rgba(var(--color-primary-rgb), 0.75);
-    border-top: 3px solid rgba(var(--color-primary-rgb), 0.75);
-    transform: rotate(45deg);
+    top: 56px;
+    right: 9px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(var(--color-primary-rgb), 0.92);
+    color: #fff;
+    font-size: 1.4rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+    animation: widgetArrowPulse 1.2s ease-in-out infinite;
+    z-index: 10000;
 }
 
-.spotlight-title {
-    margin: 0 0 6px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--color-primary);
+.widget-content.active + .widget-arrow-hint {
+    opacity: 0;
+    pointer-events: none;
 }
 
-.spotlight-subtitle {
-    margin: 0;
-    font-size: 0.8rem;
-    line-height: 1.45;
-    color: #4b5563;
+@keyframes widgetArrowPulse {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.25;
+    }
+    50% {
+        transform: translateY(-8px);
+        opacity: 1;
+    }
 }
 
 .hero-helper-card {
@@ -640,16 +637,9 @@ html {
         width: 300px;
     }
 
-    .widget-spotlight {
-        position: fixed;
-        top: calc(var(--navbar-height, 64px) + 64px);
-        right: 10px;
-        max-width: min(300px, calc(100vw - 20px));
-        margin: 0;
-    }
-
-    .widget-spotlight::after {
-        display: none;
+    .widget-arrow-hint {
+        top: 50px;
+        right: 6px;
     }
 
     .hero-helper-card {
