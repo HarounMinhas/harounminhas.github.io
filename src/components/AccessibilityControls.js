@@ -60,7 +60,7 @@ const AccessibilityControls = ({ variant = 'floating' }) => {
         aria-label="Toegankelijkheidsinstellingen openen"
       >
         <span aria-hidden="true" className="accessibility-icon" role="presentation">
-          ♿
+          A11Y
         </span>
         <span className="visually-hidden">Toegankelijkheidsopties</span>
       </Button>

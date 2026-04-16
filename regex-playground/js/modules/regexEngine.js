@@ -28,7 +28,7 @@ class RegexEngine {
                 const duration = performance.now() - startTime;
                 
                 if (duration > 1000) {
-                    console.warn(`⚠️ Slow regex detected: ${duration.toFixed(2)}ms`);
+                    console.warn(`⚠ Slow regex detected: ${duration.toFixed(2)}ms`);
                 }
                 
                 return {
