@@ -9,7 +9,7 @@ export class ExplainPanel {
         
         container.innerHTML = `
             <div class="panel-header">
-                <span class="panel-title">🧠 Explanation</span>
+                <span class="panel-title">ℹ Explanation</span>
             </div>
             <div class="explain-content">
                 ${this.explainPattern(this.state.pattern)}

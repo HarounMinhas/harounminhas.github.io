@@ -17,8 +17,8 @@ const TRANSLATIONS = {
 
         'hero.lead': 'Test Bootstrap componenten met ColorHunt color palettes',
         'hero.cta': 'Gebruik de widget net onder de menubalk (rechtsboven) om palettes te importeren en toe te passen.',
-        'hero.helperNl': '🇧🇪 Gebruik de 🎨-widget om kleurenpaletten direct uit ColorHunt te testen op alle componenten hieronder.',
-        'hero.helperEn': '🇬🇧 Use the 🎨 widget to test ColorHunt palettes instantly across all components below.',
+        'hero.helperNl': 'NL Gebruik de ◈-widget om kleurenpaletten direct uit ColorHunt te testen op alle componenten hieronder.',
+        'hero.helperEn': 'EN Use the ◈ widget to test ColorHunt palettes instantly across all components below.',
 
         'section.typography': 'Typografie',
         'typography.lead': 'Dit is een lead paragraph die opvalt.',
@@ -87,7 +87,7 @@ const TRANSLATIONS = {
         'widget.hint': 'Plak een link om automatisch toe te voegen. Duplicaten lichten op.',
         'widget.empty': 'Nog geen palettes.',
         'widget.selectFromWebsiteDisabled': 'Selecteer van website (binnenkort)',
-        'widget.spotlightTitle': '⬆️ Widget vast net onder de menubalk',
+        'widget.spotlightTitle': '↑ Widget vast net onder de menubalk',
         'widget.spotlightSubtitle': 'Deze widget blijft zichtbaar net onder de menubalk, ook tijdens scrollen, zodat je altijd snel kleuren kunt aanpassen / This widget stays visible just below the menu bar while scrolling so you can always tweak colors quickly.',
         'modal.title': 'Selecteer palettes van ColorHunt',
         'modal.loading': 'Palettes laden...',
@@ -107,8 +107,8 @@ const TRANSLATIONS = {
 
         'hero.lead': 'Test Bootstrap components with ColorHunt color palettes',
         'hero.cta': 'Use the widget just below the menu bar (top-right) to import and apply palettes.',
-        'hero.helperNl': '🇧🇪 Gebruik de 🎨-widget om kleurenpaletten direct uit ColorHunt te testen op alle componenten hieronder.',
-        'hero.helperEn': '🇬🇧 Use the 🎨 widget to test ColorHunt palettes instantly across all components below.',
+        'hero.helperNl': 'NL Gebruik de ◈-widget om kleurenpaletten direct uit ColorHunt te testen op alle componenten hieronder.',
+        'hero.helperEn': 'EN Use the ◈ widget to test ColorHunt palettes instantly across all components below.',
 
         'section.typography': 'Typography',
         'typography.lead': 'This is a standout lead paragraph.',
@@ -177,7 +177,7 @@ const TRANSLATIONS = {
         'widget.hint': 'Paste a link to auto-add. Duplicates will flash.',
         'widget.empty': 'No palettes yet.',
         'widget.selectFromWebsiteDisabled': 'Select from website (coming soon)',
-        'widget.spotlightTitle': '⬆️ Widget fixed below the menu bar',
+        'widget.spotlightTitle': '↑ Widget fixed below the menu bar',
         'widget.spotlightSubtitle': 'Deze widget blijft zichtbaar net onder de menubalk, ook tijdens scrollen, zodat je altijd snel kleuren kunt aanpassen / This widget stays visible just below the menu bar while scrolling so you can always tweak colors quickly.',
         'modal.title': 'Select palettes from ColorHunt',
         'modal.loading': 'Loading palettes...',
@@ -259,7 +259,7 @@ function applyLang(lang) {
 
     const current = document.getElementById('langCurrent');
     if (current) {
-        current.textContent = lang === 'nl' ? '🇧🇪 NL' : '🇬🇧 EN';
+        current.textContent = lang === 'nl' ? 'NL' : 'EN';
     }
 
     document.querySelectorAll('[data-check-lang]').forEach((el) => {

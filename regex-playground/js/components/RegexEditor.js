@@ -96,7 +96,7 @@ export class RegexEditor {
             errorDiv.style.display = 'none';
             document.querySelector('.regex-input').classList.remove('error');
         } catch (e) {
-            errorDiv.textContent = `❌ ${e.message}`;
+            errorDiv.textContent = `✖ ${e.message}`;
             errorDiv.style.display = 'block';
             document.querySelector('.regex-input').classList.add('error');
         }

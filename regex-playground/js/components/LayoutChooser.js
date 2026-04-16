@@ -75,7 +75,7 @@ export class LayoutChooser {
         const header = document.createElement('div');
         header.className = 'chooser-header';
         header.innerHTML = `
-            <h1>🔍 Regex Playground</h1>
+            <h1>⌕ Regex Playground</h1>
             <p>Kies je preferred layout om te starten</p>
         `;
         

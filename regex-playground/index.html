@@ -594,12 +594,12 @@
                 'wireframe.testInput': 'Test Input',
                 'wireframe.output': 'Output',
 
-                'sidebar.examples': '📚 Voorbeelden',
-                'sidebar.demoNote': '💡 Demo: Deze voorbeelden zijn ter demonstratie. Klik om te laden!',
+                'sidebar.examples': '☰ Voorbeelden',
+                'sidebar.demoNote': 'ⓘ Demo: Deze voorbeelden zijn ter demonstratie. Klik om te laden!',
 
                 'topbar.homeTitle': 'Terug naar layout keuze',
                 'topbar.tab.match': 'Match',
-                'topbar.share': '🔗 Delen',
+                'topbar.share': '⛓ Delen',
 
                 'panel.regexPattern': 'Regex Pattern',
                 'panel.testInput': 'Test Input',
@@ -609,7 +609,7 @@
                 'flags.caseInsensitive': 'i (niet hoofdlettergevoelig)',
                 'flags.multiline': 'm (multiline)',
 
-                'btn.testPattern': '▶ Test Pattern',
+                'btn.testPattern': '▸ Test Pattern',
                 'input.placeholder': 'Voer je test text hier in...',
 
                 'results.start': 'Klik op "Test Pattern" om te beginnen',
@@ -623,7 +623,7 @@
                 'match.position': 'Positie: {start}-{end}',
                 'match.captured': 'Captured groups:',
 
-                'share.copied': '🔗 Link gekopieerd naar clipboard!',
+                'share.copied': '⛓ Link gekopieerd naar clipboard!',
                 'share.prompt': 'Kopieer deze link:'
             },
             en: {
@@ -649,12 +649,12 @@
                 'wireframe.testInput': 'Test Input',
                 'wireframe.output': 'Output',
 
-                'sidebar.examples': '📚 Examples',
-                'sidebar.demoNote': '💡 Demo: These examples are for demonstration. Click to load!',
+                'sidebar.examples': '☰ Examples',
+                'sidebar.demoNote': 'ⓘ Demo: These examples are for demonstration. Click to load!',
 
                 'topbar.homeTitle': 'Back to layout picker',
                 'topbar.tab.match': 'Match',
-                'topbar.share': '🔗 Share',
+                'topbar.share': '⛓ Share',
 
                 'panel.regexPattern': 'Regex Pattern',
                 'panel.testInput': 'Test Input',
@@ -664,7 +664,7 @@
                 'flags.caseInsensitive': 'i (case insensitive)',
                 'flags.multiline': 'm (multiline)',
 
-                'btn.testPattern': '▶ Test Pattern',
+                'btn.testPattern': '▸ Test Pattern',
                 'input.placeholder': 'Enter your test text here...',
 
                 'results.start': 'Click "Test Pattern" to get started',
@@ -678,7 +678,7 @@
                 'match.position': 'Position: {start}-{end}',
                 'match.captured': 'Captured groups:',
 
-                'share.copied': '🔗 Link copied to clipboard!',
+                'share.copied': '⛓ Link copied to clipboard!',
                 'share.prompt': 'Copy this link:'
             }
         };
@@ -733,8 +733,8 @@
             const lang = getLang();
             return `
                 <select id="${id}" class="lang-select ${contextClass}" aria-label="${t('lang.aria')}">
-                    <option value="nl">🇧🇪 ${t('lang.nl')}</option>
-                    <option value="en">🇬🇧 ${t('lang.en')}</option>
+                    <option value="nl">NL ${t('lang.nl')}</option>
+                    <option value="en">EN ${t('lang.en')}</option>
                 </select>
             `;
         }
@@ -820,7 +820,7 @@
                             <div class="chooser-lang">
                                 ${langSelectHtml('lang-select-chooser', 'lang-select--chooser')}
                             </div>
-                            <h1>🔍 Regex Playground</h1>
+                            <h1>⌕ Regex Playground</h1>
                             <p>${t('chooser.subtitle')}</p>
                         </div>
                         <div class="layout-grid">
@@ -945,7 +945,7 @@
                     <div class="playground ${layoutClass}">
                         <div class="topbar">
                             <div class="topbar-left">
-                                <button class="btn-icon" id="btn-home" title="${t('topbar.homeTitle')}">🏠</button>
+                                <button class="btn-icon" id="btn-home" title="${t('topbar.homeTitle')}">⌂</button>
                                 <span class="project-name">Regex Playground</span>
                             </div>
                             <div class="topbar-center">
@@ -1157,7 +1157,7 @@
                     }
                     
                 } catch (error) {
-                    errorDiv.innerHTML = `<div class="error-message">❌ ${this.escapeHtml(error.message)}</div>`;
+                    errorDiv.innerHTML = `<div class="error-message">✖ ${this.escapeHtml(error.message)}</div>`;
                     resultsDiv.innerHTML = `<div class="empty-state">${t('results.fixRegex')}</div>`;
                     countSpan.textContent = t('match.count.zero');
                 }

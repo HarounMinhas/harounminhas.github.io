@@ -54,7 +54,7 @@ export class RegexPlayground {
         topbar.className = 'topbar';
         topbar.innerHTML = `
             <div class="topbar-left">
-                <button class="btn-icon" id="btn-home" title="Terug naar layout keuze">🏠</button>
+                <button class="btn-icon" id="btn-home" title="Terug naar layout keuze">⌂</button>
                 <span class="project-name">Regex Playground</span>
             </div>
             <div class="topbar-center">
@@ -65,9 +65,9 @@ export class RegexPlayground {
                 </div>
             </div>
             <div class="topbar-right">
-                <button class="btn-secondary" id="btn-save">💾 Save</button>
-                <button class="btn-secondary" id="btn-share">🔗 Share</button>
-                <button class="btn-icon" id="btn-theme" title="Toggle theme">🌓</button>
+                <button class="btn-secondary" id="btn-save">⬇ Save</button>
+                <button class="btn-secondary" id="btn-share">⛓ Share</button>
+                <button class="btn-icon" id="btn-theme" title="Toggle theme">◐</button>
             </div>
         `;
         
@@ -220,13 +220,13 @@ export class RegexPlayground {
         };
         
         await storage.saveProject(project);
-        alert('✅ Project opgeslagen!');
+        alert('✔ Project opgeslagen!');
     }
 
     shareUrl() {
         const url = urlState.encode(this.state, this.layout);
         navigator.clipboard.writeText(url).then(() => {
-            alert('🔗 Link gekopieerd naar clipboard!');
+            alert('⛓ Link gekopieerd naar clipboard!');
         });
     }
 

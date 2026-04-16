@@ -17,7 +17,7 @@ export class Sidebar {
         container.innerHTML = `
             <div class="sidebar-section">
                 <div class="section-header">
-                    <span class="section-title">📁 Projects</span>
+                    <span class="section-title">▤ Projects</span>
                     <button class="btn-tiny" id="btn-new-project">+</button>
                 </div>
                 <div class="project-list" id="project-list">
@@ -30,7 +30,7 @@ export class Sidebar {
             
             <div class="sidebar-section">
                 <div class="section-header">
-                    <span class="section-title">📝 Snippets</span>
+                    <span class="section-title">✎ Snippets</span>
                     <button class="btn-tiny" id="btn-new-snippet">+</button>
                 </div>
                 <div class="snippet-list" id="snippet-list">

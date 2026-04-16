@@ -13,7 +13,7 @@ export class TestSuite {
                 <span class="panel-title">Test Suite</span>
                 <div>
                     <button class="btn-secondary" id="btn-add-test">+ Add Test</button>
-                    <button class="btn-primary" id="btn-run-tests">▶ Run All</button>
+                    <button class="btn-primary" id="btn-run-tests">▸ Run All</button>
                 </div>
             </div>
             <div class="test-cases-list" id="test-cases">
@@ -34,8 +34,8 @@ export class TestSuite {
     renderTestCase(testCase, index) {
         const status = testCase.status || 'pending';
         const statusIcon = {
-            'pass': '✅',
-            'fail': '❌',
+            'pass': '✔',
+            'fail': '✖',
             'pending': '⏸'
         }[status];
         

@@ -177,7 +177,7 @@ const ThemeSwitcher = () => {
           aria-label="Kleurenschema kiezen"
         >
           <span role="img" aria-hidden="true">
-            🎨
+            ◈
           </span>
         </Button>
         
@@ -242,7 +242,7 @@ const ThemeSwitcher = () => {
         aria-label="Kleurenschema kiezen"
       >
         <span role="img" aria-hidden="true">
-          🎨
+          ◈
         </span>
       </Dropdown.Toggle>
       <Dropdown.Menu className="theme-dropdown p-2 shadow-sm border-0">
