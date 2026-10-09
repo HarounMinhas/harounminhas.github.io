@@ -764,3 +764,35 @@ body {
 @media (prefers-reduced-motion:reduce) {
   .crown-overlay,.crown-celebration,.crown-symbol { animation:none !important; }
 }
+
+
+/* Celebratory confetti over the existing Vanilla Latte crown screen */
+.crown-overlay { overflow: hidden; isolation: isolate; }
+.crown-confetti {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  z-index: 0;
+}
+.crown-celebration { position: relative; z-index: 1; }
+.crown-confetti-piece {
+  position: absolute;
+  top: -22px;
+  left: var(--confetti-x);
+  width: 9px; height: 15px;
+  opacity: 0;
+  border-radius: 2px;
+  background: #d5ac67;
+  animation: crownConfettiFall var(--confetti-duration) ease-in var(--confetti-delay) both;
+}
+.crown-confetti-piece:nth-child(5n+1) { background: #d9b77c; width: 7px; height: 12px; }
+.crown-confetti-piece:nth-child(5n+2) { background: #c17c5e; width: 7px; height: 10px; }
+.crown-confetti-piece:nth-child(5n+3) { background: #9dba9d; width: 11px; height: 7px; }
+.crown-confetti-piece:nth-child(5n+4) { background: #faf0d8; border: 1px solid #d6b98f; width: 8px; height: 8px; border-radius: 50%; }
+@keyframes crownConfettiFall {
+  0% { opacity: 0; transform: translate3d(0,-20px,0) rotate(0deg); }
+  12% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--confetti-drift),105vh,0) rotate(var(--confetti-rotate)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crown-confetti-piece { animation: none !important; display: none; }
+}
