@@ -37,7 +37,7 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
                 <div
                   key={round.id}
                   style={{
-                    background: selectedRound === index ? 'rgba(0, 122, 255, 0.2)' : 'var(--glass-bg)',
+                    background: selectedRound === index ? 'var(--glass-highlight)' : 'var(--glass-bg)',
                     padding: '1rem',
                     borderRadius: '0.75rem',
                     cursor: 'pointer',
@@ -63,7 +63,7 @@ export function RoundHistory({ rounds, players, onEditRound, onClose }: RoundHis
                       className="mt-2"
                       style={{
                         paddingTop: '1rem',
-                        borderTop: '1px solid rgba(255,255,255,0.1)',
+                        borderTop: '1px solid var(--glass-border)',
                       }}
                     >
                       <table className="table" style={{ marginBottom: 0 }}>
