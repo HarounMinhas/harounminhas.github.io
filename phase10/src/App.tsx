@@ -109,6 +109,7 @@ function App() {
   const undoLastRound = () => {
     if (lastAction && lastAction.type === 'round') {
       setGameState(lastAction.data);
+      setCrownLeader(null);
       setLastAction(null);
       setToast({ messageKey: 'toast.roundUndone' });
     }
