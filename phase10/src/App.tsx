@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GameState, Player, RoundEntry, Round, PhaseDefinition } from './types';
+import { GameState, Player, RoundEntry, Round, PhaseDefinition, PlayerScore } from './types';
 import { PlayerSetup } from './components/PlayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { EndRoundModal } from './components/EndRoundModal';
@@ -45,6 +45,14 @@ function App() {
   const [toast, setToast] = useState<ToastState>(null);
   const [lastAction, setLastAction] = useState<{ type: 'round'; data: GameState } | null>(null);
 
+  const [crownLeader, setCrownLeader] = useState<PlayerScore | null>(null);
+
+  useEffect(() => {
+    if (!crownLeader) return;
+    const timeout = window.setTimeout(() => setCrownLeader(null), 3200);
+    return () => window.clearTimeout(timeout);
+  }, [crownLeader]);
+
   // Auto-save whenever game state changes
   useEffect(() => {
     if (gameState.gameStarted) {
@@ -76,6 +84,15 @@ function App() {
       rounds: [...gameState.rounds, newRound],
       currentRound: gameState.currentRound + 1,
     };
+
+    const ranked = calculatePlayerScores(newState).sort(
+      (left, right) => right.currentPhase - left.currentPhase || left.totalPoints - right.totalPoints
+    );
+    const first = ranked[0];
+    const second = ranked[1];
+    const sharedLead = !!(first && second && first.currentPhase === second.currentPhase && first.totalPoints === second.totalPoints);
+    // A new round always announces the leader, except when first place is shared.
+    setCrownLeader(first && !sharedLead ? { ...first } : null);
 
     setGameState(newState);
     setLastAction({ type: 'round', data: previousState });
@@ -131,6 +148,7 @@ function App() {
     setToast(null);
     setActiveModal(null);
     setEditingRound(null);
+    setCrownLeader(null);
   };
 
   const newGame = () => {
@@ -186,6 +204,17 @@ function App() {
         onNewGame={newGame}
         onGeneratePhase={() => setActiveModal('generator')}
       />
+
+      {crownLeader && (
+        <div className="crown-overlay" role="status" aria-live="polite" onClick={() => setCrownLeader(null)}>
+          <div className="crown-celebration">
+            <span className="crown-symbol" aria-hidden="true">👑</span>
+            <p className="crown-eyebrow">{t('app.title')} · {t('scoreboard.round', { round: gameState.currentRound - 1 })}</p>
+            <h2 className="crown-name">{crownLeader.name}</h2>
+            <p className="crown-info">Fase {crownLeader.currentPhase} · {crownLeader.totalPoints} punten</p>
+          </div>
+        </div>
+      )}
 
       {activeModal === 'endRound' && editingRound === null && (
         <EndRoundModal
