@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { CSSProperties } from 'react';
 import { GameState, Player, RoundEntry, Round, PhaseDefinition, PlayerScore } from './types';
 import { PlayerSetup } from './components/PlayerSetup';
 import { Scoreboard } from './components/Scoreboard';
@@ -208,6 +209,21 @@ function App() {
 
       {crownLeader && (
         <div className="crown-overlay" role="status" aria-live="polite" onClick={() => setCrownLeader(null)}>
+          <div className="crown-confetti" aria-hidden="true">
+            {Array.from({ length: 42 }, (_, i) => (
+              <span
+                key={i}
+                className="crown-confetti-piece"
+                style={{
+                  '--confetti-x': `${(i * 73) % 100}%`,
+                  '--confetti-delay': `${(i % 9) * 75}ms`,
+                  '--confetti-duration': `${1900 + (i % 6) * 170}ms`,
+                  '--confetti-drift': `${((i * 41) % 180) - 90}px`,
+                  '--confetti-rotate': `${(i * 67) % 720}deg`,
+                } as CSSProperties}
+              />
+            ))}
+          </div>
           <div className="crown-celebration">
             <span className="crown-symbol" aria-hidden="true">👑</span>
             <p className="crown-eyebrow">{t('app.title')} · {t('scoreboard.round', { round: gameState.currentRound - 1 })}</p>
